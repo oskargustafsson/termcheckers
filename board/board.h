@@ -25,6 +25,9 @@ namespace board {
     /*Print a graphical view of the board in the terminal*/
     void displayBoard();
 
+    /* print a readable message of who's turn it is */
+    void printTurn();
+
   private:
     /*Array for handling board squares and their contense*/
     vector<int> squares;
