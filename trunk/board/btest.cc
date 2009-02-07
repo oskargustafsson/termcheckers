@@ -19,12 +19,18 @@ int main() {
 
   while(from != 1) {
     board->displayBoard();
+    board->printTurn();
     cout << "Move: ";
     cin >> from;
-    cout << endl;
+
+    if(from == 1) { //check for exit message
+      cout << "Bye." << endl;
+      break;
+    }
+
     cout << "to: ";
     cin >> to;
-    cout << endl;
+
 
     board->movePiece(from, to);
   }

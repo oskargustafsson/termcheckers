@@ -29,7 +29,7 @@ namespace board {
 
   void Board::movePiece(int from, int to) {
     if(!isLegal(from, to)) { //Check so that requested move is legal
-      cout << "That move is not legal, BITCH!" << endl;
+      cout << "Illegal move." << endl;
       return;
     }
     squares[to] = squares[from];
@@ -41,13 +41,33 @@ namespace board {
     else turn = 'b';
   }
 
+  void Board::printTurn() {
+    if(turn == 'b') {
+      cout << "Black's turn.";
+    }
+    else {
+      cout << "White's turn.";
+    }
+    cout << endl;
+  }
+
   bool Board::isLegal(int from, int to) {
-    //int color;
 
     /*Check so that what we are trying to move is actually valid*/
     if(squares[from] < 1) {
       return false;
     }
+    else if(turn == 'b') {
+      if(squares[from] < 3) {
+        return false;
+      }
+    }
+    else if(turn == 'w') {
+      if(squares[from] > 2) {
+        return false;
+      }
+    }
+
     /*
     else if(squares[from] == 1 or squares[from] == 2) {
       color = w;
@@ -57,8 +77,10 @@ namespace board {
     }
     */
 
-    if(squares[to] < 0) return false; //Check so target square is empty
+    if(squares[to] != 0) return false; //Check so target square is empty
 
+    /*everything is ok*/
+    switchTurn();
     return true;
     /*
     else if((squares[to] != 3 || squares[to] != 4) && color == 'w') {

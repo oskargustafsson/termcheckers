@@ -8,7 +8,7 @@ CXXFLAGS  = -pipe -O2 -Wall -W -ansi -pedantic-errors
 CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 
 # Linking:
-ltest: btest.o board.o
+btest: btest.o board.o
 	$(CXX) -o $@ $^
 
 # Dependencies, the implicit rule .cc => .o is used
