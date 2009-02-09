@@ -2,17 +2,17 @@
 
 board createBoard() {
 	board b;
-	b.blackmen = 0xFFF00000;
-	b.whitemen = 0x00000FFF;
-	b.blackkings = 0x0;
-	b.whitekings = 0x0;
+	b.black_men = 0xFFF00000;
+	b.white_men = 0x00000FFF;
+	b.black_kings = 0x0;
+	b.white_kings = 0x0;
 	b.player = WHITE;
 	return b;
 }
 
 unsigned int getMoves(const board& b, unsigned int piece, bool king) {
 	unsigned int moves = 0x0;
-	unsigned int all = b.blackmen | b.whitemen | b.blackkings | b.whitekings;
+	unsigned int all = b.black_men | b.white_men | b.black_kings | b.white_kings;
 
 	if(king) {
 		moves = moves | upleft(piece);

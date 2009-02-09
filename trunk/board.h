@@ -2,10 +2,10 @@
 #define BLACK 0x1
 
 struct board {
-	unsigned int blackmen;
-	unsigned int whitemen;
-	unsigned int blackkings;
-	unsigned int whitekings;
+	unsigned int black_men;
+	unsigned int white_men;
+	unsigned int black_kings;
+	unsigned int white_kings;
 	bool player; // WHITE=0, BLACK=1
 };
 
