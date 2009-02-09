@@ -45,11 +45,6 @@ int main() {
 
 int getMoves(const board& b, int piece) {
 	int moves = 0x0;
-	switch(b.player) {
-		case WHITE:
-			break;
-		case BLACK:
-			break;
-	}
+
 	return moves;
 }
