@@ -8,13 +8,13 @@ void displayBoard(const board b) {
 		if((i) % 8 != 0) {
 			std::cout << "\033[47m  \033[0m";
 		}
-		if((one & (b.blackmen>>i)) != 0) {
+		if((one & (b.black_men>>i)) != 0) {
 			std::cout << " b";
-		} else if((one & (b.blackkings>>i)) != 0) {
+		} else if((one & (b.black_kings>>i)) != 0) {
 			std::cout << " B";
-		} else if((one & (b.whitemen>>i)) != 0) {
+		} else if((one & (b.white_men>>i)) != 0) {
 			std::cout << " w";
-		} else if((one & (b.whitekings>>i)) != 0) {
+		} else if((one & (b.white_kings>>i)) != 0) {
 			std::cout << " W";
 		} else {
 			std::cout << "  ";
