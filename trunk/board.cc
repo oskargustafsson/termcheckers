@@ -32,10 +32,8 @@ unsigned int getMoves(const board& b, unsigned int piece, bool king) {
 		}
 	}
 
-	/**
-	 * IMPLEMENT: REMOVE MOVES TO OCCUPIED SPACES
-	 * have tried "moves = moves & (!all)"
-	 */
+	// remove occupied spaces
+	moves = moves & ~all;
 
 	return moves;
 }
