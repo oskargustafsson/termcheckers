@@ -11,30 +11,28 @@ board createBoard() {
 }
 
 void displayBoard(const board b) {
-	unsigned int ett = 1;
-	unsigned int all = b.blackmen;
-	all = all | b.blackkings;
-	all = all | b.whitemen;
-	all = all | b.whitekings;
+	unsigned int one = 0x1;
 
 	for(int i=0; i < 32; i++) {
-		if((i) % 8 == 0) {
-			std::cout << "  ";
+		if((i) % 8 != 0) {
+			std::cout << "\033[47m  \033[0m";
 		}
-		if((ett & (b.blackmen>>i)) != 0) {
+		if((one & (b.blackmen>>i)) != 0) {
 			std::cout << " b";
-		} else if((ett & (b.blackkings>>i)) != 0) {
+		} else if((one & (b.blackkings>>i)) != 0) {
 			std::cout << " B";
-		} else if((ett & (b.whitemen>>i)) != 0) {
+		} else if((one & (b.whitemen>>i)) != 0) {
 			std::cout << " w";
-		} else if((ett & (b.whitekings>>i)) != 0) {
+		} else if((one & (b.whitekings>>i)) != 0) {
 			std::cout << " W";
 		} else {
 			std::cout << "  ";
 		}
-		std::cout << "  ";
 
 		if((i+1) % 4 == 0) {
+			if((i+1)% 8 != 0) {
+				std::cout << "\033[47m  \033[0m";
+			}
 			std::cout << std::endl;
 		}
 	}
@@ -43,4 +41,15 @@ void displayBoard(const board b) {
 int main() {
 	board b = createBoard();
 	displayBoard(b);
+}
+
+int getMoves(const board& b, int piece) {
+	int moves = 0x0;
+	switch(b.player) {
+		case WHITE:
+			break;
+		case BLACK:
+			break;
+	}
+	return moves;
 }

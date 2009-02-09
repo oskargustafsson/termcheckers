@@ -10,12 +10,12 @@ struct board {
 };
 
 
-int getKingCaptureMoves(const board b&, int piece);
-int getCaptureMoves(const board b&, int piece);
-int getKingMoves(const board b&, int piece);
-int getMoves(const board b&, int piece);
+int getKingCaptureMoves(const board& b, int piece);
+int getCaptureMoves(const board& b, int piece);
+int getKingMoves(const board& b, int piece);
+int getMoves(const board& b, int piece);
 
-int evaluate(const board b&);
+int evaluate(const board& b);
 
 board alphabeta(board b);
 
