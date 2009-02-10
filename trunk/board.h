@@ -12,9 +12,13 @@ struct board {
 unsigned int getCaptureMoves(const board& b, unsigned int piece, bool king);
 unsigned int getMoves(const board& b, unsigned int piece, bool king);
 
-unsigned int upleft(unsigned const int& piece);
-unsigned int upright(unsigned const int& piece);
-unsigned int downleft(unsigned const int& piece);
-unsigned int downright(unsigned const int& piece);
+unsigned int up_left(unsigned const int& piece);
+unsigned int up_right(unsigned const int& piece);
+unsigned int down_left(unsigned const int& piece);
+unsigned int down_right(unsigned const int& piece);
 
 board createBoard();
+
+bool endOfGame(const board& b);
+
+bool move(board& b, unsigned int from, unsigned int to);
