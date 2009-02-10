@@ -1,4 +1,1 @@
-
-void displayBoard(const board b);
-
-void debugPrintIntBoard(unsigned int b);
+void printBoard(const board b);

@@ -1,49 +1,45 @@
 #include "ui.h"
-#include <iostream>
+#include <cstdio>
 
-void displayBoard(const board b) {
+void printBoard(const board b) {
+	int row = 0;
+
+	printf("\n");
 	for(int i=0; i < 32; i++) {
-		if((i) % 8 != 0) {
-			std::cout << "\033[47m  \033[0m";
+		if(i % 4 == 0) {
+			printf("  ");
 		}
-		if((0x1 & (b.black_men>>i)) != 0) {
-			std::cout << " b";
-		} else if((0x1 & (b.black_kings>>i)) != 0) {
-			std::cout << " B";
-		} else if((0x1 & (b.white_men>>i)) != 0) {
-			std::cout << " w";
-		} else if((0x1 & (b.white_kings>>i)) != 0) {
-			std::cout << " W";
-		} else {
-			std::cout << "  ";
+		if((i+4) % 8 != 0) {
+			printf("\033[47m    \033[0m");
+		}
+		if(row == 0) {
+			if((0x1 & (b.black_men>>i)) != 0) {
+				printf("\033[42;31m BM \033[0m");
+			} else if((0x1 & (b.black_kings>>i)) != 0) {
+				printf("\033[42;31m BK \033[0m");
+			} else if((0x1 & (b.white_men>>i)) != 0) {
+				printf("\033[42;37m WM \033[0m");
+			} else if((0x1 & (b.white_kings>>i)) != 0) {
+				printf("\033[42;37m WK \033[0m");
+			} else {
+				printf("\033[42m    \033[0m");
+			}
+		} else if(row == 1) {
+			printf("\033[42;30m %2d \033[0m", i+1);
 		}
 
 		if((i+1) % 4 == 0) {
-			if((i+1)% 8 != 0) {
-				std::cout << "\033[47m  \033[0m";
+			if((i+5)% 8 != 0) {
+				printf("\033[47m    \033[0m");
 			}
-			std::cout << std::endl;
+			printf("\n");
+			row++;
+			if(row == 2) {
+				row = 0;
+			} else {
+				i -= 4;
+			}
 		}
 	}
+	printf("\n");
 }
-
-void debugPrintIntBoard(unsigned int b) {
-	for(int i=0; i < 32; i++) {
-		if((i) % 8 != 0) {
-			std::cout << "\033[47m  \033[0m";
-		}
-		if((0x1 & (b>>i)) != 0) {
-			std::cout << " x";
-		} else {
-			std::cout << "  ";
-		}
-
-		if((i+1) % 4 == 0) {
-			if((i+1)% 8 != 0) {
-				std::cout << "\033[47m  \033[0m";
-			}
-			std::cout << std::endl;
-		}
-	}
-}
-

@@ -12,10 +12,9 @@ int main() {
 	board b = createBoard();
 	string line;
 
-	displayBoard(b);
 	while(!endOfGame(b)) {
 
-		cout << endl;
+		printBoard(b);
 
 		if(b.player == WHITE) {
 			cout << "White: ";
@@ -49,16 +48,14 @@ int main() {
 			from = pow(2, atoi(first.c_str())-1);
 			to = pow(2, atoi(second.c_str())-1);
 
-			cout << from << endl;
-			cout << to << endl;
+			cout << "From: " << from << endl;
+			cout << "To: " << to << endl;
 
 			if(!move(b, from, to)) {
 				cout << "Illegal move.\n";
 				continue;
 			}
 		}
-
-		displayBoard(b);
 
 		if(b.player == WHITE) {
 			b.player = BLACK;
