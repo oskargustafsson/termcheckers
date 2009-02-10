@@ -4,10 +4,10 @@
 void printBoard(const board b) {
 	int row = 0;
 
-	printf("\n");
+	printf("\033[45m%36c\033[0m\n", ' ');
 	for(int i=0; i < 32; i++) {
 		if(i % 4 == 0) {
-			printf("  ");
+			printf("\033[45m%2c\033[0m", ' ');
 		}
 		if((i+4) % 8 != 0) {
 			printf("\033[47m    \033[0m");
@@ -32,7 +32,7 @@ void printBoard(const board b) {
 			if((i+5)% 8 != 0) {
 				printf("\033[47m    \033[0m");
 			}
-			printf("\n");
+			printf("\033[45m%2c\033[0m\n", ' ');
 			row++;
 			if(row == 2) {
 				row = 0;
@@ -41,5 +41,5 @@ void printBoard(const board b) {
 			}
 		}
 	}
-	printf("\n");
+	printf("\033[45m%36c\033[0m\n", ' ');
 }
