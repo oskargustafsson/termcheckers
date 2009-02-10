@@ -10,9 +10,10 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	int kings;
 	int men;
 	int moves;
-	int a = -32000;
 	int tmp;
+	bool betacutoff = false;
 	board result;
+
 	if(endOfGame(b) || depth == 0) {
 		return evaluate(b);
 	}
@@ -38,19 +39,26 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 				move(nextboard, i, j);
 				changePlayer(nextboard);
 
-				tmp = -alphabeta(nextboard, depth-1, -alpha, -beta);
-				if(tmp > a) {
-					a = tmp;
+				tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
+				if(tmp > alpha) {
+					alpha = tmp;
 					result = nextboard;
-//					printf("\033[3%dm%d(%d) \033[0m", depth, depth, a);
+//					printf("\033[3%dm%d(%d) \033[0m", depth, depth, alpha);
 //				} else {
-//					printf("%d(%d) ", depth, a);
+//					printf("%d(%d) ", depth, alpha);
 				}
+				if(beta >= alpha) {
+					betacutoff = true;
+					break;
+				}
+			}
+			if(betacutoff) {
+				break;
 			}
 		}
 	}
 	if(depth == DEPTH) {
 		b = result;
 	}
-	return a;
+	return alpha;
 }
