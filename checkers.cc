@@ -59,11 +59,6 @@ int main() {
 				continue;
 			}
 		}
-
-		if(b.player == WHITE) {
-			b.player = BLACK;
-		} else {
-			b.player = WHITE;
-		}
+		changePlayer(b);
 	}
 }

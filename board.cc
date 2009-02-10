@@ -6,7 +6,7 @@ board createBoard() {
 	b.white_men = 0xFFF00000;
 	b.black_kings = 0x0;
 	b.white_kings = 0x0;
-	b.player = WHITE;
+	b.player = BLACK;
 	return b;
 }
 
@@ -182,4 +182,12 @@ bool move(board& b, unsigned int from, unsigned int to) {
 		}
 	}
 	return false;
+}
+
+void changePlayer(board& b) {
+	if(b.player == WHITE) {
+		b.player = BLACK;
+	} else {
+		b.player = WHITE;
+	}
 }
