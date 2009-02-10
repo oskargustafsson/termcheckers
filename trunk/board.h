@@ -22,3 +22,5 @@ board createBoard();
 bool endOfGame(const board& b);
 
 bool move(board& b, unsigned int from, unsigned int to);
+
+void changePlayer(board& b);
