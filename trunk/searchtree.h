@@ -1,2 +1,2 @@
 
-board alphabeta(board b, int depth);
+board alphabeta(board b, int depth, int alpha, int beta);
