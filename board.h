@@ -1,3 +1,6 @@
+#ifndef _board_
+#define _board_
+
 #define WHITE 0x0
 #define BLACK 0x1
 
@@ -24,3 +27,5 @@ bool endOfGame(const board& b);
 bool move(board& b, unsigned int from, unsigned int to);
 
 void changePlayer(board& b);
+
+#endif
