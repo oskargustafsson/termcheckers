@@ -13,14 +13,10 @@ void printBoard(const board b) {
 			printf("\033[47m    \033[0m");
 		}
 		if(row == 0) {
-			if((0x1 & (b.black_men>>i)) != 0) {
+			if((0x1 & (b.black>>i)) != 0) {
 				printf("\033[42;31m BM \033[0m");
-			} else if((0x1 & (b.black_kings>>i)) != 0) {
-				printf("\033[42;31m BK \033[0m");
-			} else if((0x1 & (b.white_men>>i)) != 0) {
+			} else if((0x1 & (b.white>>i)) != 0) {
 				printf("\033[42;37m WM \033[0m");
-			} else if((0x1 & (b.white_kings>>i)) != 0) {
-				printf("\033[42;37m WK \033[0m");
 			} else {
 				printf("\033[42m    \033[0m");
 			}

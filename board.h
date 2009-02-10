@@ -5,15 +5,14 @@
 #define BLACK 0x1
 
 struct board {
-	unsigned int black_men;
-	unsigned int white_men;
-	unsigned int black_kings;
-	unsigned int white_kings;
+	unsigned int black;
+	unsigned int white;
+	unsigned int kings;
 	bool player; // WHITE=0, BLACK=1
 };
 
 unsigned int getCaptureMoves(const board& b, unsigned int piece, bool king);
-unsigned int getMoves(const board& b, unsigned int piece, bool king);
+unsigned int getMoves(const board& b, unsigned int piece);
 
 unsigned int up_left(unsigned const int& piece);
 unsigned int up_right(unsigned const int& piece);

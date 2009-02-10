@@ -7,7 +7,6 @@ int alphabeta(board& b) {
 }
 
 int alphabeta(board& b, int depth, int alpha, int beta) {
-	int kings;
 	int men;
 	int moves;
 	int tmp;
@@ -15,21 +14,24 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	board result;
 
 	if(endOfGame(b) || depth == 0) {
-		return evaluate(b);
+		if(currentplayer == BLACK) {
+			return -evaluate(b);
+		} else {
+			return evaluate(b);
+		}
 	}
 
 	if(b.player == WHITE) {
-		men = b.white_men;
-		kings = b.white_kings;
+		men = b.white;
 	} else {
-		men = b.black_men;
-		kings = b.black_kings;
+		men = b.black;
 	}
 	
 	for(int i=0x1; i != 0; i = (i<<1)) {
 		if((i & men) == 0)
 			continue;
-		moves = getMoves(b, i, false);
+		moves = getMoves(b, i);
+
 		if(moves != 0) {
 			for(int j=0x1; j != 0; j = (j<<1)) {
 				if((j & moves) == 0)
@@ -37,7 +39,6 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 
 				board nextboard = b;
 				move(nextboard, i, j);
-				changePlayer(nextboard);
 
 				tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
 				if(tmp > alpha) {
