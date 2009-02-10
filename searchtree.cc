@@ -47,7 +47,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 //				} else {
 //					printf("%d(%d) ", depth, alpha);
 				}
-				if(beta >= alpha) {
+				if(beta <= alpha) {
 					betacutoff = true;
 					break;
 				}
