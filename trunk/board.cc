@@ -2,38 +2,42 @@
 
 board createBoard() {
 	board b;
-	b.black_men = 0x00000FFF;
-	b.white_men = 0xFFF00000;
-	b.black_kings = 0x0;
-	b.white_kings = 0x0;
+	b.black = 0x00000FFF;
+	b.white = 0xFFF00000;
+	b.kings = 0x0;
 	b.player = BLACK;
 	return b;
 }
 
-unsigned int getMoves(const board& b, unsigned int piece, bool king) {
+unsigned int getCaptureMoves(const board& b, unsigned int piece, bool king) {
 	unsigned int moves = 0x0;
-	unsigned int all = b.black_men | b.white_men | b.black_kings | b.white_kings;
+	unsigned int tmp = 0x0;
 
-	if(king) {
+	if(b.player == WHITE) {
+		if((tmp = up_left(piece)) != 0) {
+		}
+	}
+
+}
+
+unsigned int getMoves(const board& b, unsigned int piece) {
+	unsigned int moves = 0x0;
+
+	if((piece & b.kings) != 0) { // if king
 		moves = moves | up_left(piece);
 		moves = moves | up_right(piece);
 		moves = moves | down_left(piece);
 		moves = moves | down_right(piece);
+	} else if(b.player == WHITE) {
+		moves = moves | up_left(piece);
+		moves = moves | up_right(piece);
 	} else {
-		switch(b.player) {
-			case WHITE:
-				moves = moves | up_left(piece);
-				moves = moves | up_right(piece);
-				break;
-			case BLACK:
-				moves = moves | down_left(piece);
-				moves = moves | down_right(piece);
-				break;
-		}
+		moves = moves | down_left(piece);
+		moves = moves | down_right(piece);
 	}
 
 	// remove occupied spaces
-	moves = moves & ~all;
+	moves = moves & ~(b.black|b.white);
 
 	return moves;
 }
@@ -117,26 +121,16 @@ unsigned int down_right(unsigned const int& piece) {
 bool endOfGame(const board& b) {
 	if(b.player == WHITE) {
 		for(int i=0; i<32; i++) {
-			if((0x1 & (b.white_men>>i)) != 0) {
-				if(getMoves(b, 0x1<<i, false) != 0x0) {
-					return false;
-				}
-			}
-			if((0x1 & (b.white_kings>>i)) != 0) {
-				if(getMoves(b, 0x1<<i, true) != 0x0) {
+			if((0x1 & (b.white>>i)) != 0) {
+				if(getMoves(b, 0x1<<i) != 0x0) {
 					return false;
 				}
 			}
 		}
 	} else if(b.player == BLACK) {
 		for(int i=0; i<32; i++) {
-			if((0x1 & (b.black_men>>i)) != 0) {
-				if(getMoves(b, 0x1<<i, false) != 0x0) {
-					return false;
-				}
-			}
-			if((0x1 & (b.black_kings>>i)) != 0) {
-				if(getMoves(b, 0x1<<i, true) != 0x0) {
+			if((0x1 & (b.black>>i)) != 0) {
+				if(getMoves(b, 0x1<<i) != 0x0) {
 					return false;
 				}
 			}
@@ -149,38 +143,37 @@ bool move(board& b, unsigned int from, unsigned int to) {
 	int moves = 0x0;
 
 	if(b.player == WHITE) {
-		if((b.white_men & from) != 0) {
-			moves = getMoves(b, from, false);
+		if((b.white & from) != 0) {
+			moves = getMoves(b, from);
 			if((moves & to) != 0) {
-				b.white_men &= ~from;
-				b.white_men |= to;
-				return true;
-			}
-		} else if((b.white_kings & from) != 0) {
-			moves = getMoves(b, from, true);
-			if((moves & to) != 0) {
-				b.white_kings &= ~from;
-				b.white_kings |= to;
+				b.white &= ~from;
+				b.white |= to;
+
+				if((from & b.kings) != 0) {
+					b.kings &= ~from;
+					b.kings |= to;
+				}
+				changePlayer(b);
 				return true;
 			}
 		}
 	} else if(b.player == BLACK) {
-		if((b.black_men & from) != 0) {
-			moves = getMoves(b, from, false);
+		if((b.black & from) != 0) {
+			moves = getMoves(b, from);
 			if((moves & to) != 0) {
-				b.black_men &= ~from;
-				b.black_men |= to;
-				return true;
-			}
-		} else if((b.black_kings & from) != 0) {
-			moves = getMoves(b, from, true);
-			if((moves & to) != 0) {
-				b.black_kings &= ~from;
-				b.black_kings |= to;
+				b.black &= ~from;
+				b.black |= to;
+
+				if((from & b.kings) != 0) {
+					b.kings &= ~from;
+					b.kings |= to;
+				}
+				changePlayer(b);
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 

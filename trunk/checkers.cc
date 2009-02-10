@@ -18,6 +18,8 @@ int main() {
 
 		printBoard(b);
 
+		currentplayer = b.player;
+
 		if(b.player == WHITE) {
 			cout << "White: ";
 		}else if(b.player == BLACK) {
@@ -59,7 +61,6 @@ int main() {
 				cout << "Illegal move.\n";
 				continue;
 			}
-			changePlayer(b);
 		}
 	}
 	printBoard(b);
