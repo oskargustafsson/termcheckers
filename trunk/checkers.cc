@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "board.cc"
 #include "ui.cc"
+#include "searchtree.cc"
 
 using namespace std;
 
@@ -25,6 +26,8 @@ int main() {
 		cin >> line;
 		if(line == "quit") {
 			break;
+		} else if( line == "ai") {
+			b = alphabeta(b);
 		} else {
 			unsigned int from = 0x0;
 			unsigned int to = 0x0;
@@ -45,8 +48,8 @@ int main() {
 					second += *It;
 				It++;
 			}
-			from = pow(2, atoi(first.c_str())-1);
-			to = pow(2, atoi(second.c_str())-1);
+			from = pow(2.0, atof(first.c_str())-1);
+			to = pow(2.0, atof(second.c_str())-1);
 
 			cout << "From: " << from << endl;
 			cout << "To: " << to << endl;
