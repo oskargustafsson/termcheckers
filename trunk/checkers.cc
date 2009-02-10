@@ -3,6 +3,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include "checkers.h"
 #include "board.cc"
 #include "ui.cc"
 #include "searchtree.cc"
@@ -26,8 +27,8 @@ int main() {
 		cin >> line;
 		if(line == "quit") {
 			break;
-		} else if( line == "ai") {
-			b = alphabeta(b);
+		} else if(line == "ai") {
+			alphabeta(b);
 		} else {
 			unsigned int from = 0x0;
 			unsigned int to = 0x0;
@@ -58,7 +59,8 @@ int main() {
 				cout << "Illegal move.\n";
 				continue;
 			}
+			changePlayer(b);
 		}
-		changePlayer(b);
 	}
+	printBoard(b);
 }

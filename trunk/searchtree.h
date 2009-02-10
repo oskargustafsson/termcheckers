@@ -1,4 +1,5 @@
+#define DEPTH 5
 
-board alphabeta(board& b);
-board alphabeta(board b, int depth, int alpha, int beta);
-int min(int a, int b);
+int alphabeta(board& b);
+int alphabeta(board& b, int depth, int alpha, int beta);
+int max(int a, int b);
