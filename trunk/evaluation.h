@@ -1,2 +1,2 @@
 
-int evaluate(board b);
+int evaluate(board& b);

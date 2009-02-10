@@ -4,7 +4,7 @@
 void printBoard(const board b) {
 	int row = 0;
 
-	printf("\033[45m%36c\033[0m\n", ' ');
+	printf("\n\033[45m%36c\033[0m\n", ' ');
 	for(int i=0; i < 32; i++) {
 		if(i % 4 == 0) {
 			printf("\033[45m%2c\033[0m", ' ');

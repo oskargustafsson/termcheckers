@@ -3,7 +3,7 @@
 #include "board.h"
 
 int alphabeta(board& b) {
-	return alphabeta(b, DEPTH, -32000, 32000);
+	return alphabeta(b, DEPTH_TMP, -32000, 32000);
 }
 
 int alphabeta(board& b, int depth, int alpha, int beta) {
@@ -58,7 +58,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 			}
 		}
 	}
-	if(depth == DEPTH) {
+	if(depth == DEPTH_TMP) {
 		b = result;
 	}
 	return alpha;

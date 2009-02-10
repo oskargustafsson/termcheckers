@@ -22,10 +22,16 @@ int main() {
 
 		if(b.player == WHITE) {
 			cout << "White: ";
+			DEPTH_TMP = 7;
 		}else if(b.player == BLACK) {
+			DEPTH_TMP = 5;
 			cout << "Black: ";
 		}
+/*
+*/
+		alphabeta(b);
 
+/*
 		cin >> line;
 		if(line == "quit") {
 			break;
@@ -62,6 +68,7 @@ int main() {
 				continue;
 			}
 		}
+		*/
 	}
 	printBoard(b);
 }
