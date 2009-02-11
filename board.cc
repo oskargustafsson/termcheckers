@@ -9,15 +9,48 @@ board createBoard() {
 	return b;
 }
 
-unsigned int getCaptureMoves(const board& b, unsigned int piece, bool king) {
+unsigned int getCaptureMoves(const board& b, unsigned int piece) {
 	unsigned int moves = 0x0;
 	unsigned int tmp = 0x0;
 
 	if(b.player == WHITE) {
-		if((tmp = up_left(piece)) != 0) {
+		tmp = up_left(piece);
+		if((tmp & b.black) != 0) {
+			tmp = up_left(tmp);
+			moves |= recursiveCapture(b, piece, tmp);
+		}
+		tmp = up_right(piece);
+		if((tmp & b.black) != 0) {
+			tmp = up_right(tmp);
+			moves |= recursiveCapture(b, piece, tmp);
 		}
 	}
+	if(b.player == BLACK) {
+		tmp = down_left(piece);
+		if((tmp & b.black) != 0) {
+			tmp = down_left(tmp);
+			moves |= recursiveCapture(b, piece, tmp);
+		}
+		tmp = down_right(piece);
+		if((tmp & b.black) != 0) {
+			tmp = down_right(tmp);
+			moves |= recursiveCapture(b, piece, tmp);
+		}
+	}
+	return moves;
+}
 
+unsigned int recursiveCapture(board b, unsigned int piece, unsigned int newpiece) {
+	unsigned int moves = 0x0;
+	if((newpiece & (b.black | b.white)) == 0) {
+		move(b, piece, newpiece);
+		if((moves = getCaptureMoves(b, piece)) != 0) {
+			return moves;
+		} else {
+			return newpiece;
+		}
+	}
+	return moves;
 }
 
 unsigned int getMoves(const board& b, unsigned int piece) {

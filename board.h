@@ -11,8 +11,9 @@ struct board {
 	bool player; // WHITE=0, BLACK=1
 };
 
-unsigned int getCaptureMoves(const board& b, unsigned int piece, bool king);
+unsigned int getCaptureMoves(const board& b, unsigned int piece);
 unsigned int getMoves(const board& b, unsigned int piece);
+unsigned int recursiveCapture(board b, unsigned int piece, unsigned int newpiece);
 
 unsigned int up_left(unsigned const int& piece);
 unsigned int up_right(unsigned const int& piece);

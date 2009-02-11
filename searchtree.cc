@@ -15,9 +15,9 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 
 	if(endOfGame(b) || depth == 0) {
 		if(currentplayer == BLACK) {
-			return -evaluate(b);
-		} else {
 			return evaluate(b);
+		} else {
+			return -evaluate(b);
 		}
 	}
 
