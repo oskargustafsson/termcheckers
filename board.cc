@@ -217,3 +217,7 @@ void changePlayer(board& b) {
 		b.player = WHITE;
 	}
 }
+
+int countBits(unsigned int board) {
+	return __builtin_popcount (board);
+}
