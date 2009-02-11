@@ -24,10 +24,14 @@ board createBoard();
 
 bool endOfGame(const board& b);
 
-bool move(board& b, unsigned int from, unsigned int to);
+void move(board& b, unsigned int from, unsigned int to);
+
+unsigned int getCaptureBit(board& b, unsigned int from, unsigned int to);
 
 void changePlayer(board& b);
 
 int countBits(unsigned int b);
+
+bool empty(const board& b, unsigned int piece);
 
 #endif
