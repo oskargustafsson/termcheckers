@@ -39,3 +39,20 @@ void printBoard(const board b) {
 	}
 	printf("\033[45m%36c\033[0m\n", ' ');
 }
+
+void printInt(unsigned int b) {
+	for(int i=0; i < 32; i++) {
+		if((i+4) % 8 != 0)
+			printf("\033[47m \033[0m");
+		if((0x1 & (b>>i)) != 0)
+			printf("\033[42mx\033[0m");
+		else
+			printf("\033[42m \033[0m");
+		if((i+1) % 4 == 0) {
+			if((i)%8 != 0) {
+				printf("\033[47m \033[0m");
+			}
+			printf("\n");
+		}
+	}
+}
