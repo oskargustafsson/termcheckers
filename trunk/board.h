@@ -28,4 +28,6 @@ bool move(board& b, unsigned int from, unsigned int to);
 
 void changePlayer(board& b);
 
+int countBits(unsigned int b);
+
 #endif
