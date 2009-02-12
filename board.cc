@@ -1,4 +1,6 @@
 #include "board.h"
+#include "ui.h"
+			// ui.h bara för debug
 
 board createBoard() {
 	board b;
@@ -160,6 +162,8 @@ bool endOfGame(const board& b) {
 void move(board& b, unsigned int from, unsigned int to) {
 	int maskrows = 0xF0F0F0F0;
 
+	if((to & getPossibleMoves(b)) == 0) return;		//giltigt drag?
+
 	if((b.white & from) != 0) {
 		b.white &= ~from;
 		b.white |= to;
@@ -220,6 +224,71 @@ int countBits(unsigned int board) {
 	return __builtin_popcount (board);
 }
 
+void compute_bits_in_char()
+{
+    unsigned int i ;    
+    for (i = 0; i < 256; i++)
+        bits_in_char [i] = countBits(i) ;
+    return ;
+}
+
+int countBits2(unsigned int n)
+{
+    //kräver att bits_in_char är initierad
+    
+    return bits_in_char [ n        & 0xffu]
+        +  bits_in_char [(n >>  8) & 0xffu]
+        +  bits_in_char [(n >> 16) & 0xffu]
+        +  bits_in_char [(n >> 24) & 0xffu] ;
+}
+
+// ej kungar, än
+unsigned int getPossibleMoves(board& b) {
+	unsigned int allpieces = b.black|b.white;
+	unsigned int pieces;
+
+	if(b.player == BLACK) {
+		pieces = b.black;
+		printInt( (	((pieces & 0x0F0F0F0F)<<4) | ((pieces & 0x00E0E0E0)<<3) |
+					((pieces & 0x00F0F0F0)<<4) | ((pieces & 0x07070707)<<5) ) & (~allpieces) );
+
+	//	getPossibleCaptureMoves(b);
+		return	( (	((pieces & 0x0F0F0F0F)<<4) | ((pieces & 0x00E0E0E0)<<3) |
+					((pieces & 0x00F0F0F0)<<4) | ((pieces & 0x07070707)<<5) ) & (~allpieces) );
+	}
+	else {
+		pieces = b.white;
+		printInt( (	((pieces & 0x0F0F0F00)>>4) | ((pieces & 0xE0E0E0E0)>>5) |
+					((pieces & 0xF0F0F0F0)>>4) | ((pieces & 0x07070700)>>3) ) & (~allpieces) );
+
+		return	( (	((pieces & 0x0F0F0F00)>>4) | ((pieces & 0xE0E0E0E0)>>5) |
+					((pieces & 0xF0F0F0F0)>>4) | ((pieces & 0x07070700)>>3) ) & (~allpieces) );
+	}
+}
+/*
+unsigned int getPossibleCaptureMoves(board b) {
+	unsigned int moves;
+	if(moves = getNextLevel(b, b.black)) {
+		b.black = moves;
+		return getNextLevel(b, b.black);
+	}
+	else {
+		return 0;
+	}
+	return 0;
+}
+
+unsigned int getNextLevel(board b, unsigned int moves) {
+	if(b.player == BLACK) {
+		return getPossibleMoves( (	((moves & 0x0F0F0F0F)<<4) | ((moves & 0x00E0E0E0)<<3) |
+					((moves & 0x00F0F0F0)<<4) | ((moves & 0x07070707)<<5) ) & (b.white) );
+	}
+	else {
+		return getPossibleMoves( (	((moves & 0x0F0F0F00)>>4) | ((moves & 0xE0E0E0E0)>>5) |
+					((moves & 0xF0F0F0F0)>>4) | ((moves & 0x07070700)>>3) ) & (b.white) );
+	}
+}
+*/
 bool empty(const board& b, unsigned int piece) {
 	return (piece & (b.white|b.black)) == 0;
 }

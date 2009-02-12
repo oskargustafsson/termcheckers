@@ -11,6 +11,8 @@ struct board {
 	bool player; // WHITE=0, BLACK=1
 };
 
+static int bits_in_char [256];		// för bit-count
+
 unsigned int getCaptureMoves(const board& b, unsigned int piece);
 unsigned int getMoves(const board& b, unsigned int piece);
 unsigned int recursiveCapture(board b, unsigned int piece, unsigned int newpiece);
@@ -31,6 +33,16 @@ unsigned int getCaptureBit(unsigned int from, unsigned int to);
 void changePlayer(board& b);
 
 int countBits(unsigned int b);
+
+int countBits2(unsigned int b);
+
+void compute_bits_in_char();
+
+unsigned int getPossibleMoves(board& b);
+
+unsigned int getPossibleCaptureMoves(board b);
+
+unsigned int getNextLevel(board b, unsigned int m);
 
 bool empty(const board& b, unsigned int piece);
 

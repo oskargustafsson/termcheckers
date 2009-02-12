@@ -11,6 +11,7 @@ using namespace std;
 namespace termcheckers {
 
 	Game::Game() {
+		compute_bits_in_char();
 		black_player = 0;
 		white_player = 0;
 		output = true;
