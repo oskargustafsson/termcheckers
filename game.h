@@ -9,10 +9,9 @@ namespace termcheckers {
 	public:
 		~Game();
 		bool makeMove(unsigned int from, unsigned int to);
-		void newGame();
+		void newGame(int black, int white, bool output);
 		void play();
 		static Game* instance();
-		int currentplayer;
 		int depth;
 	private:
 		Game();
@@ -22,6 +21,7 @@ namespace termcheckers {
 		board b;
 		int black_player;
 		int white_player;
+		bool output;
 	};
 }
 #endif

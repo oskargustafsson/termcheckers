@@ -1,6 +1,9 @@
 #include <cstdio>
 #include "ui.h"
 #include "evaluation.h"
+#include "game.h"
+
+using namespace termcheckers;
 
 void printBoard(board b) {
 	int row = 0;
@@ -45,6 +48,9 @@ void printBoard(board b) {
 					printf("Black");
 				else
 					printf("White");
+			}
+			if(i == 7 && row == 0) {
+				printf("Depth: %d", Game::instance()->depth);
 			}
 			printf("\n");
 			row++;
