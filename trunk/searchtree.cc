@@ -46,30 +46,29 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		}
 	}
 	
-	for(int i=0x1; i != 0; i = (i<<1)) {
-		if((i & men) == 0)
-			continue;
+
+	while(men != 0) {
+		int from = (men & (men-1)) ^ men;
 
 		if(capture) {
-			moves = getCaptureMoves(b, i);
+			moves = getCaptureMoves(b, from);
 		} else {
-			moves = getMoves(b, i);
+			moves = getMoves(b, from);
 		}
 
 		if(moves != 0) {
-			for(int j=0x1; j != 0; j = (j<<1)) {
-				if((j & moves) == 0)
-					continue;
+			while(moves != 0) {
+				int to = (moves & (moves-1)) ^ moves;
 
 				board nextboard = b;
-				move(nextboard, i, j);
+				move(nextboard, from, to);
 				changePlayer(nextboard);
 
 				tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
 				if(tmp > alpha) {
 					alpha = tmp;
-					moveFrom = i;
-					moveTo = j;
+					moveFrom = from;
+					moveTo = to;
 //					printf("\033[3%dm%d(%d) \033[0m", depth, depth, alpha);
 //				} else {
 //					printf("%d(%d) ", depth, alpha);
