@@ -70,9 +70,14 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 
 				board nextboard = b;
 				move(nextboard, from, to);
-				changePlayer(nextboard);
 
-				tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
+				if((capture != 0) && (getCaptureMoves(nextboard, to) != 0)) {
+					printf(" %d ", depth);
+					tmp = alphabeta(nextboard, depth, -beta, -alpha);
+				} else {
+					changePlayer(nextboard);
+					tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
+				}
 				if(tmp > alpha) {
 					alpha = tmp;
 					moveFrom = from;

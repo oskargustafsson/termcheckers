@@ -14,8 +14,8 @@ struct board {
 static int bits_in_char [256];		// för bit-count
 
 unsigned int getCaptureMoves(const board& b, unsigned int piece);
+unsigned int getRecursiveCaptureMoves(board& b, unsigned int piece);
 unsigned int getMoves(const board& b, unsigned int piece);
-unsigned int recursiveCapture(board b, unsigned int piece, unsigned int newpiece);
 
 unsigned int up_left(unsigned const int& piece);
 unsigned int up_right(unsigned const int& piece);
