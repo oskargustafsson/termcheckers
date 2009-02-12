@@ -11,6 +11,9 @@ using namespace std;
 namespace termcheckers {
 
 	Game::Game() {
+		black_player = 0;
+		white_player = 0;
+		output = true;
 	}
 	Game::~Game() {
 		delete game;
@@ -59,64 +62,30 @@ namespace termcheckers {
 		}
 	}
 
-	void Game::newGame() {
-		string line;
-		int tmp;
-		white_player = -1;
-		black_player = -1;
-
-		while(black_player == -1) {
-			cout << "Black: ";
-			cin >> line;
-			if(line == "human")
-				black_player = 0;
-			if(line == "ai") {
-				do {
-					cout << "Depth: ";
-					cin >> line;
-					tmp = atoi(line.c_str());
-					if(tmp != 0) {
-						black_player = tmp;
-					}
-				} while(tmp == 0);
-			}
-		}
-		while(white_player == -1) {
-			cout << "White: ";
-			cin >> line;
-			if(line == "human")
-				white_player = 0;
-			if(line == "ai") {
-				do {
-					cout << "Depth: ";
-					cin >> line;
-					tmp = atoi(line.c_str());
-					if(tmp != 0) {
-						white_player = tmp;
-					}
-				} while(tmp == 0);
-			}
-		}
-
+	void Game::newGame(int black, int white, bool output) {
+		black_player = black;
+		white_player = white;
+		output = output;
 		b = createBoard();
+
 	}
 
 	void Game::play() {
 
 		while(!endOfGame(b)) {
 
-			printBoard(b);
-
-			currentplayer = b.player;
-
 			if(b.player == WHITE) {
 				depth = white_player;
 			}else if(b.player == BLACK) {
 				depth = black_player;
 			}
-			cout << ">> ";
 
-			if(depth != 0) {
+			if(output) {
+				printBoard(b);
+				cout << ">> ";
+			}
+
+			if(depth > 0) {
 				alphabeta(b, depth);
 			} else {
 				user();
@@ -124,7 +93,7 @@ namespace termcheckers {
 		}
 	}
 
-	Game* Game::game = 0;
+	Game* Game::game = NULL;
 
 	Game* Game::instance() {
 		if(game == NULL) {
