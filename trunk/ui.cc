@@ -1,7 +1,8 @@
 #include <cstdio>
 #include "ui.h"
+#include "evaluation.h"
 
-void printBoard(const board b) {
+void printBoard(board b) {
 	int row = 0;
 
 	printf("\n\033[40m%36c\033[0m\n", ' ');
@@ -34,7 +35,18 @@ void printBoard(const board b) {
 			if((i+5)% 8 != 0) {
 				printf("\033[47m    \033[0m");
 			}
-			printf("\033[40m%2c\033[0m\n", ' ');
+			printf("\033[40m%2c\033[0m", ' ');
+			if(i == 3 && row == 0) {
+				printf("Evaluation: %d", evaluate(b));
+			}
+			if(i == 3 && row == 1) {
+				printf("Player: ");
+				if(b.player == BLACK)
+					printf("Black");
+				else
+					printf("White");
+			}
+			printf("\n");
 			row++;
 			if(row == 2) {
 				row = 0;
