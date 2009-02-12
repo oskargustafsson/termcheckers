@@ -7,6 +7,6 @@
 
 int alphabeta(board& b, int depth);
 int alphabeta(board& b, int depth, int alpha, int beta);
-int max(int a, int b);
+int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from);
 
 #endif
