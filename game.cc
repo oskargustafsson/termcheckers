@@ -150,6 +150,7 @@ namespace termcheckers {
     } else {
       b = history.top();
       history.pop();
+      return true;
     }
   }
 
