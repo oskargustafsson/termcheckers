@@ -15,7 +15,7 @@ checkers: checkers.o board.o ui.o game.o searchtree.o evaluation.o
 
 # Dependencies, the implicit rule .cc => .o is used
 board.o: board.cc board.h
-checkers.o: checkers.cc checkers.h
+checkers.o: checkers.cc
 searchtree.o: searchtree.cc searchtree.h
 evaluation.o: evaluation.cc evaluation.h
 game.o: game.cc game.h
