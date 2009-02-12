@@ -2,6 +2,7 @@
 #include "ui.h"
 #include "evaluation.h"
 #include "game.h"
+#include "searchtree.h"
 
 using namespace termcheckers;
 
@@ -50,7 +51,7 @@ void printBoard(board b) {
 					printf("White");
 			}
 			if(i == 7 && row == 0) {
-				printf("Depth: %d", Game::instance()->depth);
+				printf("Depth: %d", MAX_DEPTH);
 			}
 			printf("\n");
 			row++;

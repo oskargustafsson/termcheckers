@@ -207,7 +207,13 @@ void move(board& b, unsigned int from, unsigned int to) {
 }
 
 bool validateMove(board& b, unsigned int from, unsigned int to) {
-	return true;
+	if((from & b.black) != 0) {
+		return true;
+	}
+	else if((from & b.white) != 0) {
+		return true;
+	}
+	return false;
 }
 
 /**
