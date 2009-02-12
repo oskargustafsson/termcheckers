@@ -59,9 +59,45 @@ namespace termcheckers {
 		}
 	}
 
-	void Game::newGame(int wp, int bp) {
-		white_player = wp;
-		black_player = bp;
+	void Game::newGame() {
+		string line;
+		int tmp;
+		white_player = -1;
+		black_player = -1;
+
+		while(black_player == -1) {
+			cout << "Black: ";
+			cin >> line;
+			if(line == "human")
+				black_player = 0;
+			if(line == "ai") {
+				do {
+					cout << "Depth: ";
+					cin >> line;
+					tmp = atoi(line.c_str());
+					if(tmp != 0) {
+						black_player = tmp;
+					}
+				} while(tmp == 0);
+			}
+		}
+		while(white_player == -1) {
+			cout << "White: ";
+			cin >> line;
+			if(line == "human")
+				white_player = 0;
+			if(line == "ai") {
+				do {
+					cout << "Depth: ";
+					cin >> line;
+					tmp = atoi(line.c_str());
+					if(tmp != 0) {
+						white_player = tmp;
+					}
+				} while(tmp == 0);
+			}
+		}
+
 		b = createBoard();
 	}
 

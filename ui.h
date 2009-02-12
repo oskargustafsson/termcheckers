@@ -3,7 +3,7 @@
 
 #include "board.h"
 
-void printBoard(const board b);
+void printBoard(board b);
 void printInt(unsigned int b);
 
 #endif

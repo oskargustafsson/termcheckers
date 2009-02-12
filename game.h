@@ -9,7 +9,7 @@ namespace termcheckers {
 	public:
 		~Game();
 		bool makeMove(unsigned int from, unsigned int to);
-		void newGame(int wp, int bp);
+		void newGame();
 		void play();
 		static Game* instance();
 		int currentplayer;
