@@ -111,11 +111,10 @@ namespace termcheckers {
 
 			if(b.player == WHITE) {
 				depth = white_player;
-				cout << "White: ";
 			}else if(b.player == BLACK) {
 				depth = black_player;
-				cout << "Black: ";
 			}
+			cout << ">> ";
 
 			if(depth != 0) {
 				alphabeta(b, depth);
