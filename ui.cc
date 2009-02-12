@@ -19,14 +19,14 @@ void printBoard(board b) {
 		if(row == 0) {
 			if((0x1 & (b.black>>i)) != 0) {
 				if((0x1 & (b.kings>>i)) != 0)
-					printf("\033[42;31m %c%c \033[0m", 'W', 'W');
+					printf("\033[42;1;31m %c%c \033[0m", 'W', 'W');
 				else
-					printf("\033[42;31m %c%c \033[0m", '(', ')');
+					printf("\033[42;1;31m %c%c \033[0m", '<', '>');
 			} else if((0x1 & (b.white>>i)) != 0) {
 				if((0x1 & (b.kings>>i)) != 0)
-					printf("\033[42;37m %c%c \033[0m", 'W', 'W');
+					printf("\033[42;1;37m %c%c \033[0m", 'W', 'W');
 				else
-					printf("\033[42;37m %c%c \033[0m", '(', ')');
+					printf("\033[42;1;37m %c%c \033[0m", '<', '>');
 			} else {
 				printf("\033[42m    \033[0m");
 			}
