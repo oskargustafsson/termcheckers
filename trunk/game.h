@@ -16,6 +16,7 @@ namespace termcheckers {
 	private:
 		Game();
 		void user();
+		bool recursiveCapture(board tmpboard, unsigned int from, unsigned int to);
 
 		static Game* game;
 		board b;

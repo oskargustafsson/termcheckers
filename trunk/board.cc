@@ -72,14 +72,26 @@ unsigned int getCaptureMoves(const board& b, unsigned int piece) {
 			}
 			tmp = up_right(piece);
 			if((tmp & b.white) != 0) {
-				tmp = up_right(piece);
-				if(empty(b, piece)) {
+				tmp = up_right(tmp);
+				if(empty(b, tmp)) {
 					moves |= tmp;
 				}
 			}
 		}
 	}
 	return moves;
+}
+
+unsigned int getRecursiveCaptureMoves(board b, unsigned int piece) {
+	unsigned int moves = getCaptureMoves(b, piece);
+	unsigned int capture = 0x0;
+	if(moves == 0) {
+		return piece;
+	}
+	while(moves != 0) {
+		capture = (moves & (moves-1)) ^ moves;
+		moves &= moves-1;
+	}
 }
 
 unsigned int getMoves(const board& b, unsigned int piece) {
@@ -158,9 +170,10 @@ bool endOfGame(const board& b) {
 
 /**
  * Dosn't check anything! any move is possible
+ * only one jump!
  */
 void move(board& b, unsigned int from, unsigned int to) {
-	int maskrows = 0xF0F0F0F0;
+	unsigned int maskrows = 0xF0F0F0F0;
 
 //	if((to & getPossibleMoves(b)) == 0) return;		//giltigt drag?
 
@@ -190,6 +203,10 @@ void move(board& b, unsigned int from, unsigned int to) {
 		b.kings &= ~from;
 		b.kings |= to;
 	}
+}
+
+bool validateMove(board& b, unsigned int from, unsigned int to) {
+	return true;
 }
 
 /**
@@ -265,7 +282,7 @@ unsigned int getPossibleMoves(board& b) {
 					((pieces & 0xF0F0F0F0)>>4) | ((pieces & 0x07070700)>>3) ) & (~allpieces) );
 	}
 }
-/*
+
 unsigned int getPossibleCaptureMoves(board b) {
 	unsigned int moves;
 	if(moves = getNextLevel(b, b.black)) {

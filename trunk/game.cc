@@ -21,15 +21,41 @@ namespace termcheckers {
 	}
 
 	bool Game::makeMove(unsigned int from, unsigned int to) {
-		if(false) {
+		if(!validateMove(b, from, to)) {
 			cout << "Illegal move.\n";
 			return false;
 		} else {
-			move(b, from, to);
+			if(getCaptureMoves(b, from) == 0) {
+				move(b, from, to);
+			} else {
+				recursiveCapture(b, from, to);
+			}
+			
 			changePlayer(b);
 			cout << log2(from)+1 << "-" << log2(to)+1 << endl;
 			return true;
 		}
+	}
+
+	bool Game::recursiveCapture(board tmpboard, unsigned int from, unsigned int to) {
+		unsigned int moves = getCaptureMoves(tmpboard, from);
+		unsigned int capture = 0x0;
+		board test;
+		while(moves != 0) {
+			capture = (moves & (moves-1)) ^ moves;
+			moves &= moves-1;
+			test = tmpboard;
+			move(test, from, capture);
+
+			if(capture == to) {
+				b = test;
+				return true;
+			}
+			if(recursiveCapture(test, capture, to)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void Game::user() {
