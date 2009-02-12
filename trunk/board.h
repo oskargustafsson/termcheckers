@@ -46,4 +46,6 @@ unsigned int getNextLevel(board b, unsigned int m);
 
 bool empty(const board& b, unsigned int piece);
 
+bool validateMove(board& b, unsigned int from, unsigned int to);
+
 #endif
