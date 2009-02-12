@@ -1,6 +1,6 @@
+#include <iostream>
 #include "evaluation.h"
 #include "board.h"
-#include <iostream>
 
 // höga poäng är bra för svart, låga bra för vit
 using namespace std;

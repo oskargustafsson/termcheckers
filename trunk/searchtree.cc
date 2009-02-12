@@ -1,10 +1,13 @@
-#include <cmath>
 #include "searchtree.h"
-#include "evaluation.cc"
+#include "evaluation.h"
 #include "board.h"
+#include "game.h"
+#include "checkers.h"
 
-int alphabeta(board& b) {
-	return alphabeta(b, DEPTH_TMP, -32000, 32000);
+using namespace termcheckers;
+
+int alphabeta(board& b, int depth) {
+	return alphabeta(b, depth, -32000, 32000);
 }
 
 int alphabeta(board& b, int depth, int alpha, int beta) {
@@ -17,7 +20,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	bool capture = false;
 
 	if(endOfGame(b) || depth == 0) {
-		if(currentplayer == BLACK) {
+		if(Game::instance()->currentplayer == BLACK) {
 			return evaluate(b);
 		} else {
 			return -evaluate(b);
@@ -35,6 +38,8 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	 * OPTIMIZE THIS!!
 	 */
 	for(int i=0x1; i != 0; i = (i<<1)) {
+		if((i & men) == 0)
+			continue;
 		if(getCaptureMoves(b, i) != 0) {
 			capture = true;
 			break;
@@ -79,9 +84,9 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 			}
 		}
 	}
-	if(depth == DEPTH_TMP) {
+	if(depth == Game::instance()->depth) {
 		// The root node, make the best move
-		makeMove(b, moveFrom, moveTo);
+		Game::instance()->makeMove(moveFrom, moveTo);
 	}
 	return alpha;
 }

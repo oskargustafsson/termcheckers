@@ -1,5 +1,5 @@
-#include "ui.h"
 #include <cstdio>
+#include "ui.h"
 
 void printBoard(const board b) {
 	int row = 0;

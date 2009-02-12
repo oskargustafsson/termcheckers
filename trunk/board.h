@@ -1,5 +1,5 @@
-#ifndef _board_
-#define _board_
+#ifndef BOARD_H
+#define BOARD_H
 
 #define WHITE 0x0
 #define BLACK 0x1
@@ -26,7 +26,7 @@ bool endOfGame(const board& b);
 
 void move(board& b, unsigned int from, unsigned int to);
 
-unsigned int getCaptureBit(board& b, unsigned int from, unsigned int to);
+unsigned int getCaptureBit(unsigned int from, unsigned int to);
 
 void changePlayer(board& b);
 
