@@ -10,13 +10,12 @@ namespace termcheckers {
         public:
                 ~Game();
                 bool makeMove(unsigned int from, unsigned int to);
-                void newGame(int black, int white, bool output);
+                void newGame();
                 void play();
+                void aiTest();
                 static Game* instance();
-                int depth;
         private:
                 Game();
-                void user();
                 bool recursiveCapture(board tmpboard, unsigned int from, unsigned int to);
 
                 bool undoLastMove();
@@ -25,8 +24,6 @@ namespace termcheckers {
                 static Game* game;
                 std::stack<board> history;
                 board b;
-                int black_player;
-                int white_player;
                 bool output;
         };
 }
