@@ -52,7 +52,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		int from = (men & (men-1)) ^ men;
 		men &= men-1;
 
-/*		if((capture == 1) && (depth == Game::instance()->depth)) {
+/*		if((capture == 1) && (depth == MAX_DEPTH)) {
 			moves = getCaptureMoves(b, from);
 			if(moves != 0) {
 				moveFrom = from;
@@ -93,7 +93,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 			break;
 		}
 	}
-	if(depth == Game::instance()->depth) {
+	if(depth == MAX_DEPTH) {
 		// The root node, make the best move
 		Game::instance()->makeMove(moveFrom, moveTo);
 	}

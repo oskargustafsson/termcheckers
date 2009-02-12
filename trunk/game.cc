@@ -13,9 +13,6 @@ namespace termcheckers {
 
         Game::Game() {
                 compute_bits_in_char();
-                black_player = 0;
-                white_player = 0;
-                output = true;
         }
         Game::~Game() {
                 delete game;
@@ -23,7 +20,6 @@ namespace termcheckers {
 
         bool Game::makeMove(unsigned int from, unsigned int to) {
                 if(!validateMove(b, from, to)) {
-                        cout << "Illegal move.\n";
                         return false;
                 } else {
                   stackBoard();
@@ -60,74 +56,83 @@ namespace termcheckers {
                 return false;
         }
 
-        void Game::user() {
-                string line;
-                cin >> line;
-
-                if(line == "undo") {
-                  if(undoLastMove()) {
-                    cout << "Reverting!" << endl;
-                    return;
-                  } else {
-                    cout << "Nothing to undo!" << endl;
-                  }
-                }
-
-                unsigned int from = 0x0;
-                unsigned int to = 0x0;
-                string first;
-                string second;
-                string::iterator It = line.begin();
-                int i=0;
-
-                while( It != line.end()) {
-                        if( *It == '-') {
-                                i++;
-                                It++;
-                                continue;
-                        }
-                        if(i == 0)
-                                first += *It;
-                        if(i == 1)
-                                second += *It;
-                        It++;
-                }
-                from = pow(2.0, atof(first.c_str())-1);
-                to = pow(2.0, atof(second.c_str())-1);
-
-                if(!makeMove(from, to)) {
-                        user();
-                }
-        }
-
-        void Game::newGame(int black, int white, bool output) {
-                black_player = black;
-                white_player = white;
-                output = output;
+        void Game::newGame() {
                 b = createBoard();
-
         }
+
+		void Game::aiTest() {
+			while(!endOfGame(b)) {
+				printBoard(b);
+				alphabeta(b, MAX_DEPTH);
+			}
+		}
 
         void Game::play() {
+				string line;
+				unsigned int from = 0x0;
+		        unsigned int to = 0x0;
 
+				printBoard(b);
                 while(!endOfGame(b)) {
 
-                        if(b.player == WHITE) {
-                                depth = white_player;
-                        }else if(b.player == BLACK) {
-                                depth = black_player;
-                        }
+					cout << "#> ";
+					cin >> line;
 
-                        if(output) {
-                                printBoard(b);
-                                cout << ">> ";
-                        }
+	                string first;
+	                string second;
+	                string::iterator It = line.begin();
+       		        int i=0;
 
-                        if(depth > 0) {
-                                alphabeta(b, depth);
-                        } else {
-                                user();
-                        }
+               		while( It != line.end()) {
+                       	if( *It == '-') {
+                            i++;
+                            It++;
+                            continue;
+	                    }
+                        if(i == 0)
+                            first += *It;
+                        if(i == 1)
+                        	second += *It;
+						It++;
+                	}
+                	from = pow(2.0, atof(first.c_str())-1);
+	                to = pow(2.0, atof(second.c_str())-1);
+
+					if(from != 0 && to != 0)
+					{
+						if(!makeMove(from, to))
+							cout << "Illigal move!";
+						else
+							printBoard(b);
+					}
+					else if(line == "ai")
+					{
+						alphabeta(b, MAX_DEPTH);
+						printBoard(b);
+					}
+					else if(line == "undo" || line == "back")
+					{
+						if(undoLastMove()) {
+							cout << "Reverting!" << endl;
+							printBoard(b);
+						} else {
+							cout << "Nothing to undo!" << endl;
+						}
+					}
+					else if(line == "help")
+					{
+						cout << "Commands: ai, undo\n";
+						cout << "Move: from-to\n";
+					}
+					else if(line == "print" || line == "board")
+					{
+						printBoard(b);
+					}
+					else if(line == "quit" || line == "exit")
+					{
+						cout << "Exit current game" << endl;
+						break;
+					}
                 }
         }
 
@@ -143,7 +148,6 @@ namespace termcheckers {
     if(history.empty()) {
       return false;
     } else {
-      history.pop();
       b = history.top();
       history.pop();
     }
