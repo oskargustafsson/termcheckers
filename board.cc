@@ -144,10 +144,12 @@ unsigned int down_right(unsigned const int& piece) {
  */
 bool endOfGame(const board& b) {
 	for(int i=0x1; i != 0; i = (i<<1)) {
-		if(getMoves(b, i) != 0x0)
-			return false;
-		if(getCaptureMoves(b, i) != 0x0)
-			return false;
+		if((((b.player == BLACK) && ((i & b.black) != 0)) || (b.player == WHITE) && ((i & b.white) != 0))) {
+			if(getMoves(b, i) != 0x0)
+				return false;
+			if(getCaptureMoves(b, i) != 0x0)
+				return false;
+		}
 	}
 	return true;
 }
@@ -156,8 +158,6 @@ bool endOfGame(const board& b) {
  * Dosn't check anything! any move is possible
  */
 void move(board& b, unsigned int from, unsigned int to) {
-	int moves = 0x0;
-
 	int maskrows = 0xF0F0F0F0;
 
 	if((b.white & from) != 0) {
@@ -168,7 +168,7 @@ void move(board& b, unsigned int from, unsigned int to) {
 		}
 
 		if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
-			b.black &= ~getCaptureBit(b, from, to);
+			b.black &= ~getCaptureBit(from, to);
 		}
 	}
 	if((b.black & from) != 0) {
@@ -179,7 +179,7 @@ void move(board& b, unsigned int from, unsigned int to) {
 		}
 
 		if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
-			b.white &= ~getCaptureBit(b, from, to);
+			b.white &= ~getCaptureBit(from, to);
 		}
 	}
 	if((from & b.kings) != 0) {
@@ -191,7 +191,7 @@ void move(board& b, unsigned int from, unsigned int to) {
 /**
  * get the position between two squares
  */
-unsigned int getCaptureBit(board& b, unsigned int from, unsigned int to) {
+unsigned int getCaptureBit(unsigned int from, unsigned int to) {
 	if(from < to) {
 		if(down_left(down_left(from)) == to) {
 			return down_left(from);
