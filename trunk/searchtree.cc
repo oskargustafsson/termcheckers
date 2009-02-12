@@ -10,6 +10,8 @@ int alphabeta(board& b, int depth) {
 	return alphabeta(b, depth, -32000, 32000);
 }
 
+unsigned int recursiveTo = 0x0;
+
 int alphabeta(board& b, int depth, int alpha, int beta) {
 	int men;
 	int moves;
@@ -50,56 +52,79 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		int from = (men & (men-1)) ^ men;
 		men &= men-1;
 
-		if((capture == 1) && (depth == Game::instance()->depth)) {
+/*		if((capture == 1) && (depth == Game::instance()->depth)) {
 			moves = getCaptureMoves(b, from);
 			if(moves != 0) {
 				moveFrom = from;
 				moveTo = moves;
 				break;
 			}
-		} else if(capture == 0) {
+		} else*/ if(capture == 0) {
 			moves = getMoves(b, from);
 		} else {
 			moves = getCaptureMoves(b, from);
 		}
 
-		if(moves != 0) {
-			while(moves != 0) {
-				int to = (moves & (moves-1)) ^ moves;
-				moves &= moves-1;
+		while(moves != 0) {
+			unsigned int to = (moves & (moves-1)) ^ moves;
+			moves &= moves-1;
 
-				board nextboard = b;
-				move(nextboard, from, to);
+			board nextboard = b;
+			move(nextboard, from, to);
 
-				if((capture != 0) && (getCaptureMoves(nextboard, to) != 0)) {
-					printf(" %d ", depth);
-					tmp = alphabeta(nextboard, depth, -beta, -alpha);
-				} else {
-					changePlayer(nextboard);
-					tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
-				}
-				if(tmp > alpha) {
-					alpha = tmp;
-					moveFrom = from;
-					moveTo = to;
-//					printf("\033[3%dm%d(%d) \033[0m", depth, depth, alpha);
-//				} else {
-//					printf("%d(%d) ", depth, alpha);
-				}
-				if(beta <= alpha) {
-					betacutoff = true;
-//					printf("<beta>");
-					break;
-				}
+			if(capture != 0) {
+				tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
+				to = recursiveTo;
+			} else {
+				changePlayer(nextboard);
+				tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
 			}
-			if(betacutoff) {
+			if(tmp > alpha) {
+				alpha = tmp;
+				moveFrom = from;
+				moveTo = to;
+			}
+			if(beta <= alpha) {
+				betacutoff = true;
 				break;
 			}
+		}
+		if(betacutoff) {
+			break;
 		}
 	}
 	if(depth == Game::instance()->depth) {
 		// The root node, make the best move
 		Game::instance()->makeMove(moveFrom, moveTo);
 	}
+	return alpha;
+}
+
+int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from) {
+	unsigned int moves = getCaptureMoves(b, from);
+	int tmp;
+
+	if(moves == 0) {
+		changePlayer(b);
+		tmp = -alphabeta(b, depth-1, -beta, -alpha);
+		if(tmp > alpha) {
+			alpha = tmp;
+			recursiveTo = from;
+		}
+	}
+
+	while(moves != 0) {
+		unsigned int to = (moves & (moves-1)) ^ moves;
+		moves &= moves-1;
+
+		board nextboard = b;
+		move(nextboard, from, to);
+
+		tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
+		if(tmp > alpha) {
+			alpha = tmp;
+		}
+	}
+
 	return alpha;
 }

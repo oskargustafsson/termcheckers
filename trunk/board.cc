@@ -92,6 +92,7 @@ unsigned int getRecursiveCaptureMoves(board b, unsigned int piece) {
 		capture = (moves & (moves-1)) ^ moves;
 		moves &= moves-1;
 	}
+	return 0x0;
 }
 
 unsigned int getMoves(const board& b, unsigned int piece) {
@@ -158,7 +159,7 @@ unsigned int down_right(unsigned const int& piece) {
  */
 bool endOfGame(const board& b) {
 	for(int i=0x1; i != 0; i = (i<<1)) {
-		if((((b.player == BLACK) && ((i & b.black) != 0)) || (b.player == WHITE) && ((i & b.white) != 0))) {
+		if(((b.player == BLACK) && ((i & b.black) != 0)) || ((b.player == WHITE) && ((i & b.white) != 0))) {
 			if(getMoves(b, i) != 0x0)
 				return false;
 			if(getCaptureMoves(b, i) != 0x0)
