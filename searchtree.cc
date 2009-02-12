@@ -17,7 +17,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	bool betacutoff = false;
 	int moveFrom = 0x0;
 	int moveTo = 0x0;
-	bool capture = false;
+	int capture = 0;
 
 	if(endOfGame(b) || depth == 0) {
 		if(b.player == BLACK) {
@@ -41,24 +41,32 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		if((i & men) == 0)
 			continue;
 		if(getCaptureMoves(b, i) != 0) {
-			capture = true;
-			break;
+			capture++;
 		}
 	}
 	
 
 	while(men != 0) {
 		int from = (men & (men-1)) ^ men;
+		men &= men-1;
 
-		if(capture) {
+		if((capture == 1) && (depth == Game::instance()->depth)) {
 			moves = getCaptureMoves(b, from);
-		} else {
+			if(moves != 0) {
+				moveFrom = from;
+				moveTo = moves;
+				break;
+			}
+		} else if(capture == 0) {
 			moves = getMoves(b, from);
+		} else {
+			moves = getCaptureMoves(b, from);
 		}
 
 		if(moves != 0) {
 			while(moves != 0) {
 				int to = (moves & (moves-1)) ^ moves;
+				moves &= moves-1;
 
 				board nextboard = b;
 				move(nextboard, from, to);

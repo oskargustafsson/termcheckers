@@ -162,7 +162,7 @@ bool endOfGame(const board& b) {
 void move(board& b, unsigned int from, unsigned int to) {
 	int maskrows = 0xF0F0F0F0;
 
-	if((to & getPossibleMoves(b)) == 0) return;		//giltigt drag?
+//	if((to & getPossibleMoves(b)) == 0) return;		//giltigt drag?
 
 	if((b.white & from) != 0) {
 		b.white &= ~from;
@@ -241,7 +241,7 @@ int countBits2(unsigned int n)
         +  bits_in_char [(n >> 16) & 0xffu]
         +  bits_in_char [(n >> 24) & 0xffu] ;
 }
-
+/*
 // ej kungar, än
 unsigned int getPossibleMoves(board& b) {
 	unsigned int allpieces = b.black|b.white;
