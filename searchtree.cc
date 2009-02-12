@@ -1,8 +1,8 @@
+#include <cstdio>
 #include "searchtree.h"
 #include "evaluation.h"
 #include "board.h"
 #include "game.h"
-#include "checkers.h"
 
 using namespace termcheckers;
 
@@ -20,7 +20,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	bool capture = false;
 
 	if(endOfGame(b) || depth == 0) {
-		if(Game::instance()->currentplayer == BLACK) {
+		if(b.player == BLACK) {
 			return evaluate(b);
 		} else {
 			return -evaluate(b);
@@ -70,12 +70,13 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 					alpha = tmp;
 					moveFrom = i;
 					moveTo = j;
-	//				printf("\033[3%dm%d(%d) \033[0m", depth, depth, alpha);
-	//			} else {
-	//				printf("%d(%d) ", depth, alpha);
+//					printf("\033[3%dm%d(%d) \033[0m", depth, depth, alpha);
+//				} else {
+//					printf("%d(%d) ", depth, alpha);
 				}
 				if(beta <= alpha) {
 					betacutoff = true;
+//					printf("<beta>");
 					break;
 				}
 			}

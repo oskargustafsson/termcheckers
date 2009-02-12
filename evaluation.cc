@@ -30,8 +30,8 @@ unsigned int allPieces = b.black|b.white;
 	score += 100 * countBits(b.black);			// +100 per svart man (inkl kungar)
 	score += 50 * countBits(b.black & b.kings);	// +50 för varje pjäs som även är kung
 
-	score += 100 * countBits(b.white);			// +100 per vit man (inkl kungar)
-	score += 50 * countBits(b.white & b.kings);	// +50 för varje pjäs som även är kung
+	score -= 100 * countBits(b.white);			// +100 per vit man (inkl kungar)
+	score -= 50 * countBits(b.white & b.kings);	// +50 för varje pjäs som även är kung
 
 	if(((b.black & 0x0F000000)<<4) & (~allPieces)) score += 40;	// +40 för svart vänsterdrag som ger kung
 	if(((b.black & 0x0F000000)<<5) & (~allPieces)) score += 40;	// +40 för svart högerdrag som ger kung
