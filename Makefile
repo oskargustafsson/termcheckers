@@ -10,7 +10,7 @@ CXXFLAGS += -g
 
 
 # Linking:
-checkers: checkers.o board.o ui.o game.o searchtree.o evaluation.o
+lennart: checkers.o board.o ui.o game.o searchtree.o evaluation.o
 	$(CXX) -o $@ $^
 
 # Dependencies, the implicit rule .cc => .o is used
