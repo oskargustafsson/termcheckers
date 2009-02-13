@@ -1,11 +1,12 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <fstream>
+#include <stack>
 #include "game.h"
 #include "searchtree.h"
 #include "board.h"
 #include "ui.h"
-#include <stack>
 
 using namespace std;
 
@@ -60,10 +61,55 @@ namespace termcheckers {
                 b = createBoard();
         }
 
+	void Game::loadGame(char* file) {
+		ifstream is;
+		is.open(file);
+		unsigned int piece = 0x1;
+
+		if(is != NULL) {
+			cout << "Loading file...\n";
+			char ch;
+			while(is.get(ch) != NULL) {
+				cout << ch;
+				if(ch == 'b') {
+					if(piece == 0) {
+						b.player = BLACK;
+					}
+					b.black |= piece;
+					piece = piece<<1;
+				} else if(ch == 'B') {
+					b.black |= piece;
+					b.kings |= piece;
+					piece = piece<<1;
+				} else if(ch == 'w') {
+					if(piece == 0) {
+						b.player = WHITE;
+					}
+					b.white |= piece;
+					piece = piece<<1;
+				} else if(ch == 'W') {
+					b.white |= piece;
+					b.kings |= piece;
+					piece = piece<<1;
+				} else if(ch == '.') {
+					piece = piece<<1;
+				}
+			}
+			is.close();
+		}
+	}
+
+	void Game::kingGame() {
+		b.white = 0x8000000;
+		b.black = 0x24000;
+		b.kings = b.black|b.white;
+		b.player = BLACK;
+	}
+
 		void Game::aiTest() {
 			while(!endOfGame(b)) {
 				printBoard(b);
-				alphabeta(b, MAX_DEPTH);
+				alphabeta(b, DEPTH);
 			}
 		}
 
@@ -107,7 +153,7 @@ namespace termcheckers {
 					}
 					else if(line == "ai")
 					{
-						alphabeta(b, MAX_DEPTH);
+						alphabeta(b, DEPTH);
 						printBoard(b);
 					}
 					else if(line == "undo" || line == "back")

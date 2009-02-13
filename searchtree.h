@@ -1,7 +1,7 @@
 #ifndef SEARCHTREE_H
 #define SEARCHTREE_H
 
-#define MAX_DEPTH 10
+#define DEPTH 10
 
 #include "board.h"
 

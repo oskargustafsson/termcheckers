@@ -11,6 +11,8 @@ namespace termcheckers {
                 ~Game();
                 bool makeMove(unsigned int from, unsigned int to);
                 void newGame();
+                void kingGame();
+                void loadGame(char* file);
                 void play();
                 void aiTest();
                 static Game* instance();
