@@ -1,3 +1,4 @@
+#include <iostream>
 #include "board.h"
 #include "ui.h"
 			// ui.h bara för debug
@@ -118,24 +119,40 @@ void move(board& b, unsigned int from, unsigned int to) {
 	}
 }
 
-/*
 bool validateMove(board& b, unsigned int from, unsigned int to) {
-	return true;
-}*/
+	unsigned int moves = 0x0;
+	if((moves = getCaptureMoves(b, from)) != 0) {
+		return validateCapture(b, from, to);
+	}
+	moves = getMoves(b, from);
+	return (moves & to) != 0;
+}
 
-
-bool validateMove(board& b, unsigned int from, unsigned int to) {
-	if((from & b.black) != 0) {
-		if(empty(b, to)) {
+bool validateCapture(board& b, unsigned int from, unsigned int to) {
+	unsigned int moves = getCaptureMoves(b, from);
+	board newboard;
+	bool result = false;
+	
+	if((moves & to) != 0) {
+		newboard = b;
+		move(newboard, from, to);
+		if((getCaptureMoves(newboard, to)) == 0) {
 			return true;
+		} else {
+			std::cout << "More captures possible!\n";
+			return false;
+		}
+	} 
+	while(moves != 0) {
+		unsigned int nextto = (moves & (moves-1)) ^ moves;
+		moves &= moves-1;
+		newboard = b;
+		move(newboard, from, nextto);
+		if(validateCapture(newboard, nextto, to)) {
+			result = true;
 		}
 	}
-	else if((from & b.white) != 0) {
-		if(empty(b, to)) {
-			return true;
-		}
-	}
-	return false;
+	return result;
 }
 
 
@@ -160,11 +177,7 @@ unsigned int getCaptureBit(unsigned int from, unsigned int to) {
 }
 
 void changePlayer(board& b) {
-	if(b.player == WHITE) {
-		b.player = BLACK;
-	} else {
-		b.player = WHITE;
-	}
+	b.player == WHITE ? b.player = BLACK : b.player = WHITE;
 }
 
 int countBits(unsigned int board) {
@@ -189,6 +202,6 @@ int countBits2(unsigned int n)
         +  bits_in_char [(n >> 24) & 0xffu] ;
 }
 
-bool empty(const board& b, unsigned int piece) {
+inline bool empty(const board& b, unsigned int piece) {
 	return (piece & (b.white|b.black)) == 0;
 }

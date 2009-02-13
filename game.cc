@@ -27,11 +27,15 @@ namespace termcheckers {
                         if(getCaptureMoves(b, from) == 0) {
                                 move(b, from, to);
                         } else {
-                                recursiveCapture(b, from, to);
+                                if(recursiveCapture(b, from, to)) {
+				} else {
+					cout << "Erroronous move: " << log2(from)+1 << "-" << log2(to)+1 << endl;
+					return false;
+				}
                         }
 
                         changePlayer(b);
-                        cout << log2(from)+1 << "-" << log2(to)+1 << endl;
+                        cout << "My move is: " << log2(from)+1 << "-" << log2(to)+1 << endl;
                         return true;
                 }
         }
@@ -114,72 +118,72 @@ namespace termcheckers {
 		}
 
         void Game::play() {
-				string line;
-				unsigned int from = 0x0;
-		        unsigned int to = 0x0;
+			string line;
+			unsigned int from = 0x0;
+	        unsigned int to = 0x0;
 
-				printBoard(b);
-                while(!endOfGame(b)) {
+			printBoard(b);
+            while(!endOfGame(b)) {
 
-					cout << "#> ";
-					cin >> line;
+			cout << "#> ";
+			cin >> line;
 
-	                string first;
-	                string second;
-	                string::iterator It = line.begin();
-       		        int i=0;
+            string first;
+            string second;
+            string::iterator It = line.begin();
+	        int i=0;
 
-               		while( It != line.end()) {
-                       	if( *It == '-') {
-                            i++;
-                            It++;
-                            continue;
-	                    }
-                        if(i == 0)
-                            first += *It;
-                        if(i == 1)
-                        	second += *It;
+       		while( It != line.end()) {
+               	if( *It == '-') {
+                	i++;
+                    It++;
+                    continue;
+	            }
+                if(i == 0)
+                	first += *It;
+                    if(i == 1)
+                    	second += *It;
 						It++;
-                	}
-                	from = pow(2.0, atof(first.c_str())-1);
-	                to = pow(2.0, atof(second.c_str())-1);
-
-					if(from != 0 && to != 0)
-					{
-						if(!makeMove(from, to))
-							cout << "Illigal move!";
-						else
-							printBoard(b);
-					}
-					else if(line == "ai")
-					{
-						alphabeta(b, DEPTH);
-						printBoard(b);
-					}
-					else if(line == "undo" || line == "back")
-					{
-						if(undoLastMove()) {
-							cout << "Reverting!" << endl;
-							printBoard(b);
-						} else {
-							cout << "Nothing to undo!" << endl;
-						}
-					}
-					else if(line == "help")
-					{
-						cout << "Commands: ai, undo\n";
-						cout << "Move: from-to\n";
-					}
-					else if(line == "print" || line == "board")
-					{
-						printBoard(b);
-					}
-					else if(line == "quit" || line == "exit")
-					{
-						cout << "Exit current game" << endl;
-						break;
-					}
                 }
+                from = pow(2.0, atof(first.c_str())-1);
+	            to = pow(2.0, atof(second.c_str())-1);
+
+				if(from != 0 && to != 0)
+				{
+					if(!makeMove(from, to))
+						cout << "Illigal move!\n";
+					else
+						printBoard(b);
+				}
+				else if(line == "ai")
+				{
+					alphabeta(b, DEPTH);
+					printBoard(b);
+				}
+				else if(line == "undo" || line == "back")
+				{
+					if(undoLastMove()) {
+						cout << "Reverting!" << endl;
+						printBoard(b);
+					} else {
+						cout << "Nothing to undo!" << endl;
+					}
+				}
+				else if(line == "help")
+				{
+					cout << "Commands: ai, undo, print, quit\n";
+					cout << "Move: from-to\n";
+				}
+				else if(line == "print" || line == "board")
+				{
+					printBoard(b);
+				}
+				else if(line == "quit" || line == "exit")
+				{
+					cout << "Exit current game" << endl;
+					break;
+				}
+            }
         }
 
         Game* Game::game = NULL;
@@ -190,6 +194,7 @@ namespace termcheckers {
                 }
                 return game;
         }
+
   bool Game::undoLastMove() {
     if(history.empty()) {
       return false;
