@@ -13,32 +13,27 @@ int alphabeta(board& b, int depth) {
 unsigned int recursiveTo = 0x0;
 
 int alphabeta(board& b, int depth, int alpha, int beta) {
-	int men;
-	int moves;
+	unsigned int men;
+	unsigned int moves;
 	int tmp;
 	bool betacutoff = false;
-	int moveFrom = 0x0;
-	int moveTo = 0x0;
+	unsigned int moveFrom = 0x0;
+	unsigned int from = 0x0;
+	unsigned int to = 0x0;
+	unsigned int moveTo = 0x0;
 	int capture = 0;
 
-	if(b.player == WHITE) {
-		men = b.white;
-	} else {
-		men = b.black;
-	}
+	b.player == WHITE ? men = b.white : men = b.black;
 
-	/**
-	 * TODO:
-	 * OPTIMIZE THIS!!
-	 */
-	for(int i=0x1; i != 0; i = (i<<1)) {
-		if((i & men) == 0)
-			continue;
-		if(getCaptureMoves(b, i) != 0) {
+	while(men != 0) {
+		from = (men & (men-1)) ^ men;
+		men &= men-1;
+		if(getCaptureMoves(b, from) != 0) {
 			capture++;
 		}
 	}
 	
+	// if there is capture moves try one depth more
 	if(endOfGame(b) || ((depth < 1) && (capture == 0))) {
 		if(b.player == BLACK) {
 			return evaluate(b);
@@ -47,11 +42,15 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		}
 	}
 
+	b.player == WHITE ? men = b.white : men = b.black;
+
 	while(men != 0) {
-		int from = (men & (men-1)) ^ men;
+		from = (men & (men-1)) ^ men;
 		men &= men-1;
 
-/*		if((capture == 1) && (depth == DEPTH)) {
+/*
+ * FIX THIS: break if there is onky one capturemove to do
+ * 			if((capture == 1) && (depth == DEPTH)) {
 			moves = getCaptureMoves(b, from);
 			if(moves != 0) {
 				moveFrom = from;
@@ -65,7 +64,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		}
 
 		while(moves != 0) {
-			unsigned int to = (moves & (moves-1)) ^ moves;
+			to = (moves & (moves-1)) ^ moves;
 			moves &= moves-1;
 
 			board nextboard = b;
@@ -101,6 +100,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 
 int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from) {
 	unsigned int moves = getCaptureMoves(b, from);
+	unsigned int to = 0x0;
 	int tmp;
 
 	if(moves == 0) {
@@ -113,7 +113,7 @@ int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from
 	}
 
 	while(moves != 0) {
-		unsigned int to = (moves & (moves-1)) ^ moves;
+		to = (moves & (moves-1)) ^ moves;
 		moves &= moves-1;
 
 		board nextboard = b;
