@@ -12,7 +12,7 @@ board createBoard() {
 }
 
 unsigned int getCaptureMoves(const board& b, unsigned int piece) {
-	unsigned int moves = 0x0u;
+	unsigned int moves = 0x0;
 
 	if(piece & b.white) {		// white man
 		moves =	(up_left((up_left(piece) & b.black)) & (~(b.black|b.white))) |
@@ -31,19 +31,6 @@ unsigned int getCaptureMoves(const board& b, unsigned int piece) {
 		}
 	}
 	return moves;
-}
-
-unsigned int getRecursiveCaptureMoves(board b, unsigned int piece) {
-	unsigned int moves = getCaptureMoves(b, piece);
-	unsigned int capture = 0x0;
-	if(moves == 0) {
-		return piece;
-	}
-	while(moves != 0) {
-		capture = (moves & (moves-1)) ^ moves;
-		moves &= moves-1;
-	}
-	return 0x0;
 }
 
 unsigned int getMoves(const board& b, unsigned int piece) {
@@ -139,10 +126,14 @@ bool validateMove(board& b, unsigned int from, unsigned int to) {
 
 bool validateMove(board& b, unsigned int from, unsigned int to) {
 	if((from & b.black) != 0) {
-		return true;
+		if(empty(b, to)) {
+			return true;
+		}
 	}
 	else if((from & b.white) != 0) {
-		return true;
+		if(empty(b, to)) {
+			return true;
+		}
 	}
 	return false;
 }

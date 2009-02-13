@@ -21,14 +21,6 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	int moveTo = 0x0;
 	int capture = 0;
 
-	if(endOfGame(b) || depth == 0) {
-		if(b.player == BLACK) {
-			return evaluate(b);
-		} else {
-			return -evaluate(b);
-		}
-	}
-
 	if(b.player == WHITE) {
 		men = b.white;
 	} else {
@@ -47,12 +39,19 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		}
 	}
 	
+	if(endOfGame(b) || ((depth < 1) && (capture == 0))) {
+		if(b.player == BLACK) {
+			return evaluate(b);
+		} else {
+			return -evaluate(b);
+		}
+	}
 
 	while(men != 0) {
 		int from = (men & (men-1)) ^ men;
 		men &= men-1;
 
-/*		if((capture == 1) && (depth == MAX_DEPTH)) {
+/*		if((capture == 1) && (depth == DEPTH)) {
 			moves = getCaptureMoves(b, from);
 			if(moves != 0) {
 				moveFrom = from;
@@ -93,7 +92,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 			break;
 		}
 	}
-	if(depth == MAX_DEPTH) {
+	if(depth == DEPTH) {
 		// The root node, make the best move
 		Game::instance()->makeMove(moveFrom, moveTo);
 	}

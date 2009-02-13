@@ -51,7 +51,7 @@ void printBoard(board b) {
 					printf("White");
 			}
 			if(i == 7 && row == 0) {
-				printf("Depth: %d", MAX_DEPTH);
+				printf("Depth: %d", DEPTH);
 			}
 			printf("\n");
 			row++;
