@@ -17,10 +17,10 @@ unsigned int getCaptureMoves(const board& b, unsigned int piece);
 unsigned int getRecursiveCaptureMoves(board& b, unsigned int piece);
 unsigned int getMoves(const board& b, unsigned int piece);
 
-unsigned int up_left(unsigned const int& piece);
-unsigned int up_right(unsigned const int& piece);
-unsigned int down_left(unsigned const int& piece);
-unsigned int down_right(unsigned const int& piece);
+inline unsigned int up_left(unsigned const int& piece);
+inline unsigned int up_right(unsigned const int& piece);
+inline unsigned int down_left(unsigned const int& piece);
+inline unsigned int down_right(unsigned const int& piece);
 
 board createBoard();
 
@@ -42,7 +42,7 @@ unsigned int getPossibleMoves(board& b);
 
 unsigned int getPossibleCaptureMoves(board b);
 
-unsigned int getNextLevel(board b, unsigned int m);
+unsigned int getNextLevel(board b);
 
 bool empty(const board& b, unsigned int piece);
 

@@ -12,71 +12,22 @@ board createBoard() {
 }
 
 unsigned int getCaptureMoves(const board& b, unsigned int piece) {
-	unsigned int moves = 0x0;
-	unsigned int tmp = 0x0;
+	unsigned int moves = 0x0u;
 
-	if((piece & b.white) != 0) { // if white
-		tmp = up_left(piece);
-		if((tmp & b.black) != 0) {
-			tmp = up_left(tmp);
-			if(empty(b, tmp)) {
-				moves |= tmp;
-			}
-		}
-		tmp = up_right(piece);
-		if((tmp & b.black) != 0) {
-			tmp = up_right(tmp);
-			if(empty(b, tmp)) {
-				moves |= tmp;
-			}
-		}
-		if((piece & b.kings) != 0) { // if white king
-			tmp = down_left(piece);
-			if((tmp & b.black) != 0) {
-				tmp = down_left(tmp);
-				if(empty(b, tmp)) {
-					moves |= tmp;
-				}
-			}
-			tmp = down_right(piece);
-			if((tmp & b.black) != 0) {
-				tmp = down_right(tmp);
-				if(empty(b, tmp)) {
-					moves |= tmp;
-				}
-			}
+	if(piece & b.white) {		// white man
+		moves =	(up_left((up_left(piece) & b.black)) & (~(b.black|b.white))) |
+				(up_right((up_right(piece) & b.black)) & (~(b.black|b.white)));
+		if(piece & b.kings) {	// white king
+			moves |=	(down_left((down_left(piece) & b.black)) & (~(b.black|b.white))) |
+						(down_right((down_right(piece) & b.black)) & (~(b.black|b.white)));
 		}
 	}
-	if((piece & b.black) != 0) { // if black
-		tmp = down_left(piece);
-		if((tmp & b.white) != 0) {
-			tmp = down_left(tmp);
-			if(empty(b, tmp)) {
-				moves |= tmp;
-			}
-		}
-		tmp = down_right(piece);
-		if((tmp & b.white) != 0) {
-			tmp = down_right(tmp);
-			if(empty(b, tmp)) {
-				moves |= tmp;
-			}
-		}
-		if((piece & b.kings) != 0) { // if black king
-			tmp = up_left(piece);
-			if((tmp & b.white) != 0) {
-				tmp = up_left(tmp);
-				if(empty(b, tmp)) {
-					moves |= tmp;
-				}
-			}
-			tmp = up_right(piece);
-			if((tmp & b.white) != 0) {
-				tmp = up_right(tmp);
-				if(empty(b, tmp)) {
-					moves |= tmp;
-				}
-			}
+	else if(piece & b.black) {	// white man
+		moves =	(down_left((down_left(piece) & b.white)) & (~(b.black|b.white))) |
+				(down_right((down_right(piece) & b.white)) & (~(b.black|b.white)));
+		if(piece & b.kings) {	// black pimp
+			moves |=	(up_left((up_left(piece) & b.white)) & (~(b.black|b.white))) |
+						(up_right((up_right(piece) & b.white)) & (~(b.black|b.white)));
 		}
 	}
 	return moves;
@@ -96,25 +47,14 @@ unsigned int getRecursiveCaptureMoves(board b, unsigned int piece) {
 }
 
 unsigned int getMoves(const board& b, unsigned int piece) {
-	unsigned int moves = 0x0;
-
 	if((piece & b.kings) != 0) {
-		moves |= up_left(piece);
-		moves |= up_right(piece);
-		moves |= down_left(piece);
-		moves |= down_right(piece);
+		return (up_left(piece) | up_right(piece) | down_left(piece) | down_right(piece)) & (~(b.black|b.white));
 	} else if((piece & b.white) != 0) {
-		moves |= up_left(piece);
-		moves |= up_right(piece);
+		return (up_left(piece) | up_right(piece)) & (~(b.black|b.white));
 	} else if((piece & b.black) != 0) {
-		moves |= down_left(piece);
-		moves |= down_right(piece);
+		return (down_left(piece) | down_right(piece))  & (~(b.black|b.white));
 	}
-
-	// remove occupied spaces
-	moves = moves & ~(b.black|b.white);
-
-	return moves;
+	return 0x0u;
 }
 
 
@@ -122,36 +62,20 @@ unsigned int getMoves(const board& b, unsigned int piece) {
  * up_left, up_right, down_left, down_right
  * returns the bitmap after piece move one step
  */
-unsigned int up_left(unsigned const int& piece) {
-	if((piece & 0x0F0F0F00) != 0)
-		return piece>>4;
-	if((piece & 0xE0E0E0E0) != 0)
-		return piece>>5;
-	return 0x0;
+inline unsigned int up_left(unsigned const int& piece) {
+	return (((piece & 0x0F0F0F00)>>4) | ((piece & 0xE0E0E0E0)>>5));
 }
 
-unsigned int up_right(unsigned const int& piece) {
-	if((piece & 0xF0F0F0F0) != 0)
-		return piece>>4;
-	if((piece & 0x07070700) != 0)
-		return piece>>3;
-	return 0x0;
+inline unsigned int up_right(unsigned const int& piece) {
+	return (((piece & 0xF0F0F0F0)>>4) | ((piece & 0x07070700)>>3));
 }
 
-unsigned int down_left(unsigned const int& piece) {
-	if((piece & 0x0F0F0F0F) != 0)
-		return piece<<4;
-	if((piece & 0x00E0E0E0) != 0)
-		return piece<<3;
-	return 0x0;
+inline unsigned int down_left(unsigned const int& piece) {
+	return (((piece & 0x0F0F0F0F)<<4) | ((piece & 0x00E0E0E0)<<3));
 }
 
-unsigned int down_right(unsigned const int& piece) {
-	if((piece & 0x00F0F0F0) != 0)
-		return piece<<4;
-	if((piece & 0x07070707) != 0)
-		return piece<<5;
-	return 0x0;
+inline unsigned int down_right(unsigned const int& piece) {
+	return (((piece & 0x00F0F0F0)<<4) | ((piece & 0x07070707)<<5));
 }
 
 /**
@@ -176,7 +100,8 @@ bool endOfGame(const board& b) {
 void move(board& b, unsigned int from, unsigned int to) {
 	unsigned int maskrows = 0xF0F0F0F0;
 
-//	if((to & getPossibleMoves(b)) == 0) return;		//giltigt drag?
+//	printInt(getPossibleMoves(b));		//giltigt drag?
+//	printInt(getNextLevel(b));
 
 	if((b.white & from) != 0) {
 		b.white &= ~from;
@@ -206,6 +131,12 @@ void move(board& b, unsigned int from, unsigned int to) {
 	}
 }
 
+/*
+bool validateMove(board& b, unsigned int from, unsigned int to) {
+	return true;
+}*/
+
+
 bool validateMove(board& b, unsigned int from, unsigned int to) {
 	if((from & b.black) != 0) {
 		return true;
@@ -215,6 +146,7 @@ bool validateMove(board& b, unsigned int from, unsigned int to) {
 	}
 	return false;
 }
+
 
 /**
  * get the position between two squares
@@ -265,54 +197,7 @@ int countBits2(unsigned int n)
         +  bits_in_char [(n >> 16) & 0xffu]
         +  bits_in_char [(n >> 24) & 0xffu] ;
 }
-/*
-// ej kungar, än
-unsigned int getPossibleMoves(board& b) {
-	unsigned int allpieces = b.black|b.white;
-	unsigned int pieces;
 
-	if(b.player == BLACK) {
-		pieces = b.black;
-		printInt( (	((pieces & 0x0F0F0F0F)<<4) | ((pieces & 0x00E0E0E0)<<3) |
-					((pieces & 0x00F0F0F0)<<4) | ((pieces & 0x07070707)<<5) ) & (~allpieces) );
-
-	//	getPossibleCaptureMoves(b);
-		return	( (	((pieces & 0x0F0F0F0F)<<4) | ((pieces & 0x00E0E0E0)<<3) |
-					((pieces & 0x00F0F0F0)<<4) | ((pieces & 0x07070707)<<5) ) & (~allpieces) );
-	}
-	else {
-		pieces = b.white;
-		printInt( (	((pieces & 0x0F0F0F00)>>4) | ((pieces & 0xE0E0E0E0)>>5) |
-					((pieces & 0xF0F0F0F0)>>4) | ((pieces & 0x07070700)>>3) ) & (~allpieces) );
-
-		return	( (	((pieces & 0x0F0F0F00)>>4) | ((pieces & 0xE0E0E0E0)>>5) |
-					((pieces & 0xF0F0F0F0)>>4) | ((pieces & 0x07070700)>>3) ) & (~allpieces) );
-	}
-}
-
-unsigned int getPossibleCaptureMoves(board b) {
-	unsigned int moves;
-	if(moves = getNextLevel(b, b.black)) {
-		b.black = moves;
-		return getNextLevel(b, b.black);
-	}
-	else {
-		return 0;
-	}
-	return 0;
-}
-
-unsigned int getNextLevel(board b, unsigned int moves) {
-	if(b.player == BLACK) {
-		return getPossibleMoves( (	((moves & 0x0F0F0F0F)<<4) | ((moves & 0x00E0E0E0)<<3) |
-					((moves & 0x00F0F0F0)<<4) | ((moves & 0x07070707)<<5) ) & (b.white) );
-	}
-	else {
-		return getPossibleMoves( (	((moves & 0x0F0F0F00)>>4) | ((moves & 0xE0E0E0E0)>>5) |
-					((moves & 0xF0F0F0F0)>>4) | ((moves & 0x07070700)>>3) ) & (b.white) );
-	}
-}
-*/
 bool empty(const board& b, unsigned int piece) {
 	return (piece & (b.white|b.black)) == 0;
 }
