@@ -121,7 +121,20 @@ void move(board& b, unsigned int from, unsigned int to) {
 
 bool validateMove(board& b, unsigned int from, unsigned int to) {
 	unsigned int moves = 0x0;
-	if((moves = getCaptureMoves(b, from)) != 0) {
+	unsigned int men = 0x0;
+	bool capture = false;
+
+	b.player == WHITE ? men = b.white : men = b.black;
+	while(men != 0) {
+		unsigned int tmp = (men & (men-1)) ^ men;
+		men &= men-1;
+		if(getCaptureMoves(b, tmp) != 0) {
+			capture = true;
+			break;
+		}
+	}
+
+	if(capture) {
 		return validateCapture(b, from, to);
 	}
 	moves = getMoves(b, from);
