@@ -7,13 +7,13 @@ board createBoard() {
 	board b;
 	b.black = 0x00000FFF;
 	b.white = 0xFFF00000;
-	b.kings = 0x0;
+	b.kings = 0x0u;
 	b.player = BLACK;
 	return b;
 }
 
 unsigned int getCaptureMoves(const board& b, unsigned int piece) {
-	unsigned int moves = 0x0;
+	unsigned int moves = 0x0u;
 
 	if(piece & b.white) {		// white man
 		moves =	(up_left((up_left(piece) & b.black)) & (~(b.black|b.white))) |
@@ -72,9 +72,9 @@ inline unsigned int down_right(unsigned const int& piece) {
 bool endOfGame(const board& b) {
 	for(int i=0x1; i != 0; i = (i<<1)) {
 		if(((b.player == BLACK) && ((i & b.black) != 0)) || ((b.player == WHITE) && ((i & b.white) != 0))) {
-			if(getMoves(b, i) != 0x0)
+			if(getMoves(b, i) != 0x0u)
 				return false;
-			if(getCaptureMoves(b, i) != 0x0)
+			if(getCaptureMoves(b, i) != 0x0u)
 				return false;
 		}
 	}
@@ -100,6 +100,7 @@ void move(board& b, unsigned int from, unsigned int to) {
 
 		if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
 			b.black &= ~getCaptureBit(from, to);
+			b.kings &= ~getCaptureBit(from, to);
 		}
 	}
 	if((b.black & from) != 0) {
@@ -111,6 +112,7 @@ void move(board& b, unsigned int from, unsigned int to) {
 
 		if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
 			b.white &= ~getCaptureBit(from, to);
+			b.kings &= ~getCaptureBit(from, to);
 		}
 	}
 	if((from & b.kings) != 0) {
@@ -120,8 +122,8 @@ void move(board& b, unsigned int from, unsigned int to) {
 }
 
 bool validateMove(board& b, unsigned int from, unsigned int to) {
-	unsigned int moves = 0x0;
-	unsigned int men = 0x0;
+	unsigned int moves = 0x0u;
+	unsigned int men = 0x0u;
 	bool capture = false;
 
 	b.player == WHITE ? men = b.white : men = b.black;
@@ -186,7 +188,7 @@ unsigned int getCaptureBit(unsigned int from, unsigned int to) {
 			return up_right(from);
 		}
 	}
-	return 0x0;
+	return 0x0u;
 }
 
 void changePlayer(board& b) {
