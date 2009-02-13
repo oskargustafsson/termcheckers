@@ -182,6 +182,9 @@ namespace termcheckers {
 				{
 					cout << "Exit current game" << endl;
 					break;
+				} else if(line == "skip") {
+					changePlayer(b);
+					printBoard(b);
 				}
             }
         }
