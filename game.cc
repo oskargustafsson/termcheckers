@@ -49,17 +49,15 @@ namespace termcheckers {
 		bool Game::recursiveCapture(board tmpboard, unsigned int from, unsigned int to) {
 				unsigned int moves = getCaptureMoves(tmpboard, from);
 				unsigned int capture = 0x0;
-				bool king;
 				board test;
 				while(moves != 0) {
 						capture = (moves & (moves-1)) ^ moves;
 						moves &= moves-1;
 						test = tmpboard;
 
-						king = (test.kings & from) != 0;
 						move(test, from, capture);
 
-						if(capture == to || (!king && ((test.kings & capture) != 0))) {
+						if(capture == to) {
 								b = test;
 								return true;
 						}

@@ -12,13 +12,15 @@ board createBoard() {
 	return b;
 }
 
+bool newKing = false;
+
 unsigned int getCaptureMoves(const board& b, unsigned int piece) {
 	unsigned int moves = 0x0u;
 
 	if(piece & b.white) {		// white man
 		moves =	(up_left((up_left(piece) & b.black)) & (~(b.black|b.white))) |
 				(up_right((up_right(piece) & b.black)) & (~(b.black|b.white)));
-		if(piece & b.kings) {	// white king
+		if((piece & b.kings) && !newKing) {	// white king
 			moves |=	(down_left((down_left(piece) & b.black)) & (~(b.black|b.white))) |
 						(down_right((down_right(piece) & b.black)) & (~(b.black|b.white)));
 		}
@@ -26,7 +28,7 @@ unsigned int getCaptureMoves(const board& b, unsigned int piece) {
 	else if(piece & b.black) {	// white man
 		moves =	(down_left((down_left(piece) & b.white)) & (~(b.black|b.white))) |
 				(down_right((down_right(piece) & b.white)) & (~(b.black|b.white)));
-		if(piece & b.kings) {	// black pimp
+		if((piece & b.kings) && !newKing) {	// black pimp
 			moves |=	(up_left((up_left(piece) & b.white)) & (~(b.black|b.white))) |
 						(up_right((up_right(piece) & b.white)) & (~(b.black|b.white)));
 		}
@@ -88,6 +90,7 @@ bool endOfGame(const board& b) {
  */
 void move(board& b, unsigned int from, unsigned int to) {
 	unsigned int maskrows = 0xF0F0F0F0;
+	newKing = false;
 
 //	printInt(getPossibleMoves(b));		//giltigt drag?
 //	printInt(getNextLevel(b));
@@ -95,7 +98,8 @@ void move(board& b, unsigned int from, unsigned int to) {
 	if((b.white & from) != 0) {
 		b.white &= ~from;
 		b.white |= to;
-		if((to & 0x0000000F) != 0) {
+		if(((to & 0x0000000F) != 0) && ((b.kings & from) == 0)) {
+			newKing = true;
 			b.kings |= to;
 		}
 
@@ -107,7 +111,8 @@ void move(board& b, unsigned int from, unsigned int to) {
 	if((b.black & from) != 0) {
 		b.black &= ~from;
 		b.black |= to;
-		if((to & 0xF0000000) != 0) {
+		if(((to & 0xF0000000) != 0) && ((b.kings & from) == 0)) {
+			newKing = true;
 			b.kings |= to;
 		}
 
@@ -125,22 +130,17 @@ void move(board& b, unsigned int from, unsigned int to) {
 bool validateMove(board& b, unsigned int from, unsigned int to) {
 	unsigned int moves = 0x0u;
 	unsigned int men = 0x0u;
-	bool capture = false;
 
 	b.player == WHITE ? men = b.white : men = b.black;
 	while(men != 0) {
 		unsigned int tmp = (men & (men-1)) ^ men;
 		men &= men-1;
 		if(getCaptureMoves(b, tmp) != 0) {
-			capture = true;
-			break;
+			return validateCapture(b, from, to);
 		}
 	}
+	
 	b.player == WHITE ? men = b.white : men = b.black;
-
-	if(capture) {
-		return validateCapture(b, from, to);
-	}
 	moves = getMoves(b, from);
 	return ((moves & to) != 0) && ((men & from) != 0);
 }
