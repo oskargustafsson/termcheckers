@@ -1,9 +1,5 @@
 
-* Fixa makefilen bättre
-* Validera giltiga drag
-* Tillåta flera hopp
 * Inte upprepa samma drag
-
-* Tabell med resultat av olika kombinationer av djup på 2 ai
-
-! Vid jämna djup är den bra, vid udda dålig
+* Undvik draw
+* Inte tillåta nya kungar att hoppa vidare (kingjump.wdp) //fixa i validateMove och AI också...
+* Ai ska raportera exakt väg om det behövs

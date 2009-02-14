@@ -9,7 +9,7 @@ namespace termcheckers {
         class Game {
         public:
                 ~Game();
-                bool makeMove(unsigned int from, unsigned int to);
+                bool makeMove(unsigned int places[], int size);
                 void newGame();
                 void kingGame();
                 void loadGame(char* file);

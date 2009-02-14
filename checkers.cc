@@ -11,28 +11,24 @@ int main(int argc, char* argv[]) {
 
 	cout << "Hello!\n";
 
+	Game* game = Game::instance();
+	game->newGame();
+
 	if(argc > 1) {
-		Game* game = Game::instance();
 		game->loadGame(argv[1]);
-		game->play();
-	} else do {
+	}
+	do {
 		cout << "#> ";
 		cin >> line;
 		
-		if(line == "play" || line == "newgame") {
-			Game* game = Game::instance();
-			game->newGame();
+		if(line == "play") {
 			game->play();
-
 		} else if(line == "printboard") {
 			printBoard(createBoard());
 		} else if(line == "aitest") {
-			Game* game = Game::instance();
-			game->newGame();
 			game->aiTest();
-		} else if(line == "kingtest") {
-			Game* game = Game::instance();
-			game->kingGame();
+		} else if(line == "newgame") {
+			game->newGame();
 			game->play();
 		}
 	} while(line != "quit");
