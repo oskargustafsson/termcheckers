@@ -68,6 +68,7 @@ inline unsigned int down_right(unsigned const int& piece) {
 
 /**
  * Returns true if there are no possible moves for current player
+ * OPTIMIZE this run for every node in searchtree
  */
 bool endOfGame(const board& b) {
 	for(int i=0x1; i != 0; i = (i<<1)) {
@@ -135,12 +136,13 @@ bool validateMove(board& b, unsigned int from, unsigned int to) {
 			break;
 		}
 	}
+	b.player == WHITE ? men = b.white : men = b.black;
 
 	if(capture) {
 		return validateCapture(b, from, to);
 	}
 	moves = getMoves(b, from);
-	return (moves & to) != 0;
+	return ((moves & to) != 0) && ((men & from) != 0);
 }
 
 bool validateCapture(board& b, unsigned int from, unsigned int to) {

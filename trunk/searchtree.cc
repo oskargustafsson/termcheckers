@@ -3,10 +3,14 @@
 #include "evaluation.h"
 #include "board.h"
 #include "game.h"
+#include "ui.h"
 
 using namespace termcheckers;
 
+int maxdepth;
+
 int alphabeta(board& b, int depth) {
+	maxdepth = depth;
 	return alphabeta(b, depth, -32000, 32000);
 }
 
@@ -49,8 +53,8 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		men &= men-1;
 
 /*
- * FIX THIS: break if there is onky one capturemove to do
- * 			if((capture == 1) && (depth == DEPTH)) {
+ * FIX THIS: break if there is only one capturemove to do
+ * 			if((capture == 1) && (depth == maxdepth)) {
 			moves = getCaptureMoves(b, from);
 			if(moves != 0) {
 				moveFrom = from;
@@ -91,9 +95,10 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 			break;
 		}
 	}
-	if(depth == DEPTH) {
+	if(depth == maxdepth) {
+		unsigned int places[] = {moveFrom, moveTo};
 		// The root node, make the best move
-		Game::instance()->makeMove(moveFrom, moveTo);
+		Game::instance()->makeMove(places, 2);
 	}
 	return alpha;
 }
@@ -105,10 +110,13 @@ int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from
 
 	if(moves == 0) {
 		changePlayer(b);
+
 		tmp = -alphabeta(b, depth-1, -beta, -alpha);
 		if(tmp > alpha) {
 			alpha = tmp;
-			recursiveTo = from;
+			if(depth == maxdepth) {
+				recursiveTo = from;
+			}
 		}
 	}
 

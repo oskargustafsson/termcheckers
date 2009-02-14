@@ -70,7 +70,7 @@ void printInt(unsigned int b) {
 		if((i+4) % 8 != 0)
 			printf("\033[47m  \033[0m");
 		if((0x1 & (b>>i)) != 0)
-			printf("\033[42mx \033[0m");
+			printf("\033[40m  \033[0m");
 		else
 			printf("\033[42m  \033[0m");
 		if((i+1) % 4 == 0) {
@@ -80,4 +80,5 @@ void printInt(unsigned int b) {
 			printf("\n");
 		}
 	}
+	printf("\n");
 }
