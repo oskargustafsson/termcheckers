@@ -24,6 +24,7 @@ namespace termcheckers {
 						return false;
 				} else {
 						stackBoard();
+						b.newKing = false;
 						if((getCaptureMoves(b, places[0]) == 0) && size == 2) {
 								move(b, places[0], places[1]);
 						} else {

@@ -8,6 +8,7 @@ struct board {
 	unsigned int black;
 	unsigned int white;
 	unsigned int kings;
+	bool newKing;
 	bool player; // WHITE=0, BLACK=1
 };
 
