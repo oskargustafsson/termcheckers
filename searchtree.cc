@@ -27,9 +27,20 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 	unsigned int moveTo = 0x0u;
 	int capture = 0;
 
-	// Count number of capture moves:
-	// try and do this without loop!
 	b.player == WHITE ? men = b.white : men = b.black;
+
+	/*
+	 * test optimiering:
+	 * ta bort några som garanterat inte kan hoppa
+	 * inte säkert att det är bättre. och i vilket fall som helst så blir det nog ingen större skillnad...
+	*/
+	men = (((men<<9) & ~(b.black & b.white))>>9) |
+		(((men<<7) & ~(b.black & b.white))>>7) |
+		(((men>>9) & ~(b.black & b.white))<<9) |
+		(((men>>7) & ~(b.black & b.white))<<7);
+
+	// Count number of capture moves:
+	// TODO: try and do this without loop!
 	while(men != 0) {
 		from = (men & (men-1)) ^ men;
 		men &= men-1;
@@ -50,19 +61,18 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		from = (men & (men-1)) ^ men;
 		men &= men-1;
 
-/*
- * FIX THIS: break if there is only one capturemove to do
- * 			if((capture == 1) && (depth == maxdepth)) {
-			moves = getCaptureMoves(b, from);
-			if(moves != 0) {
-				moveFrom = from;
-				moveTo = moves;
-				break;
-			}
-		} else*/ if(capture == 0) {
+		if(capture == 0) {
 			moves = getMoves(b, from);
 		} else {
 			moves = getCaptureMoves(b, from);
+
+ 			// break if there is only one capture move to do
+			// maybe move this outside alphabeta?
+			if(moves != 0 && capture == 1 && depth == maxdepth && oneCapture(b, from, moves)) {
+				moveFrom = from;
+				moveTo = recursiveTo;
+				break;
+			}
 		}
 
 		while(moves != 0) {
@@ -132,4 +142,18 @@ int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from
 	}
 
 	return alpha;
+}
+
+bool oneCapture(board b, unsigned int from, unsigned int moves) {
+	int bits = countBits(moves);
+
+	while(bits == 1) {
+		move(b, from, moves);
+		from = moves;
+		moves = getCaptureMoves(b, from);
+		bits = countBits(moves);
+	}
+	recursiveTo = from;
+
+	return bits == 0;
 }

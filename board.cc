@@ -5,8 +5,8 @@
 
 board createBoard() {
 	board b;
-	b.black = 0x00000FFF;
-	b.white = 0xFFF00000;
+	b.black = 0x00000FFFu;
+	b.white = 0xFFF00000u;
 	b.kings = 0x0u;
 	b.player = BLACK;
 	b.newKing = false;
@@ -70,7 +70,7 @@ inline unsigned int down_right(unsigned const int& piece) {
 
 /**
  * Returns true if there are no possible moves for current player
- * OPTIMIZE this run for every node in searchtree
+ * OPTIMIZE
  */
 bool endOfGame(const board& b) {
 	for(int i=0x1; i != 0; i = (i<<1)) {
@@ -87,6 +87,7 @@ bool endOfGame(const board& b) {
 /**
  * Dosn't check anything! any move is possible
  * only one jump!
+ * OPTIMIZE
  */
 void move(board& b, unsigned int from, unsigned int to) {
 	unsigned int maskrows = 0xF0F0F0F0;
@@ -175,6 +176,7 @@ bool validateCapture(board& b, unsigned int from, unsigned int to) {
 
 /**
  * get the position between two squares
+ * OPTIMIZE
  */
 unsigned int getCaptureBit(unsigned int from, unsigned int to) {
 	if(from < to) {
