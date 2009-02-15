@@ -14,21 +14,22 @@ int alphabeta(board& b, int depth) {
 	return alphabeta(b, depth, -32000, 32000);
 }
 
-unsigned int recursiveTo = 0x0;
+unsigned int recursiveTo = 0x0u;
 
 int alphabeta(board& b, int depth, int alpha, int beta) {
 	unsigned int men;
 	unsigned int moves;
 	int tmp;
 	bool betacutoff = false;
-	unsigned int moveFrom = 0x0;
-	unsigned int from = 0x0;
-	unsigned int to = 0x0;
-	unsigned int moveTo = 0x0;
+	unsigned int moveFrom = 0x0u;
+	unsigned int from = 0x0u;
+	unsigned int to = 0x0u;
+	unsigned int moveTo = 0x0u;
 	int capture = 0;
 
+	// Count number of capture moves:
+	// try and do this without loop!
 	b.player == WHITE ? men = b.white : men = b.black;
-
 	while(men != 0) {
 		from = (men & (men-1)) ^ men;
 		men &= men-1;
@@ -37,17 +38,14 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 		}
 	}
 	
+	// Check if its the end node
 	// if there is capture moves try one depth more
 	if(endOfGame(b) || ((depth < 1) && (capture == 0))) {
-		if(b.player == BLACK) {
-			return evaluate(b);
-		} else {
-			return -evaluate(b);
-		}
+		return b.player == BLACK ? evaluate(b) : -evaluate(b);
 	}
 
+	// For each move
 	b.player == WHITE ? men = b.white : men = b.black;
-
 	while(men != 0) {
 		from = (men & (men-1)) ^ men;
 		men &= men-1;
@@ -105,7 +103,7 @@ int alphabeta(board& b, int depth, int alpha, int beta) {
 
 int captureAlphaBeta(board& b, int depth, int alpha, int beta, unsigned int from) {
 	unsigned int moves = getCaptureMoves(b, from);
-	unsigned int to = 0x0;
+	unsigned int to = 0x0u;
 	int tmp;
 
 	if(moves == 0) {

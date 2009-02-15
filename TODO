@@ -1,5 +1,17 @@
 
 * Inte upprepa samma drag
 * Undvik draw
-* Inte tillåta nya kungar att hoppa vidare (kingjump.wdp) //fixa i validateMove och AI också...
 * Ai ska raportera exakt väg om det behövs
+* Räkna tiden
+* Skriva ut varje gång:
+	Player: White
+	Current evaluation: 234
+	Time left: 295 sek
+
+	Last move
+	  Move Nbr: 1
+	  Move: 9-13
+	  Value: (retur-värde av alpha-beta)
+	  Evaluated nodes: 12453534
+	  Depth: 16
+	  Time used: 2 sek
