@@ -3,6 +3,9 @@
 * Undvik draw
 * Ai ska raportera exakt väg om det behövs
 * Räkna tiden
+
+
+Lämna till Linus: ---------------------------------
 * Skriva ut varje gång:
 	Player: White
 	Current evaluation: 234
@@ -15,3 +18,6 @@
 	  Evaluated nodes: 12453534
 	  Depth: 16
 	  Time used: 2 sek
+
+Jag kan fixa detta I veckan. :-D
+---------------------------------------------------
