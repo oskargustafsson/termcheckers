@@ -3,6 +3,8 @@
 
 #include "board.h"
 
-int evaluate(board& b);
+using namespace checkers;
+
+int evaluate(Board& b);
 
 #endif
