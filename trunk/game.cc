@@ -141,7 +141,7 @@ namespace checkers {
 
 	void Game::play() {
 		string line;
-
+		state = PLAYING;
 		gui->printBoard(board);
 		while(!board.endOfGame()) {
 			gui->input();

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "board.h"
 #include "gui.h"
 // ui.h bara för debug
@@ -144,6 +145,21 @@ namespace checkers {
 			kings |= to;
 		}
 	}
+
+/*	void Board::move(unsigned int from, unsigned int to) {
+
+		int n = 2;
+
+		from = log2(from);
+	to = log2(to);
+		std::cout << "white " << from << " black " << to;
+
+		int tmp = ((white >> from) ^ (white >> to)) & ((1 << n) - 1); 	// XOR temporary
+		white = white ^ ((tmp << from) | (tmp << to));
+
+		tmp = ((black >> from) ^ (black >> to)) & ((1 << n) - 1);
+		black = black ^ ((tmp << from) | (tmp << to));
+	} */
 
 	bool Board::validateMove(unsigned int from, unsigned int to) {
 		unsigned int moves = 0x0u;
