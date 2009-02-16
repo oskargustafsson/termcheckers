@@ -99,27 +99,29 @@ namespace checkers {
 	  }
 
 	  void GUI::input() {
-			string line;
+			 string line;
 			 cout << "> ";
 			 cin >> line;
 
 			 switch (game->state) {
-				case 0:
+				case NOT_PLAYING:
 					  if(line == "play") {
 							 game->play();
 					  } else if(line == "aitest") {
 							 game->aiTest();
 					  } else if(line == "newgame") {
 							 game->newGame();
+					  } else if(line == "help") {
+							 println("Commands: aitest, newgame, play, quit");
 					  } else if(line == "quit") {
-					  		game->state = QUIT;
+							 game->state = QUIT;
 					  }
 					  break;
 				case PLAYING:
-					 int size;
+					  int size;
 					  if((size = isMovement(line)) != 0)
 					  {
-					  		vector<int> movements = parseMovement(line);
+							 vector<int> movements = parseMovement(line);
 							 if(!game->makeMove(movements, size))
 								cout << "Illegal move!\n";
 							 else
@@ -131,56 +133,55 @@ namespace checkers {
 					  else if(line == "undo" || line == "back")
 					  {
 							 if(game->undoLastMove()) {
-								cout << "Reverting!" << endl;
+								println("Reverting!");
 								printBoard(game->board);
 							 } else {
-								cout << "Nothing to undo!" << endl;
+								println("Nothing to undo!");
 							 }
 					  }
 					  else if(line == "help")
 					  {
-							 cout << "Commands: ai, undo, print, quit\n";
-							 cout << "Move: from-to\n";
+							 println("Commands: ai, undo, print, quit");
+							 println("Move: from-to");
 					  }
 					  else if(line == "print" || line == "board")
 					  {
 							 printBoard(game->board);
 					  }
-					  else if(line == "quit" || line == "exit")
+					  else if(line == "quit" || line == "stop")
 					  {
-							 cout << "Exit current game" << endl;
+							 game->state = NOT_PLAYING;
+							 game->board.createBoard();
+							 println("Stops current game");
 					  } else if(line == "skip") {
 							 game->board.changePlayer();
 							 printBoard(game->board);
 					  }
 					  break;
-					  default:
-					  cout << "default" << game->state;
-					  break;
 			 }
 	  }
 
-		int GUI::isMovement(string line) {
-			string::iterator It = line.begin();
-			string tmpstr;
-			int result = 1;
-			while( It != line.end()) {
+	  int GUI::isMovement(string line) {
+			 string::iterator It = line.begin();
+			 string tmpstr;
+			 int result = 1;
+			 while( It != line.end()) {
 				if( *It == '-') {
-					result++;
-					if(atoi(tmpstr.c_str()) == 0) {
-						result = 0;
-						break;
-					}
-					tmpstr = "";
+					  result++;
+					  if(atoi(tmpstr.c_str()) == 0) {
+							 result = 0;
+							 break;
+					  }
+					  tmpstr = "";
 				} else
-					tmpstr += *It;
+					  tmpstr += *It;
 				It++;
 			 }
-			if(atof(tmpstr.c_str()) == 0) {
+			 if(atof(tmpstr.c_str()) == 0) {
 				result = 0;
-			}
-			return result;
-		}
+			 }
+			 return result;
+	  }
 
 	  vector<int> GUI::parseMovement(string line) {
 			 string::iterator It = line.begin();
