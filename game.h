@@ -11,30 +11,30 @@
 #define QUIT 2
 
 namespace checkers {
-		class GUI;
+	class GUI;
 
-        class Game {
-        public:
-                Game();
-                ~Game();
-					 void setGUI(GUI* g);
-                bool makeMove(std::vector<int> movements, int size);
-                void newGame();
-                void loadGame(char* file);
-                void play();
-					 void stop();
-                void aiTest();
-                void ai();
-                bool undoLastMove();
+	class Game {
+		public:
+			Game();
+			~Game();
+			void setGUI(GUI* g);
+			bool makeMove(std::vector<unsigned int> movements);
+			void newGame();
+			void loadGame(char* file);
+			void play();
+			void stop();
+			void aiTest();
+			void ai();
+			bool undoLastMove();
 
-                Board board;
-					 int state;
-        private:
-                bool recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
+			Board board;
+			int state;
+		private:
+			bool recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 
-                std::stack<Board> history;
-                bool output;
-					 GUI* gui;
-        };
+			std::stack<Board> history;
+			bool output;
+			GUI* gui;
+	};
 }
 #endif

@@ -1,9 +1,12 @@
 
 * Inte upprepa samma drag
 * Undvik draw
-* Ai ska raportera exakt väg om det behövs / johan fixar
 * Räkna tiden // Linus fixar.
 * Iterativ deepening
+* Hashtable grejjer för att spara drag
+* Lägga in 2-3 första dragen utan sökning
+* Scout algoritmen
+* Lite andra optimeringar typ history heuristics
 
 
 Lämna till Linus: ---------------------------------

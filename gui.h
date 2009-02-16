@@ -23,7 +23,7 @@ namespace checkers {
 	private:
 		Game* game;
 		int isMovement(std::string line);
-		std::vector<int> parseMovement(std::string line);
+		std::vector<unsigned int> parseMovement(std::string line);
 	};
 }
 
