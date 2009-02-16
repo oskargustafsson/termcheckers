@@ -5,7 +5,7 @@
 #include <stack>
 #include <vector>
 #include "game.h"
-#include "searchtree.h"
+#include "search.h"
 #include "board.h"
 #include "gui.h"
 
@@ -13,7 +13,8 @@ using namespace std;
 
 namespace checkers {
 
-	Game::Game() : state(NOT_PLAYING) {
+	Game::Game() {
+		state = NOT_PLAYING;
 		//board.compute_bits_in_char();
 	}
 	Game::~Game() {}
@@ -126,14 +127,16 @@ namespace checkers {
 
 	void Game::aiTest() {
 		while(!board.endOfGame()) {
+			Search search(this);
 			gui->printBoard(board);
-			alphabeta(board, DEPTH, this);
+			search.alphabeta(board, DEPTH);
 		}
 	}
 
 	void Game::ai() {
-			  alphabeta(board, DEPTH, this);
-			  gui->printBoard(board);
+			Search search(this);
+			search.alphabeta(board, DEPTH);
+			gui->printBoard(board);
 	}
 
 	void Game::play() {

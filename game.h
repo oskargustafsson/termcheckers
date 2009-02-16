@@ -2,10 +2,9 @@
 #define GAME_H
 
 #include "board.h"
-#include "gui.h"
 #include <stack>
 #include <vector>
-#include "searchtree.h"
+#include "search.h"
 
 #define NOT_PLAYING 0
 #define PLAYING 1

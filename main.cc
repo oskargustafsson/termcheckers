@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 	string line;
 
 	Game* game = new Game();
-	GUI* gui = new GUI();
+	GUI* gui = new GUI(game);
 	game->setGUI(gui);
 
 	if(argc > 1) {
