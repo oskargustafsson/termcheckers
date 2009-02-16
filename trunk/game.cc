@@ -3,243 +3,159 @@
 #include <cstdlib>
 #include <fstream>
 #include <stack>
+#include <vector>
 #include "game.h"
 #include "searchtree.h"
 #include "board.h"
-#include "ui.h"
+#include "gui.h"
 
 using namespace std;
 
-namespace termcheckers {
+namespace checkers {
 
-		Game::Game() {
-				compute_bits_in_char();
-		}
-		Game::~Game() {
-				delete game;
-		}
+	Game::Game() : state(NOT_PLAYING) {
+		//board.compute_bits_in_char();
+	}
+	Game::~Game() {}
 
-		bool Game::makeMove(unsigned int places[], int size) {
-				if(!validateMove(b, places[0], places[size-1])) {
+
+	void Game::setGUI(GUI* g) {
+		gui = g;
+	}
+
+	bool Game::makeMove(vector<int> movements, int size) {
+		if(!board.validateMove(movements[0], movements[size-1])) {
+			return false;
+		} else {
+			history.push(board);
+			board.newKing = false;
+			if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
+				board.move(movements[0], movements[1]);
+			} else {
+				for(int i=1; i<size; i++) {
+					if(recursiveCapture(board, movements[i-1], movements[i])) {
+					} else {
+						cout << "Illegal move: " << log2(movements[i-1])+1 << "-" << log2(movements[i])+1 << endl;
+						undoLastMove();
 						return false;
-				} else {
-						stackBoard();
-						b.newKing = false;
-						if((getCaptureMoves(b, places[0]) == 0) && size == 2) {
-								move(b, places[0], places[1]);
-						} else {
-								for(int i=1; i<size; i++) {
-										if(recursiveCapture(b, places[i-1], places[i])) {
-										} else {
-												cout << "Illegal move: " << log2(places[i-1])+1 << "-" << log2(places[i])+1 << endl;
-												undoLastMove();
-												return false;
-										}
-								}
-						}
-						cout << "My move is: " << log2(places[0])+1;
-						for(int i=1; i<size; i++) {
-								cout << "-" << log2(places[i])+1;
-						}
-						cout << endl;
-						changePlayer(b);
-						return true;
+					}
 				}
+			}
+			cout << "My move is: " << log2(movements[0])+1;
+			for(int i=1; i<size; i++) {
+				cout << "-" << log2(movements[i])+1;
+			}
+			cout << endl;
+			board.changePlayer();
+			return true;
 		}
+	}
 
-		bool Game::recursiveCapture(board tmpboard, unsigned int from, unsigned int to) {
-				unsigned int moves = getCaptureMoves(tmpboard, from);
-				unsigned int capture = 0x0;
-				board test;
-				while(moves != 0) {
-						capture = (moves & (moves-1)) ^ moves;
-						moves &= moves-1;
-						test = tmpboard;
+	bool Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
+		unsigned int moves = tmpboard.getCaptureMoves(from);
+		unsigned int capture = 0x0;
+		Board test;
+		while(moves != 0) {
+			capture = (moves & (moves-1)) ^ moves;
+			moves &= moves-1;
+			test = tmpboard;
 
-						move(test, from, capture);
+			test.move(from, capture);
 
-						if(capture == to) {
-								b = test;
-								return true;
-						}
-						if(recursiveCapture(test, capture, to)) {
-								return true;
-						}
+			if(capture == to) {
+				board = test;
+				return true;
+			}
+			if(recursiveCapture(test, capture, to)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void Game::newGame() {
+		board.createBoard();
+	}
+
+	void Game::loadGame(char* file) {
+		ifstream is;
+		is.open(file);
+		unsigned int piece = 0x1;
+
+		if(is != NULL) {
+			cout << "Loading file...\n";
+			char ch;
+			while(is.get(ch) != NULL) {
+				cout << ch;
+				if(ch == 'b') {
+					if(piece == 0) {
+						board.player = BLACK;
+					}
+					board.black |= piece;
+					board.white &= ~piece;
+					board.kings &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'B') {
+					board.black |= piece;
+					board.kings |= piece;
+					board.white &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'w') {
+					if(piece == 0) {
+						board.player = WHITE;
+					}
+					board.white |= piece;
+					board.black &= ~piece;
+					board.kings &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'W') {
+					board.white |= piece;
+					board.kings |= piece;
+					board.black &= ~piece;
+					piece = piece<<1;
+				} else if(ch == '.') {
+					board.black &= ~piece;
+					board.white &= ~piece;
+					board.kings &= ~piece;
+					piece = piece<<1;
 				}
-				return false;
+			}
+			is.close();
 		}
+	}
 
-		void Game::newGame() {
-				b = createBoard();
+	void Game::aiTest() {
+		while(!board.endOfGame()) {
+			gui->printBoard(board);
+			alphabeta(board, DEPTH, this);
 		}
+	}
 
-		void Game::loadGame(char* file) {
-				ifstream is;
-				is.open(file);
-				unsigned int piece = 0x1;
+	void Game::ai() {
+			  alphabeta(board, DEPTH, this);
+			  gui->printBoard(board);
+	}
 
-				if(is != NULL) {
-						cout << "Loading file...\n";
-						char ch;
-						while(is.get(ch) != NULL) {
-								cout << ch;
-								if(ch == 'b') {
-										if(piece == 0) {
-												b.player = BLACK;
-										}
-										b.black |= piece;
-										b.white &= ~piece;
-										b.kings &= ~piece;
-										piece = piece<<1;
-								} else if(ch == 'B') {
-										b.black |= piece;
-										b.kings |= piece;
-										b.white &= ~piece;
-										piece = piece<<1;
-								} else if(ch == 'w') {
-										if(piece == 0) {
-												b.player = WHITE;
-										}
-										b.white |= piece;
-										b.black &= ~piece;
-										b.kings &= ~piece;
-										piece = piece<<1;
-								} else if(ch == 'W') {
-										b.white |= piece;
-										b.kings |= piece;
-										b.black &= ~piece;
-										piece = piece<<1;
-								} else if(ch == '.') {
-										b.black &= ~piece;
-										b.white &= ~piece;
-										b.kings &= ~piece;
-										piece = piece<<1;
-								}
-						}
-						is.close();
-				}
+	void Game::play() {
+		string line;
+
+		gui->printBoard(board);
+		while(!board.endOfGame()) {
+			gui->input();
 		}
+		cout << "Game over...\n";
+	}
 
-		void Game::kingGame() {
-				b.white = 0x8000000;
-				b.black = 0x24000;
-				b.kings = b.black|b.white;
-				b.player = BLACK;
+	void Game::stop() {
+	}
+
+	bool Game::undoLastMove() {
+		if(history.empty()) {
+			return false;
+		} else {
+			board = history.top();
+			history.pop();
+			return true;
 		}
-
-		void Game::aiTest() {
-				while(!endOfGame(b)) {
-						printBoard(b);
-						alphabeta(b, DEPTH);
-				}
-		}
-
-		void Game::play() {
-				string line;
-
-				printBoard(b);
-				while(!endOfGame(b)) {
-
-						cout << "#> ";
-						cin >> line;
-
-						string::iterator It = line.begin();
-						int i=0;
-
-						while( It != line.end()) {
-								if( *It == '-') {
-										i++;
-								}
-								It++;
-						}
-
-						unsigned int* places = new unsigned int[i];
-
-						It = line.begin();
-						i = 0;
-						bool moveSyntax = true;
-						string tmpstr;
-						while( It != line.end()) {
-								if(*It == '-') {
-										places[i] = pow(2.0, atof(tmpstr.c_str())-1);
-										if(places[i] == 0) {
-												moveSyntax = false;
-												break;
-										}
-										tmpstr = "";
-										i++;
-										It++;
-										continue;
-								}
-								tmpstr += *It;
-								It++;
-						}
-						places[i] = pow(2.0, atof(tmpstr.c_str())-1);
-						if(places[i] == 0)
-								moveSyntax = false;
-
-						if(moveSyntax)
-						{
-								if(!makeMove(places, i+1))
-										cout << "Illegal move!\n";
-								else
-										printBoard(b);
-						}
-						else if(line == "ai")
-						{
-								alphabeta(b, DEPTH);
-								printBoard(b);
-						}
-						else if(line == "undo" || line == "back")
-						{
-								if(undoLastMove()) {
-										cout << "Reverting!" << endl;
-										printBoard(b);
-								} else {
-										cout << "Nothing to undo!" << endl;
-								}
-						}
-						else if(line == "help")
-						{
-								cout << "Commands: ai, undo, print, quit\n";
-								cout << "Move: from-to\n";
-						}
-						else if(line == "print" || line == "board")
-						{
-								printBoard(b);
-						}
-						else if(line == "quit" || line == "exit")
-						{
-								cout << "Exit current game" << endl;
-								break;
-						} else if(line == "skip") {
-								changePlayer(b);
-								printBoard(b);
-						}
-				}
-				cout << "Game over...\n";
-		}
-
-		Game* Game::game = NULL;
-
-		Game* Game::instance() {
-				if(game == NULL) {
-						game = new Game();
-				}
-				return game;
-		}
-
-		bool Game::undoLastMove() {
-				if(history.empty()) {
-						return false;
-				} else {
-						b = history.top();
-						history.pop();
-						return true;
-				}
-		}
-
-		void Game::stackBoard() {
-				history.push(b);
-		}
+	}
 }

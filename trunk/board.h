@@ -4,49 +4,49 @@
 #define WHITE 0x0
 #define BLACK 0x1
 
-struct board {
-	unsigned int black;
-	unsigned int white;
-	unsigned int kings;
-	bool newKing;
-	bool player; // WHITE=0, BLACK=1
-};
 
-static int bits_in_char [256];		// för bit-count
+namespace checkers {
 
-unsigned int getCaptureMoves(const board& b, unsigned int piece);
-unsigned int getMoves(const board& b, unsigned int piece);
+	class Board {
 
-inline unsigned int up_left(unsigned const int& piece);
-inline unsigned int up_right(unsigned const int& piece);
-inline unsigned int down_left(unsigned const int& piece);
-inline unsigned int down_right(unsigned const int& piece);
+	public:
+		Board();
+		~Board();
+		unsigned int black;
+		unsigned int white;
+		unsigned int kings;
+		bool player; // WHITE=0, BLACK=1
+		bool newKing;
 
-board createBoard();
+		static int bits_in_char [256];		// för bit-count
 
-bool endOfGame(const board& b);
+		Board& operator=(Board& b);
+		void createBoard();
+		unsigned int getCaptureMoves(unsigned int piece);
+		unsigned int getMoves(unsigned int piece);
+		bool endOfGame();
+		void move(unsigned int from, unsigned int to);
 
-void move(board& b, unsigned int from, unsigned int to);
+		unsigned int getCaptureBit(unsigned int from, unsigned int to);
 
-unsigned int getCaptureBit(unsigned int from, unsigned int to);
+		void changePlayer();
 
-void changePlayer(board& b);
+		int countBits(unsigned int b);
 
-int countBits(unsigned int b);
+		int countBits2(unsigned int b);
 
-int countBits2(unsigned int b);
+		void compute_bits_in_char();
 
-void compute_bits_in_char();
+		inline bool empty(unsigned int piece);
 
-unsigned int getPossibleMoves(board& b);
-
-unsigned int getPossibleCaptureMoves(board b);
-
-unsigned int getNextLevel(board b);
-
-inline bool empty(const board& b, unsigned int piece);
-
-bool validateMove(board& b, unsigned int from, unsigned int to);
-bool validateCapture(board& b, unsigned int from, unsigned int to);
+		bool validateMove(unsigned int from, unsigned int to);
+		bool validateCapture(unsigned int from, unsigned int to);
+	private:
+		inline unsigned int up_left(unsigned const int& piece);
+		inline unsigned int up_right(unsigned const int& piece);
+		inline unsigned int down_left(unsigned const int& piece);
+		inline unsigned int down_right(unsigned const int& piece);
+	};
+}
 
 #endif

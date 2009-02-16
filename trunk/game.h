@@ -2,31 +2,40 @@
 #define GAME_H
 
 #include "board.h"
+#include "gui.h"
 #include <stack>
+#include <vector>
+#include "searchtree.h"
 
-namespace termcheckers {
+#define NOT_PLAYING 0
+#define PLAYING 1
+#define QUIT 2
+
+namespace checkers {
+		class GUI;
 
         class Game {
         public:
+                Game();
                 ~Game();
-                bool makeMove(unsigned int places[], int size);
+					 void setGUI(GUI* g);
+                bool makeMove(std::vector<int> movements, int size);
                 void newGame();
-                void kingGame();
                 void loadGame(char* file);
                 void play();
+					 void stop();
                 void aiTest();
-                static Game* instance();
-        private:
-                Game();
-                bool recursiveCapture(board tmpboard, unsigned int from, unsigned int to);
-
+                void ai();
                 bool undoLastMove();
-                void stackBoard();
 
-                static Game* game;
-                std::stack<board> history;
-                board b;
+                Board board;
+					 int state;
+        private:
+                bool recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
+
+                std::stack<Board> history;
                 bool output;
+					 GUI* gui;
         };
 }
 #endif
