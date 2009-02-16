@@ -1,8 +1,9 @@
 
 * Inte upprepa samma drag
 * Undvik draw
-* Ai ska raportera exakt väg om det behövs
+* Ai ska raportera exakt väg om det behövs / johan fixar
 * Räkna tiden
+* Iterativ deepening
 
 
 Lämna till Linus: ---------------------------------
