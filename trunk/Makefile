@@ -10,12 +10,12 @@ CXXFLAGS += -g
 
 
 # Linking:
-lennart: main.o board.o game.o gui.o searchtree.o evaluation.o
+lennart: main.o board.o game.o gui.o search.o evaluation.o
 	$(CXX) -o $@ $^
 
 # Dependencies, the implicit rule .cc => .o is used
 board.o: board.cc board.h
-searchtree.o: searchtree.cc searchtree.h
+search.o: search.cc search.h
 main.o: main.cc
 evaluation.o: evaluation.cc evaluation.h
 game.o: game.cc game.h

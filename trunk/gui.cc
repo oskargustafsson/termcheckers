@@ -10,7 +10,7 @@ using namespace std;
 
 namespace checkers {
 
-	  GUI::GUI() {
+	  GUI::GUI(Game* g) : game(g) {
 	  }
 
 	  GUI::~GUI() {
@@ -103,7 +103,6 @@ namespace checkers {
 			 cout << "> ";
 			 cin >> line;
 
-				cout << "0";
 			 switch (game->state) {
 				case 0:
 					  if(line == "play") {
@@ -157,7 +156,7 @@ namespace checkers {
 					  }
 					  break;
 					  default:
-					  cout << "default";
+					  cout << "default" << game->state;
 					  break;
 			 }
 	  }

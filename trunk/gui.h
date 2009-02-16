@@ -13,7 +13,6 @@ namespace checkers {
 
 	class GUI {
 	public:
-		GUI();
 		GUI(Game* g);
 		~GUI();
 
