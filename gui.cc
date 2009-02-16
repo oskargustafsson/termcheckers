@@ -111,7 +111,6 @@ namespace checkers {
 							 game->aiTest();
 					  } else if(line == "newgame") {
 							 game->newGame();
-							 game->play();
 					  } else if(line == "quit") {
 					  		game->state = QUIT;
 					  }
@@ -167,12 +166,12 @@ namespace checkers {
 			int result = 1;
 			while( It != line.end()) {
 				if( *It == '-') {
-					tmpstr = "";
 					result++;
-					if(atof(tmpstr.c_str()) == 0) {
+					if(atoi(tmpstr.c_str()) == 0) {
 						result = 0;
 						break;
 					}
+					tmpstr = "";
 				} else
 					tmpstr += *It;
 				It++;
