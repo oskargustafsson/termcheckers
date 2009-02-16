@@ -24,33 +24,34 @@ namespace checkers {
     gui = g;
   }
 
-  bool Game::makeMove(vector<int> movements, int size) {
-    if(!board.validateMove(movements[0], movements[size-1])) {
-      return false;
-    } else {
-      history.push(board);
-      if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
-        board.move(movements[0], movements[1]);
-      } else {
-        for(int i=1; i<size; i++) {
-          if(recursiveCapture(board, movements[i-1], movements[i])) {
-          } else {
-            cout << "Illegal move: " << log2(movements[i-1])+1 << "-" << log2(movements[i])+1 << endl;
-            undoLastMove();
-            return false;
-          }
-        }
-      }
-      cout << "My move is: " << log2(movements[0])+1;
-      for(int i=1; i<size; i++) {
-        cout << "-" << log2(movements[i])+1;
-      }
-      cout << endl;
-      board.updateKings();
-      board.changePlayer();
-      return true;
-    }
-  }
+	bool Game::makeMove(vector<unsigned int> movements) {
+		int size = movements.size();
+		if(!board.validateMove(movements[0], movements[size-1])) {
+			return false;
+		} else {
+			history.push(board);
+			if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
+				board.move(movements[0], movements[1]);
+			} else {
+				for(int i=1; i<size; i++) {
+					if(recursiveCapture(board, movements[i-1], movements[i])) {
+					} else {
+						cout << "Illegal move: " << log2(movements[i-1])+1 << "-" << log2(movements[i])+1 << endl;
+						undoLastMove();
+						return false;
+					}
+				}
+			}
+			cout << "My move is: " << log2(movements[0])+1;
+			for(int i=1; i<size; i++) {
+				cout << "-" << log2(movements[i])+1;
+			}
+			cout << endl;
+			board.updateKings();
+			board.changePlayer();
+			return true;
+		}
+	}
 
   bool Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
     unsigned int moves = tmpboard.getCaptureMoves(from);
@@ -125,19 +126,19 @@ namespace checkers {
     }
   }
 
-  void Game::aiTest() {
-    while(!board.endOfGame()) {
-      Search search(this);
-      gui->printBoard(board);
-      search.alphabeta(board, DEPTH);
-    }
-  }
+	void Game::aiTest() {
+		while(!board.endOfGame()) {
+			Search search(this);
+			gui->printBoard(board);
+			search.search();
+		}
+	}
 
-  void Game::ai() {
-    Search search(this);
-    search.alphabeta(board, DEPTH);
-    gui->printBoard(board);
-  }
+	void Game::ai() {
+			Search search(this);
+			search.search();
+			gui->printBoard(board);
+	}
 
   void Game::play() {
     state = PLAYING;

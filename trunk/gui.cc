@@ -123,8 +123,8 @@ namespace checkers {
       int size;
       if((size = isMovement(line)) != 0)
         {
-          vector<int> movements = parseMovement(line);
-          if(!game->makeMove(movements, size))
+          vector<int unsigned> movement = parseMovement(line);
+          if(!game->makeMove(movement))
             cout << "Illegal move!\n";
           else
             printBoard(game->board);
@@ -158,6 +158,11 @@ namespace checkers {
         } else if(line == "skip") {
         game->board.changePlayer();
         printBoard(game->board);
+      } else if(line == "test") {
+	      println("Jump pieces:");
+	      printInt(game->board.getJumpPieces());
+	      println("Move pieces:");
+	      printInt(game->board.getMovePieces());
       }
       break;
     }
@@ -185,15 +190,15 @@ namespace checkers {
     return result;
   }
 
-  vector<int> GUI::parseMovement(string line) {
+  vector<unsigned int> GUI::parseMovement(string line) {
     string::iterator It = line.begin();
     int i=0;
-    vector<int> movement;
+    vector<unsigned int> movement;
     string tmpstr;
 
     while( It != line.end()) {
       if(*It == '-') {
-        movement.push_back(static_cast<int>(pow(2.0, atof(tmpstr.c_str())-1)));
+        movement.push_back(static_cast<unsigned int>(pow(2.0, atof(tmpstr.c_str())-1)));
         tmpstr = "";
         i++;
         It++;
@@ -202,7 +207,7 @@ namespace checkers {
       tmpstr += *It;
       It++;
     }
-    movement.push_back(static_cast<int>(pow(2.0, atof(tmpstr.c_str())-1)));
+    movement.push_back(static_cast<unsigned int>(pow(2.0, atof(tmpstr.c_str())-1)));
 
     return movement;
   }

@@ -1,9 +1,10 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <queue>
+
 #define WHITE 0x0
 #define BLACK 0x1
-
 
 namespace checkers {
 
@@ -41,6 +42,11 @@ namespace checkers {
 		bool validateCapture(unsigned int from, unsigned int to);
 
 		void updateKings();
+
+		std::queue<unsigned int> getSortedMoveList();
+
+		unsigned int getJumpPieces();
+		unsigned int getMovePieces();
 	private:
 		inline unsigned int up_left(unsigned const int& piece);
 		inline unsigned int up_right(unsigned const int& piece);

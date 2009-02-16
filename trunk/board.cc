@@ -1,8 +1,9 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include <queue>
 #include "board.h"
-#include "gui.h"
-// ui.h bara för debug
+
 namespace checkers {
 
   Board::Board() :
@@ -75,10 +76,7 @@ namespace checkers {
   }
 
   bool Board::endOfGame() {
-    if(player == BLACK)
-      return ( getMoves(black) | getCaptureMoves(black) ) == 0;
-    else
-      return ( getMoves(white) | getCaptureMoves(white) ) == 0;
+      return ( getJumpPieces() | getMovePieces() ) == 0;
   }
 
   void Board::move(unsigned int from, unsigned int to) {
@@ -111,14 +109,8 @@ namespace checkers {
     unsigned int moves = 0x0u;
     unsigned int men = 0x0u;
 
-    player == WHITE ? men = white : men = black;
-    while(men != 0) {
-      unsigned int tmp = (men & (men-1)) ^ men;
-      men &= men-1;
-      if(getCaptureMoves(tmp) != 0) {
+    if(getJumpPieces() != 0x0u)
         return validateCapture(from, to);
-      }
-    }
 
     player == WHITE ? men = white : men = black;
     moves = getMoves(from);
@@ -151,7 +143,6 @@ namespace checkers {
     }
     return result;
   }
-
 
   /**
    * get the position between two squares
@@ -210,4 +201,71 @@ namespace checkers {
     kings |= (white & 0x0000000Fu);
     kings |= (black & 0xF0000000u);
   }
+
+/**
+	 * NOT WORKING
+	 */
+	std::queue<unsigned int> Board::getSortedMoveList() {
+		unsigned int pieces;
+		unsigned int from;
+		std::queue<unsigned int> moves;
+
+		pieces = getJumpPieces();
+		if(pieces == 0x0u) {
+			pieces = getMovePieces();
+		}
+
+		while(pieces != 0) {
+			from = (pieces & (pieces-1)) ^ pieces;
+			pieces &= pieces-1;
+
+		}
+		return moves;
+	}
+
+	/**
+	 * TODO: remove if-statement
+	 */
+	unsigned int Board::getJumpPieces() {
+		unsigned int pieces = 0x0u;
+
+		if(player == WHITE) {
+			pieces |= down_right(down_right(up_left((up_left(white) & black)) & ~(black | white)));
+			pieces |= down_left(down_left(up_right((up_right(white) & black)) & ~(black | white)));
+
+			pieces |= up_right(up_right(down_left((down_left(white & kings) & black)) & ~(black | white)));
+			pieces |= up_left(up_left(down_right((down_right(white & kings) & black)) & ~(black | white)));
+		} else {
+			pieces |= up_right(up_right(down_left((down_left(black) & white)) & ~(black | white)));
+			pieces |= up_left(up_left(down_right((down_right(black) & white)) & ~(black | white)));
+
+			pieces |= down_right(down_right(up_left((up_left(black & kings) & white)) & ~(black | white)));
+			pieces |= down_left(down_left(up_right((up_right(black & kings) & white)) & ~(black | white)));
+		}
+
+		return pieces;
+	}
+
+	/**
+	 * TODO: remove if-statement
+	 */
+	unsigned int Board::getMovePieces() {
+		unsigned int pieces = 0x0u;
+
+		if(player == WHITE) {
+			pieces |= down_right((up_left(white) & ~(black | white)));
+			pieces |= down_left((up_right(white) & ~(black | white)));
+			
+			pieces |= up_right((down_left(white & kings) & ~(black | white)));
+			pieces |= up_left((down_right(white & kings) & ~(black | white)));
+		} else {
+			pieces |= up_right((down_left(black) & ~(black | white)));
+			pieces |= up_left((down_right(black) & ~(black | white)));
+
+			pieces |= down_right((up_left(black & kings) & ~(black | white)));
+			pieces |= down_left((up_right(black & kings) & ~(black | white)));
+		}
+
+		return pieces;
+	}
 }

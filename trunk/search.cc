@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <cmath>
+#include <vector>
 #include <iostream>
 #include "search.h"
 #include "evaluation.h"
@@ -11,153 +13,170 @@ namespace checkers {
 	Search::Search(Game* g) : game(g) {}
 	Search::~Search() {}
 
-	int Search::alphabeta(Board& board, int depth) {
-			 maxdepth = depth;
-			 return alphabeta(board, depth, -32000, 32000);
+
+	int Search::search() {
+		int value = 0;
+
+		if(singleJump(game->board)) {
+			game->makeMove(movement);
+			return value;
+		}
+		maxdepth = 10;
+		value = alphabeta(game->board, maxdepth, -32000, 32000);
+		reverse(movement);
+		game->makeMove(movement);
+
+		return value;
 	}
 
 	int Search::alphabeta(Board& board, int depth, int alpha, int beta) {
-			 unsigned int men;
-			 unsigned int moves;
-			 int tmp;
-			 bool betacutoff = false;
-			 unsigned int moveFrom = 0x0u;
-			 unsigned int from = 0x0u;
-			 unsigned int to = 0x0u;
-			 unsigned int moveTo = 0x0u;
-			 int capture = 0;
+		unsigned int pieces;
+		unsigned int moves;
+		int tmp;
+		bool betacutoff = false;
+		unsigned int from = 0x0u;
+		unsigned int to = 0x0u;
+		bool capture = false;
 
-			 board.player == WHITE ? men = board.white : men = board.black;
+		// check if there is capture moves
+		// and check which pieces can move
+		if((pieces = board.getJumpPieces()) != 0x0u)
+			capture=true;
+		else
+			pieces = board.getMovePieces();
 
-			 /*
-			* test optimiering:
-			* ta bort några som garanterat inte kan hoppa
-			* inte säkert att det är bättre. och i vilket fall som helst så blir det nog ingen större skillnad...
-			*/
-			 men = (((men<<9) & ~(board.black & board.white))>>9) |
-				(((men<<7) & ~(board.black & board.white))>>7) |
-				(((men>>9) & ~(board.black & board.white))<<9) |
-				(((men>>7) & ~(board.black & board.white))<<7);
+		// Check if its the end node
+		// if there is capture moves try one depth more
+		if(((depth < 1) && !capture) || board.endOfGame()) {
+			return board.player == BLACK ? evaluate(board) : -evaluate(board);
+		}
 
-			 // Count number of capture moves:
-			 // TODO: try and do this without loop!
-			 while(men != 0) {
-				from = (men & (men-1)) ^ men;
-				men &= men-1;
-				if(board.getCaptureMoves(from) != 0) {
-					capture++;
-				}
-			 }
+		// For each move
+		while(pieces != 0) {
+			from = (pieces & (pieces-1)) ^ pieces;
+			pieces &= pieces-1;
 
-			 // Check if its the end node
-			 // if there is capture moves try one depth more
-			 if(board.endOfGame() || ((depth < 1) && (capture == 0))) {
-				return board.player == BLACK ? evaluate(board) : -evaluate(board);
-			 }
+			if(capture) {
+				moves = board.getCaptureMoves(from);
+			} else {
+				moves = board.getMoves(from);
+			}
 
-			 // For each move
-			 board.player == WHITE ? men = board.white : men = board.black;
-			 while(men != 0) {
-				from = (men & (men-1)) ^ men;
-				men &= men-1;
-
-				if(capture == 0) {
-					moves = board.getMoves(from);
-				} else {
-					moves = board.getCaptureMoves(from);
-
-					// break if there is only one capture move to do
-					// maybe move this outside alphabeta?
-					if(moves != 0 && capture == 1 && depth == maxdepth && oneCapture(board, from, moves)) {
-							 moveFrom = from;
-							 moveTo = recursiveTo;
-							 break;
-					}
-				}
-
-				while(moves != 0) {
-					to = (moves & (moves-1)) ^ moves;
-					moves &= moves-1;
-
-					Board nextboard = board;
-					nextboard.move(from, to);
-
-					if(capture != 0) {
-							 tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
-							 to = recursiveTo;
-					} else {
-							 nextboard.changePlayer();
-							 nextboard.updateKings();
-							 tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
-					}
-					if(tmp > alpha) {
-							 alpha = tmp;
-							 moveFrom = from;
-							 moveTo = to;
-					}
-					if(beta <= alpha) {
-							 betacutoff = true;
-							 break;
-					}
-				}
-				if(betacutoff) {
-					break;
-				}
-			 }
-			 if(depth == maxdepth) {
-				// The root node, make the best move
-				std::vector<int> movement;
-				movement.push_back(moveFrom);
-				movement.push_back(moveTo);
-				game->makeMove(movement, 2);
-			 }
-			 return alpha;
-	}
-
-	int Search::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
-			 unsigned int moves = board.getCaptureMoves(from);
-			 unsigned int to = 0x0u;
-			 int tmp;
-
-			 if(moves == 0) {
-				board.changePlayer();
-				board.updateKings();
-				tmp = -alphabeta(board, depth-1, -beta, -alpha);
-				if(tmp > alpha) {
-					alpha = tmp;
-					if(depth == maxdepth) {
-							 recursiveTo = from;
-					}
-				}
-			 }
-
-			 while(moves != 0) {
+			while(moves != 0) {
 				to = (moves & (moves-1)) ^ moves;
 				moves &= moves-1;
 
 				Board nextboard = board;
 				nextboard.move(from, to);
 
-				tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
+				if(capture) {
+					tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
+				} else {
+					nextboard.changePlayer();
+					nextboard.updateKings();
+					tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
+				}
 				if(tmp > alpha) {
 					alpha = tmp;
+					if(depth == maxdepth) { // best movement so far, at the first depth
+						best_movement.clear();
+						for(unsigned int i=0; i < capture_movement.size(); i++) {
+							best_movement.push_back(capture_movement[i]);
+						}
+						if(board.countBits(board.getCaptureMoves(from)) != 1)
+							best_movement.push_back(to);
+						best_movement.push_back(from);
+					}
 				}
-			 }
-
-			 return alpha;
+				if(beta <= alpha) {
+					betacutoff = true;
+					break;
+				}
+			}
+			if(betacutoff) {
+				break;
+			}
+		}
+		if(depth == maxdepth) {
+			// The root node, make the best move
+			movement.clear();
+			movement = best_movement;
+		}
+		return alpha;
 	}
 
-	bool Search::oneCapture(Board board, unsigned int from, unsigned int moves) {
-			 int bits = board.countBits(moves);
+	int Search::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
+		unsigned int moves = board.getCaptureMoves(from);
+		int nrOfMoves = board.countBits(moves);
+		unsigned int moveTo;
+		unsigned int to = 0x0u;
+		int tmp;
 
-			 while(bits == 1) {
-				board.move(from, moves);
-				from = moves;
-				moves = board.getCaptureMoves(from);
-				bits = board.countBits(moves);
-			 }
-			 recursiveTo = from;
+		if(moves == 0) {
+			board.changePlayer();
+			board.updateKings();
+			tmp = -alphabeta(board, depth-1, -beta, -alpha);
+			if(tmp > alpha) {
+				alpha = tmp;
+				if(depth == maxdepth) {
+					capture_movement.clear();
+					capture_movement.push_back(from);
+				}
+			}
+		}
 
-			 return bits == 0;
+		while(moves != 0) {
+			to = (moves & (moves-1)) ^ moves;
+			moves &= moves-1;
+
+			Board nextboard = board;
+			nextboard.move(from, to);
+
+			tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
+			if(tmp > alpha) {
+				alpha = tmp;
+				moveTo = to;
+			}
+		}
+
+		if(nrOfMoves > 1 && depth == maxdepth && capture_movement.back() != moveTo) {
+			capture_movement.push_back(moveTo);
+		}
+
+		return alpha;
+	}
+
+	bool Search::singleJump(Board board) {
+		unsigned int to;
+		int bits;
+		unsigned int from = board.getJumpPieces();
+
+		if(board.countBits(from) != 1)
+			return false;
+
+		movement.clear();
+		movement.push_back(from);
+
+		to = board.getCaptureMoves(from);
+		bits = board.countBits(to);
+		while(bits == 1) {
+			board.move(from, to);
+			from = to;
+			to = board.getCaptureMoves(from);
+			bits = board.countBits(to);
+		}
+		movement.push_back(from);
+
+		return bits == 0;
+	}
+
+	void Search::reverse(std::vector<unsigned int>& list) {
+		std::vector<unsigned int> tmp_list = list;
+		
+		list.clear();
+		while(!tmp_list.empty()) {
+			list.push_back(tmp_list.back());
+			tmp_list.pop_back();
+		}
 	}
 }
