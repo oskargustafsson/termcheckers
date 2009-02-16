@@ -16,11 +16,9 @@ namespace checkers {
 		unsigned int white;
 		unsigned int kings;
 		bool player; // WHITE=0, BLACK=1
-		bool newKing;
 
 		static int bits_in_char [256];		// för bit-count
 
-		Board& operator=(Board& b);
 		void createBoard();
 		unsigned int getCaptureMoves(unsigned int piece);
 		unsigned int getMoves(unsigned int piece);
@@ -41,6 +39,8 @@ namespace checkers {
 
 		bool validateMove(unsigned int from, unsigned int to);
 		bool validateCapture(unsigned int from, unsigned int to);
+
+		void updateKings();
 	private:
 		inline unsigned int up_left(unsigned const int& piece);
 		inline unsigned int up_right(unsigned const int& piece);

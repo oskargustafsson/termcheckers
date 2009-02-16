@@ -29,7 +29,6 @@ namespace checkers {
 			return false;
 		} else {
 			history.push(board);
-			board.newKing = false;
 			if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
 				board.move(movements[0], movements[1]);
 			} else {
@@ -47,6 +46,7 @@ namespace checkers {
 				cout << "-" << log2(movements[i])+1;
 			}
 			cout << endl;
+			board.updateKings();
 			board.changePlayer();
 			return true;
 		}
@@ -54,7 +54,7 @@ namespace checkers {
 
 	bool Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
 		unsigned int moves = tmpboard.getCaptureMoves(from);
-		unsigned int capture = 0x0;
+		unsigned int capture = 0x0u;
 		Board test;
 		while(moves != 0) {
 			capture = (moves & (moves-1)) ^ moves;

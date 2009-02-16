@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include "search.h"
 #include "evaluation.h"
 #include "board.h"
@@ -86,6 +87,7 @@ namespace checkers {
 							 to = recursiveTo;
 					} else {
 							 nextboard.changePlayer();
+							 nextboard.updateKings();
 							 tmp = -alphabeta(nextboard, depth-1, -beta, -alpha);
 					}
 					if(tmp > alpha) {
@@ -119,7 +121,7 @@ namespace checkers {
 
 			 if(moves == 0) {
 				board.changePlayer();
-
+				board.updateKings();
 				tmp = -alphabeta(board, depth-1, -beta, -alpha);
 				if(tmp > alpha) {
 					alpha = tmp;

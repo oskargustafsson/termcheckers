@@ -9,27 +9,16 @@ namespace checkers {
 		black(0x0u),
 		      white(0x0u),
 		      kings(0x0u),
-		      player(BLACK),
-		      newKing(false)
+		      player(BLACK)
 		      {}
 
 	Board::~Board() {}
-
-	Board& Board::operator=(Board& b) {
-		b.black = black;
-		b.white = white;
-		b.kings = kings;
-		b.player = player;
-		b.newKing = newKing;
-		return b;
-	}
 
 	void Board::createBoard() {
 		black = 0x00000FFFu;
 		white = 0xFFF00000u;
 		kings = 0x0u;
 		player = BLACK;
-		newKing = false;
 	}
 
 	unsigned int Board::getCaptureMoves(unsigned int piece) {
@@ -38,15 +27,15 @@ namespace checkers {
 		if(piece & white) {		// white man
 			moves =	(up_left((up_left(piece) & black)) & (~(black|white))) |
 				(up_right((up_right(piece) & black)) & (~(black|white)));
-			if((piece & kings) && !newKing) {	// white king
+			if((piece & kings)) {	// white king
 				moves |=	(down_left((down_left(piece) & black)) & (~(black|white))) |
 					(down_right((down_right(piece) & black)) & (~(black|white)));
 			}
 		}
-		else if(piece & black) {	// white man
+		else if(piece & black) {	// black man
 			moves =	(down_left((down_left(piece) & white)) & (~(black|white))) |
 				(down_right((down_right(piece) & white)) & (~(black|white)));
-			if((piece & kings) && !newKing) {	// black pimp
+			if((piece & kings)) {	// black pimp
 				moves |=	(up_left((up_left(piece) & white)) & (~(black|white))) |
 					(up_right((up_right(piece) & white)) & (~(black|white)));
 			}
@@ -108,7 +97,6 @@ namespace checkers {
 	 */
 	void Board::move(unsigned int from, unsigned int to) {
 		unsigned int maskrows = 0xF0F0F0F0;
-		newKing = false;
 
 		//	printInt(getPossibleMoves(b));		//giltigt drag?
 		//	printInt(getNextLevel(b));
@@ -116,10 +104,6 @@ namespace checkers {
 		if((white & from) != 0) {
 			white &= ~from;
 			white |= to;
-			if(((to & 0x0000000F) != 0) && ((kings & from) == 0)) {
-				newKing = true;
-				kings |= to;
-			}
 
 			if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
 				black &= ~getCaptureBit(from, to);
@@ -129,10 +113,6 @@ namespace checkers {
 		if((black & from) != 0) {
 			black &= ~from;
 			black |= to;
-			if(((to & 0xF0000000) != 0) && ((kings & from) == 0)) {
-				newKing = true;
-				kings |= to;
-			}
 
 			if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
 				white &= ~getCaptureBit(from, to);
@@ -229,7 +209,6 @@ namespace checkers {
 	}
 
 	void Board::changePlayer() {
-		newKing = false;
 		player == WHITE ? player = BLACK : player = WHITE;
 	}
 
@@ -259,5 +238,10 @@ namespace checkers {
 */
 	inline bool Board::empty(unsigned int piece) {
 		return (piece & (white|black)) == 0;
+	}
+
+	void Board::updateKings() {
+		kings |= (white & 0x0000000Fu);
+		kings |= (black & 0xF0000000u);
 	}
 }
