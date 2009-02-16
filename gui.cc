@@ -6,6 +6,7 @@
 #include "gui.h"
 #include "evaluation.h"
 #include "game.h"
+#include "board.h"
 
 using namespace std;
 
