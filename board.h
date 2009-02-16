@@ -46,6 +46,8 @@ namespace checkers {
 		inline unsigned int up_right(unsigned const int& piece);
 		inline unsigned int down_left(unsigned const int& piece);
 		inline unsigned int down_right(unsigned const int& piece);
+		
+		static const unsigned int lg2[5];
 	};
 }
 

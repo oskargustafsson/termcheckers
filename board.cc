@@ -74,72 +74,38 @@ namespace checkers {
 		return (((piece & 0x00F0F0F0)<<4) | ((piece & 0x07070707)<<5));
 	}
 
-	/**
-	 * Returns true if there are no possible moves for current player
-	 * OPTIMIZE
-	 */
 	bool Board::endOfGame() {
-		for(int i=0x1; i != 0; i = (i<<1)) {
-			if(((player == BLACK) && ((i & black) != 0)) || ((player == WHITE) && ((i & white) != 0))) {
-				if(getMoves(i) != 0x0u)
-					return false;
-				if(getCaptureMoves(i) != 0x0u)
-					return false;
-			}
-		}
-		return true;
+		if(player == BLACK)
+			return ( getMoves(black) | getCaptureMoves(black) ) == 0;
+		else
+			return ( getMoves(white) | getCaptureMoves(white) ) == 0;
 	}
 
-	/**
-	 * Dosn't check anything! any move is possible
-	 * only one jump!
-	 * OPTIMIZE
-	 */
 	void Board::move(unsigned int from, unsigned int to) {
-		unsigned int maskrows = 0xF0F0F0F0;
-
-		//	printInt(getPossibleMoves(b));		//giltigt drag?
-		//	printInt(getNextLevel(b));
-
-		if((white & from) != 0) {
-			white &= ~from;
-			white |= to;
-
-			if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
-				black &= ~getCaptureBit(from, to);
-				kings &= ~getCaptureBit(from, to);
-			}
-		}
-		if((black & from) != 0) {
-			black &= ~from;
-			black |= to;
-
-			if (((maskrows & from) == 0) == ((maskrows & to) == 0)) { // capture move
-				white &= ~getCaptureBit(from, to);
-				kings &= ~getCaptureBit(from, to);
-			}
-		}
-
-		if((from & kings) != 0) {
-			kings &= ~from;
-			kings |= to;
-		}
+		// regular move
+		unsigned int mask = player;
+		--mask;						// 1-1=0, 0-1=2^32
+		black &= ~from;
+		black |= to & (~mask);
+		white &= ~from;
+		white |= to & mask;
+		
+		mask = ((from & kings) == 0);
+		--mask;
+		kings &= ~from;
+		kings |= to & mask;
+		
+		// capture
+		mask  = (up_left(from) & down_right(to));
+		mask |= (up_right(from) & down_left(to));
+		mask |= (down_left(from) & up_right(to));
+		mask |= (down_right(from) & up_left(to));
+		mask = ~mask;
+		
+		white &= mask;
+		black &= mask;
+		kings &= mask;
 	}
-
-/*	void Board::move(unsigned int from, unsigned int to) {
-
-		int n = 2;
-
-		from = log2(from);
-	to = log2(to);
-		std::cout << "white " << from << " black " << to;
-
-		int tmp = ((white >> from) ^ (white >> to)) & ((1 << n) - 1); 	// XOR temporary
-		white = white ^ ((tmp << from) | (tmp << to));
-
-		tmp = ((black >> from) ^ (black >> to)) & ((1 << n) - 1);
-		black = black ^ ((tmp << from) | (tmp << to));
-	} */
 
 	bool Board::validateMove(unsigned int from, unsigned int to) {
 		unsigned int moves = 0x0u;
@@ -234,8 +200,8 @@ namespace checkers {
 			+  bits_in_char [(n >> 16) & 0xffu]
 			+  bits_in_char [(n >> 24) & 0xffu] ;
 	}
-
 */
+
 	inline bool Board::empty(unsigned int piece) {
 		return (piece & (white|black)) == 0;
 	}
