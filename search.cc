@@ -10,8 +10,12 @@
 
 namespace checkers {
 
-	Search::Search(Game* g) : game(g) {}
-	Search::~Search() {}
+	Search::Search(Game* g) : game(g) {
+		killer = new unsigned int[100];
+	}
+	Search::~Search() {
+		delete[] killer;
+	}
 
 
 	int Search::search() {
