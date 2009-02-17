@@ -138,8 +138,9 @@ namespace checkers {
       moves &= moves-1;
       newboard = *this;
       newboard.move(from, nextto);
-      if(newboard.validateCapture(nextto, to)) {
-        result = 0;
+		result = newboard.validateCapture(nextto, to);
+		if(result == 0) {
+        return 0;
       }
     }
     return result;

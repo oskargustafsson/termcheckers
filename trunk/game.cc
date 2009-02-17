@@ -29,16 +29,14 @@ namespace checkers {
     string lmTemp;        //for gui output
     ostringstream oss;    // -----||-----
     int result = 0;
-
     int size = movements.size();
+
     result = board.validateMove(movements[0], movements[size-1]);
-    if(result != 0) {
-      undoLastMove();
-    }
-    else {
+
+    if(result == 0) {
       history.push(board);
 
-      if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
+      if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
         board.move(movements[0], movements[1]);
       }
       else {
@@ -46,6 +44,7 @@ namespace checkers {
           result = recursiveCapture(board, movements[i-1], movements[i]);
           if(result != 0)
             undoLastMove();
+				break;
         }
       }
     }
@@ -72,8 +71,10 @@ namespace checkers {
 
     ////////////SLUT!
 
-    board.updateKings();
-    board.changePlayer();
+    if(result == 0) {
+    	board.updateKings();
+    	board.changePlayer();
+	 }
     return result == 0;
   }
 
@@ -92,7 +93,7 @@ namespace checkers {
         board = test;
         return 0;
       }
-      if(recursiveCapture(test, capture, to)) {
+      if(recursiveCapture(test, capture, to) == 0) {
         return 0;
       }
     }

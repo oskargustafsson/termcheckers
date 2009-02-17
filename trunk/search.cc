@@ -14,7 +14,7 @@ namespace checkers {
 		killer = new unsigned int[100];
 	}
 	Search::~Search() {
-		delete[] killer;
+//		delete[] killer;
 	}
 
 
