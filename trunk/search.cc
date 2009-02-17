@@ -52,6 +52,7 @@ namespace checkers {
 
 		// For each move
 		while(pieces != 0) {
+			Board nextboard = board;
 			if(moves == 0) {
 				from = (pieces & (pieces-1)) ^ pieces;
 				if(capture) {
@@ -64,7 +65,6 @@ namespace checkers {
 			to = (moves & (moves-1)) ^ moves;
 			moves &= moves-1;
 
-			Board nextboard = board;
 			nextboard.move(from, to);
 
 			if(capture) {
@@ -76,6 +76,7 @@ namespace checkers {
 			}
 			if(tmp > alpha) {
 				alpha = tmp;
+				killer[depth] = from | to;
 				if(depth == maxdepth) { // best movement so far, at the first depth
 					best_movement.clear();
 					for(unsigned int i=0; i < capture_movement.size(); i++) {
