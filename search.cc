@@ -47,7 +47,7 @@ namespace checkers {
 
 		// Check if its the end node
 		// if there is capture moves try one depth more
-		if(((depth < 1) && !capture) || board.endOfGame()) {
+		if(((depth < 1) && !capture) || pieces == 0) {
 			return board.player == BLACK ? evaluate(board) : -evaluate(board);
 		}
 
