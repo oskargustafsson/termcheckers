@@ -20,4 +20,6 @@ int main(int argc, char* argv[]) {
 	while(game->state != QUIT) {
 		gui->input();
 	}
+	delete game;
+	delete gui;
 }
