@@ -26,7 +26,7 @@ namespace checkers {
 			std::vector<unsigned int> best_movement;
 			unsigned int recursiveTo;
 
-			unsigned int killer[100];
+			unsigned int* killer;
 
 			struct shortMove {
 				unsigned int from;
