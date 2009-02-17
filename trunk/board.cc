@@ -105,7 +105,7 @@ namespace checkers {
     kings &= mask;
   }
 
-  bool Board::validateMove(unsigned int from, unsigned int to) {
+  int Board::validateMove(unsigned int from, unsigned int to) {
     unsigned int moves = 0x0u;
     unsigned int men = 0x0u;
 
@@ -114,22 +114,23 @@ namespace checkers {
 
     player == WHITE ? men = white : men = black;
     moves = getMoves(from);
-    return ((moves & to) != 0) && ((men & from) != 0);
+    if(((moves & to) != 0) && ((men & from) != 0))
+      return 0;
+    else return -1;
   }
 
-  bool Board::validateCapture(unsigned int from, unsigned int to) {
+  int Board::validateCapture(unsigned int from, unsigned int to) {
     unsigned int moves = getCaptureMoves(from);
     Board newboard;
-    bool result = false;
+    int result = -1;
 
     if((moves & to) != 0) {
       newboard = *this;
       newboard.move(from, to);
       if((newboard.getCaptureMoves(to)) == 0) {
-        return true;
+        return 0;
       } else {
-        std::cout << "More captures possible!\n";
-        return false;
+        return -2;
       }
     }
     while(moves != 0) {
@@ -138,7 +139,7 @@ namespace checkers {
       newboard = *this;
       newboard.move(from, nextto);
       if(newboard.validateCapture(nextto, to)) {
-        result = true;
+        result = 0;
       }
     }
     return result;

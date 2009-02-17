@@ -19,10 +19,22 @@ namespace checkers {
     delete game;
   }
 
+  void GUI::clearScreen() {
+    string clear;
+    clear.append(80, ' ');
+    cout << "\033[21A" << clear << endl;
+    for(size_t i = 0; i < 20; ++i) {
+      cout << clear << endl;
+    }
+    cout << endl;
+  }
+
   void GUI::printBoard(Board& board) {
     int row = 0;
 
-    printf("\n\033[40m%36c\033[0m\n", ' ');
+    clearScreen();
+
+    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
     for(int i=0; i < 32; i++) {
       if(i % 4 == 0) {
         printf("\033[40m%2c\033[0m", ' ');
@@ -66,6 +78,9 @@ namespace checkers {
         if(i == 7 && row == 0) {
           printf("Depth: %d", DEPTH);
         }
+        if(i == 31 && row == 1) {
+          cout << lastMove;
+        }
         printf("\n");
         row++;
         if(row == 2) {
@@ -100,7 +115,15 @@ namespace checkers {
     printf("%s\n", str.c_str());
   }
 
+  void GUI::setInfo(string str, string inf) {
+    if(inf == "LM") {
+      lastMove = str;
+    }
+  }
+
+
   void GUI::input() {
+    printBoard(game->board);
     string line;
     cout << "> ";
     cin >> line;
@@ -124,10 +147,7 @@ namespace checkers {
       if((size = isMovement(line)) != 0)
         {
           vector<int unsigned> movement = parseMovement(line);
-          if(!game->makeMove(movement))
-            cout << "Illegal move!\n";
-          else
-            printBoard(game->board);
+          game->makeMove(movement);
         }
       else if(line == "ai") {
         game->ai();
@@ -136,7 +156,6 @@ namespace checkers {
         {
           if(game->undoLastMove()) {
             println("Reverting!");
-            printBoard(game->board);
           } else {
             println("Nothing to undo!");
           }
@@ -146,10 +165,6 @@ namespace checkers {
           println("Commands: ai, undo, print, quit");
           println("Move: from-to");
         }
-      else if(line == "print" || line == "board")
-        {
-          printBoard(game->board);
-        }
       else if(line == "quit" || line == "stop")
         {
           game->state = NOT_PLAYING;
@@ -157,12 +172,11 @@ namespace checkers {
           println("Stops current game");
         } else if(line == "skip") {
         game->board.changePlayer();
-        printBoard(game->board);
       } else if(line == "test") {
-	      println("Jump pieces:");
-	      printInt(game->board.getJumpPieces());
-	      println("Move pieces:");
-	      printInt(game->board.getMovePieces());
+              println("Jump pieces:");
+              printInt(game->board.getJumpPieces());
+              println("Move pieces:");
+              printInt(game->board.getMovePieces());
       }
       break;
     }

@@ -30,7 +30,7 @@ namespace checkers {
 			Board board;
 			int state;
 		private:
-			bool recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
+			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 
 			std::stack<Board> history;
 			bool output;

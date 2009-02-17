@@ -38,8 +38,8 @@ namespace checkers {
 
 		inline bool empty(unsigned int piece);
 
-		bool validateMove(unsigned int from, unsigned int to);
-		bool validateCapture(unsigned int from, unsigned int to);
+		int validateMove(unsigned int from, unsigned int to);
+		int validateCapture(unsigned int from, unsigned int to);
 
 		void updateKings();
 

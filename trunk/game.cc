@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stack>
 #include <vector>
+#include <sstream>
 #include "game.h"
 #include "search.h"
 #include "board.h"
@@ -24,36 +25,59 @@ namespace checkers {
     gui = g;
   }
 
-	bool Game::makeMove(vector<unsigned int> movements) {
-		int size = movements.size();
-		if(!board.validateMove(movements[0], movements[size-1])) {
-			return false;
-		} else {
-			history.push(board);
-			if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
-				board.move(movements[0], movements[1]);
-			} else {
-				for(int i=1; i<size; i++) {
-					if(recursiveCapture(board, movements[i-1], movements[i])) {
-					} else {
-						cout << "Illegal move: " << log2(movements[i-1])+1 << "-" << log2(movements[i])+1 << endl;
-						undoLastMove();
-						return false;
-					}
-				}
-			}
-			cout << "My move is: " << log2(movements[0])+1;
-			for(int i=1; i<size; i++) {
-				cout << "-" << log2(movements[i])+1;
-			}
-			cout << endl;
-			board.updateKings();
-			board.changePlayer();
-			return true;
-		}
-	}
+  bool Game::makeMove(vector<unsigned int> movements) {
+    string lmTemp;        //for gui output
+    ostringstream oss;    // -----||-----
+    int result = 0;
 
-  bool Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
+    int size = movements.size();
+    result = board.validateMove(movements[0], movements[size-1]);
+    if(result != 0) {
+      undoLastMove();
+    }
+    else {
+      history.push(board);
+
+      if((board.getCaptureMoves(movements[0]) == 0) && size == 2) {
+        board.move(movements[0], movements[1]);
+      }
+      else {
+        for(int i=1; i<size; i++) {
+          result = recursiveCapture(board, movements[i-1], movements[i]);
+          if(result != 0)
+            undoLastMove();
+        }
+      }
+    }
+
+    /////////////GUI GREJJER////////
+    // result:
+    // 0 Legal move.
+    // -1 illegal
+    // -2 more captures possible
+    //////////////////
+    if (result == 0) {
+      oss << "Last move: " << log2(movements[0])+1;
+      for(int i = 1; i<size; i++) {
+        oss << "-" << log2(movements[i])+1;
+      }
+    }
+    else if(result == -1) {
+      oss << "\033[31mIllegal move!\033[0m";
+    }
+    else {
+      oss << "\033[31mMore captures possible!\033[0m";
+    }
+    gui->setInfo(oss.str(), "LM"); //Send info to gui.
+
+    ////////////SLUT!
+
+    board.updateKings();
+    board.changePlayer();
+    return result == 0;
+  }
+
+  int Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
     unsigned int moves = tmpboard.getCaptureMoves(from);
     unsigned int capture = 0x0u;
     Board test;
@@ -66,13 +90,13 @@ namespace checkers {
 
       if(capture == to) {
         board = test;
-        return true;
+        return 0;
       }
       if(recursiveCapture(test, capture, to)) {
-        return true;
+        return 0;
       }
     }
-    return false;
+    return -1;
   }
 
   void Game::newGame() {
@@ -126,19 +150,19 @@ namespace checkers {
     }
   }
 
-	void Game::aiTest() {
-		while(!board.endOfGame()) {
-			Search search(this);
-			gui->printBoard(board);
-			search.search();
-		}
-	}
+        void Game::aiTest() {
+                while(!board.endOfGame()) {
+                        Search search(this);
+                        gui->printBoard(board);
+                        search.search();
+                }
+        }
 
-	void Game::ai() {
-			Search search(this);
-			search.search();
-			gui->printBoard(board);
-	}
+        void Game::ai() {
+                        Search search(this);
+                        search.search();
+                        gui->printBoard(board);
+        }
 
   void Game::play() {
     state = PLAYING;
@@ -146,6 +170,7 @@ namespace checkers {
     while(!board.endOfGame()) {
       gui->input();
     }
+    state = NOT_PLAYING;
     cout << "Game over...\n";
   }
 
