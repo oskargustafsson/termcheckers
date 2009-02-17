@@ -21,7 +21,7 @@ namespace checkers {
 			game->makeMove(movement);
 			return value;
 		}
-		maxdepth = 15;
+		maxdepth = 11;
 		value = alphabeta(game->board, maxdepth, -32000, 32000);
 		reverse(movement);
 		game->makeMove(movement);
@@ -33,7 +33,6 @@ namespace checkers {
 		unsigned int pieces = 0x0u;
 		unsigned int moves = 0x0u;
 		int tmp = 0;
-		bool betacutoff = false;
 		unsigned int from = 0x0u;
 		unsigned int to = 0x0u;
 		bool capture = false;
@@ -88,7 +87,6 @@ namespace checkers {
 				}
 			}
 			if(beta <= alpha) {
-				betacutoff = true;
 				break;
 			}
 			if(moves == 0)
