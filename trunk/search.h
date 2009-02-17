@@ -31,7 +31,7 @@ namespace checkers {
 			struct shortMove {
 				unsigned int from;
 				unsigned int to;
-			}
+			};
 	};
 }
 
