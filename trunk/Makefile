@@ -21,6 +21,10 @@ all: $(PROG)
 debug: main.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
 	$(CXX) -ggdb -o $@ $^
 
+.PHONY: clean
+clean:
+	rm *.o -f
+
 # Linking:
 lennart: main.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
 	$(CXX) -o $@ $^
