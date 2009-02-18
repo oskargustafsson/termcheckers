@@ -92,19 +92,22 @@ namespace checkers {
           cout << "\033[32m+-< AI >-------------+\033[0m";
         }
         if(i == 15 && row == 1) {
-          printf("\033[32m|\033[0mDepth: %d", DEPTH);
+          printf("\033[32m|\033[0m");
         }
         if(i == 15 && row == 0) {
           cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board);
         }
         if(i == 19 && row == 0) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m|\033[0m" << "Nodes evaluated: " << nodes;
+          nodes = "0";
         }
         if(i == 19 && row == 1) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m|\033[0m" << "Calculation time: " << timeUsed;
+          timeUsed = "0";
         }
         if(i == 23 && row == 0) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m|\033[0m" << "Depth: " << depth;
+          depth = "0";
         }
         if(i == 23 && row == 1) {
           cout << "\033[32m+-< General >--------+\033[0m";
@@ -159,6 +162,18 @@ namespace checkers {
   void GUI::setInfo(string str, string inf) {
     if(inf == "LM") {
       lastMove = str;
+    }
+    else if(inf == "TIME") {
+      timeUsed = str;
+    }
+    else if(inf == "NODES") {
+      nodes = str;
+    }
+    else if(inf == "DEPTH") {
+      depth = str;
+    }
+    else if(inf == "VALUE") {
+      value = str;
     }
   }
 
