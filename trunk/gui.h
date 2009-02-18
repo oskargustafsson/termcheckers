@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 #include "board.h"
 #include "game.h"
 
@@ -29,8 +30,15 @@ namespace checkers {
     std::vector<unsigned int> parseMovement(std::string line);
 
     void clearScreen();
+
+    std::string depth;
+    std::string timeUsed;
+    std::string nodes;
+    std::string value;
     int moveCount;
+
     std::string lastMove;
+    //std::stack<std::string> moveHistory;
   };
 }
 
