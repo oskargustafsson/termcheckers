@@ -28,7 +28,6 @@ namespace checkers {
 
 			Board board;
 			int state;
-
 		private:
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 

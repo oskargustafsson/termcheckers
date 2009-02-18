@@ -17,6 +17,7 @@ namespace checkers {
 	{
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
+		timer = new timer::Timer();
 #ifdef KILLER_MOVES
 		for(int i=0; i<100; ++i) {
 			killer[i] = 0x0u;
@@ -31,6 +32,7 @@ namespace checkers {
 	{
 		delete movement;
 		delete capture_movement;
+		delete timer;
 	}
 
 	/*
@@ -41,7 +43,6 @@ namespace checkers {
 	int Search::search()
 	{
 		int value = 0;
-		timer::Timer* timer = new timer::Timer();
 
 		timer->startTimer();
 
@@ -50,7 +51,7 @@ namespace checkers {
 			return value;
 		}
 		int i=1;
-		while(timer->getTime() < 400000) {
+		while(timer->getTime() < 100000) {
 			maxdepth = i;
 			value = alphabeta(game->board, 0, -32000, 32000);
 			++i;
@@ -60,7 +61,6 @@ namespace checkers {
 		game->makeMove(*movement);
 
 		timer->stopTimer();
-		delete timer;
 		return value;
 	}
 

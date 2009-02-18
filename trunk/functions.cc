@@ -4,7 +4,6 @@ int countBits(unsigned int board) {
 	return __builtin_popcount (board);
 }
 
-/*
 void compute_bits_in_char()
 {
 	unsigned int i ;
@@ -22,4 +21,3 @@ int countBits2(unsigned int n)
 		+  bits_in_char [(n >> 16) & 0xffu]
 		+  bits_in_char [(n >> 24) & 0xffu] ;
 }
-*/

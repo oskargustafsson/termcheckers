@@ -16,7 +16,6 @@ namespace checkers {
 
   Game::Game() {
     state = NOT_PLAYING;
-    //board.compute_bits_in_char();
   }
   Game::~Game() {}
 
@@ -69,6 +68,7 @@ namespace checkers {
       oss << "\033[31mMore captures possible!\033[0m";
     }
     gui->setInfo(oss.str(), "LM"); //Send info to gui.
+    oss.flush();
 
     ////////////SLUT!
 
