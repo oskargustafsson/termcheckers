@@ -1,3 +1,6 @@
+#ifndef TIMER_H
+#define TIMER_H
+
 /*
  * timer.h
  */
@@ -26,3 +29,5 @@ namespace timer {
   };
 
 }
+
+#endif /* TIMER_H */

@@ -2,6 +2,7 @@
 #define SEARCHTREE_H
 
 #include "board.h"
+#include "timer.h"
 #include <vector>
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
@@ -30,6 +31,7 @@ namespace checkers {
 			std::vector<unsigned int>* capture_movement;
 			unsigned int recursiveTo;
 
+			timer::Timer* timer;
 #ifdef KILLER_MOVES
 			unsigned int killer[100];
 #endif
