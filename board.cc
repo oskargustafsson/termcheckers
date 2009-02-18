@@ -171,30 +171,6 @@ namespace checkers {
     player == WHITE ? player = BLACK : player = WHITE;
   }
 
-  int Board::countBits(unsigned int board) {
-    return __builtin_popcount (board);
-  }
-
-  /*
-    void Board::compute_bits_in_char()
-    {
-    unsigned int i ;
-    for (i = 0; i < 256; i++)
-    bits_in_char [i] = countBits(i) ;
-    return ;
-    }
-
-    int Board::countBits2(unsigned int n)
-    {
-    //kräver att bits_in_char är initierad
-
-    return bits_in_char [ n        & 0xffu]
-    +  bits_in_char [(n >>  8) & 0xffu]
-    +  bits_in_char [(n >> 16) & 0xffu]
-    +  bits_in_char [(n >> 24) & 0xffu] ;
-    }
-  */
-
   inline bool Board::empty(unsigned int piece) {
     return (piece & (white|black)) == 0;
   }
@@ -203,27 +179,6 @@ namespace checkers {
     kings |= (white & 0x0000000Fu);
     kings |= (black & 0xF0000000u);
   }
-
-/**
-	 * NOT WORKING
-	 */
-	std::queue<unsigned int> Board::getSortedMoveList() {
-		unsigned int pieces;
-		unsigned int from;
-		std::queue<unsigned int> moves;
-
-		pieces = getJumpPieces();
-		if(pieces == 0x0u) {
-			pieces = getMovePieces();
-		}
-
-		while(pieces != 0) {
-			from = (pieces & (pieces-1)) ^ pieces;
-			pieces &= pieces-1;
-
-		}
-		return moves;
-	}
 
 	/**
 	 * TODO: remove if-statement

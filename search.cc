@@ -6,6 +6,7 @@
 #include "board.h"
 #include "game.h"
 #include "timer.h"
+#include "functions.h"
 
 namespace checkers {
 
@@ -94,7 +95,7 @@ namespace checkers {
 #ifdef KILLER_MOVES
 		if(depth >= 0)
 			from = pieces & killer[depth];
-		if((from != 0) && (board.countBits(from) == 1))
+		if((from != 0) && (countBits(from) == 1))
 		{
 			if(capture)
 				moves = board.getCaptureMoves(from);
@@ -172,7 +173,7 @@ namespace checkers {
 	 */
 	int Search::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
 		unsigned int moves = board.getCaptureMoves(from);
-		int nrOfMoves = board.countBits(moves);
+		int nrOfMoves = countBits(moves);
 		unsigned int moveTo;
 		unsigned int to = 0x0u;
 		int tmp;
@@ -221,19 +222,19 @@ namespace checkers {
 		int bits;
 		unsigned int from = board.getJumpPieces();
 
-		if(board.countBits(from) != 1)
+		if(countBits(from) != 1)
 			return false;
 
 		movement->clear();
 		movement->push_back(from);
 
 		to = board.getCaptureMoves(from);
-		bits = board.countBits(to);
+		bits = countBits(to);
 		while(bits == 1) {
 			board.move(from, to);
 			from = to;
 			to = board.getCaptureMoves(from);
-			bits = board.countBits(to);
+			bits = countBits(to);
 		}
 		movement->push_back(from);
 
@@ -250,7 +251,7 @@ namespace checkers {
 		{
 			movement->push_back((*capture_movement)[i]);
 		}
-		if(board.countBits(board.getCaptureMoves(from)) != 1)
+		if(countBits(board.getCaptureMoves(from)) != 1)
 		{
 			movement->push_back(to);
 		}
