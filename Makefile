@@ -10,7 +10,7 @@ CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 CXXFLAGS += -g
 
 
-PROG = lennart timertest
+PROG = lennart timertest aitest
 
 #what to do with all
 
@@ -22,10 +22,12 @@ debugg: main.o board.o game.o gui.o search.o evaluation.o
 	$(CXX) -ggdb -o $@ $^
 
 # Linking:
-lennart: main.o board.o game.o gui.o search.o evaluation.o
+lennart: main.o board.o game.o gui.o search.o evaluation.o timer.o
 	$(CXX) -o $@ $^
 
 timertest: timertest.o timer.o
+
+aitest: aitest.o board.o game.o gui.o search.o evaluation.o timer.o
 
 # Dependencies, the implicit rule .cc => .o is used
 timertest.o: timertest.cc timer.h
@@ -36,3 +38,4 @@ main.o: main.cc
 evaluation.o: evaluation.cc evaluation.h
 game.o: game.cc game.h
 gui.o: gui.cc gui.h
+aitest.o: aitest.cc

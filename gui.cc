@@ -17,7 +17,6 @@ namespace checkers {
   }
 
   GUI::~GUI() {
-    //delete game;
   }
 
   void GUI::clearScreen() {
@@ -33,9 +32,9 @@ namespace checkers {
   void GUI::printBoard(Board& board) {
     int row = 0;
 
-    clearScreen();
+    //clearScreen();
 
-    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
+    //printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
     for(int i=0; i < 32; i++) {
       if(i % 4 == 0) {
         printf("\033[40m%2c\033[0m", ' ');
@@ -177,12 +176,10 @@ namespace checkers {
     case NOT_PLAYING:
       if(line == "play") {
         game->play();
-      } else if(line == "aitest") {
-        game->aiTest();
       } else if(line == "newgame") {
         game->newGame();
       } else if(line == "help") {
-        println("Commands: aitest, newgame, play, quit");
+        println("Commands: newgame, play, quit");
       } else if(line == "quit") {
         game->state = QUIT;
       }
@@ -217,11 +214,6 @@ namespace checkers {
           println("Stops current game");
         } else if(line == "skip") {
         game->board.changePlayer();
-      } else if(line == "test") {
-              println("Jump pieces:");
-              printInt(game->board.getJumpPieces());
-              println("Move pieces:");
-              printInt(game->board.getMovePieces());
       }
       break;
     }

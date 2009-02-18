@@ -4,6 +4,9 @@
 #include "board.h"
 #include <vector>
 
+// DEFINE WHAT OPTIMIZATIONS TO USE:
+#define KILLER_MOVES
+
 namespace checkers {
 	class Game;
 
@@ -18,15 +21,18 @@ namespace checkers {
 			int captureAlphaBeta(Board& b, int depth, int alpha, int beta, unsigned int from);
 			bool singleJump(Board b);
 			void reverse(std::vector<unsigned int>& list);
+			void newBestMove(Board& board, unsigned int from, unsigned int to);
 
 			Game* game;
 			int maxdepth;
-			std::vector<unsigned int> movement;
-			std::vector<unsigned int> capture_movement;
-			std::vector<unsigned int> best_movement;
+			double nrOfNodes;
+			std::vector<unsigned int>* movement;
+			std::vector<unsigned int>* capture_movement;
 			unsigned int recursiveTo;
 
-			unsigned int* killer;
+#ifdef KILLER_MOVES
+			unsigned int killer[100];
+#endif
 
 			struct shortMove {
 				unsigned int from;
