@@ -18,16 +18,16 @@ PROG = lennart timertest aitest
 all: $(PROG)
 
 .PHONY: debug
-debugg: main.o board.o game.o gui.o search.o evaluation.o
+debug: main.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
 	$(CXX) -ggdb -o $@ $^
 
 # Linking:
-lennart: main.o board.o game.o gui.o search.o evaluation.o timer.o
+lennart: main.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
 	$(CXX) -o $@ $^
 
 timertest: timertest.o timer.o
 
-aitest: aitest.o board.o game.o gui.o search.o evaluation.o timer.o
+aitest: aitest.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
 
 # Dependencies, the implicit rule .cc => .o is used
 timertest.o: timertest.cc timer.h
@@ -39,3 +39,4 @@ evaluation.o: evaluation.cc evaluation.h
 game.o: game.cc game.h
 gui.o: gui.cc gui.h
 aitest.o: aitest.cc
+functions.o: functions.h functions.cc

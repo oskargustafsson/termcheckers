@@ -1,8 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <queue>
-
 #define WHITE 0x0
 #define BLACK 0x1
 
@@ -18,8 +16,6 @@ namespace checkers {
 		unsigned int kings;
 		bool player; // WHITE=0, BLACK=1
 
-		static int bits_in_char [256];		// för bit-count
-
 		void createBoard();
 		unsigned int getCaptureMoves(unsigned int piece);
 		unsigned int getMoves(unsigned int piece);
@@ -30,20 +26,12 @@ namespace checkers {
 
 		void changePlayer();
 
-		int countBits(unsigned int b);
-
-		int countBits2(unsigned int b);
-
-		void compute_bits_in_char();
-
 		inline bool empty(unsigned int piece);
 
 		int validateMove(unsigned int from, unsigned int to);
 		int validateCapture(unsigned int from, unsigned int to);
 
 		void updateKings();
-
-		std::queue<unsigned int> getSortedMoveList();
 
 		unsigned int getJumpPieces();
 		unsigned int getMovePieces();
