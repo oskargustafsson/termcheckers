@@ -23,12 +23,12 @@ namespace checkers {
 			void loadGame(char* file);
 			void play();
 			void stop();
-			void aiTest();
 			void ai();
 			bool undoLastMove();
 
 			Board board;
 			int state;
+
 		private:
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 

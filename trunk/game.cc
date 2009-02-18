@@ -152,16 +152,6 @@ namespace checkers {
     }
   }
 
-        void Game::aiTest() {
-                state = PLAYING;
-                while(!board.endOfGame()) {
-                        Search search(this);
-                        search.search();
-                        gui->printBoard(board);
-                }
-                state = NOT_PLAYING;
-        }
-
         void Game::ai() {
                         Search search(this);
                         search.search();
