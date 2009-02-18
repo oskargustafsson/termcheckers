@@ -13,6 +13,7 @@ using namespace std;
 namespace checkers {
 
   GUI::GUI(Game* g) : game(g) {
+    moveCount = 0;
   }
 
   GUI::~GUI() {
@@ -64,23 +65,64 @@ namespace checkers {
         if((i+5)% 8 != 0) {
           printf("\033[47m    \033[0m");
         }
+
+
         printf("\033[40m%2c\033[0m", ' ');
+
+        /*information output*/
         if(i == 3 && row == 0) {
-          printf("Evaluation: %d", evaluate(board));
+          cout << "\033[32m+-< Game >-----------+\033[0m";
         }
         if(i == 3 && row == 1) {
-          printf("Player: ");
+          printf("\033[32m|\033[0mPlayer: ");
           if(board.player == BLACK)
             printf("Black");
           else
             printf("White");
         }
         if(i == 7 && row == 0) {
-          printf("Depth: %d", DEPTH);
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 7 && row == 1) {
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 11 && row == 0) {
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 11 && row == 1) {
+          cout << "\033[32m+-< AI >-------------+\033[0m";
+        }
+        if(i == 15 && row == 1) {
+          printf("\033[32m|\033[0mDepth: %d", DEPTH);
+        }
+        if(i == 15 && row == 0) {
+          cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board);
+        }
+        if(i == 19 && row == 0) {
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 19 && row == 1) {
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 23 && row == 0) {
+          cout << "\033[32m|\033[0m";
+        }
+        if(i == 23 && row == 1) {
+          cout << "\033[32m+-< General >--------+\033[0m";
+        }
+        if(i == 27 && row == 0) {
+          cout << "\033[32m|\033[0mMove count: " << moveCount;
+        }
+         if(i == 27 && row == 1) {
+          cout << "\033[32m|\033[0m";
+        }
+         if(i == 31 && row == 0) {
+          cout << "\033[32m|\033[0m";
         }
         if(i == 31 && row == 1) {
-          cout << lastMove;
-        }
+          cout << "\033[32m|\033[0m" << lastMove;
+        }//// info output done
+
         printf("\n");
         row++;
         if(row == 2) {
@@ -121,6 +163,9 @@ namespace checkers {
     }
   }
 
+  void GUI::editMoveCounter(int b) {
+    moveCount += b;
+  }
 
   void GUI::input() {
     printBoard(game->board);

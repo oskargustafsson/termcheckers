@@ -9,27 +9,29 @@
 #define DEPTH 10
 
 namespace checkers {
-        class Game;
+  class Game;
 
-        class GUI {
-        public:
-                GUI(Game* g);
-                ~GUI();
+  class GUI {
+  public:
+    GUI(Game* g);
+    ~GUI();
 
-                void setInfo(std::string str, std::string inf);
-                void printBoard(Board& b);
-                static void printInt(unsigned int b);
-                void input();
-                void println(std::string str);
-        private:
-                Game* game;
-                int isMovement(std::string line);
-                std::vector<unsigned int> parseMovement(std::string line);
+    void setInfo(std::string str, std::string inf);
+    void printBoard(Board& b);
+    static void printInt(unsigned int b);
+    void input();
+    void editMoveCounter(int b);
+    void println(std::string str);
 
-                void clearScreen();
+  private:
+    Game* game;
+    int isMovement(std::string line);
+    std::vector<unsigned int> parseMovement(std::string line);
 
-                std::string lastMove;
-        };
+    void clearScreen();
+    int moveCount;
+    std::string lastMove;
+  };
 }
 
 #endif

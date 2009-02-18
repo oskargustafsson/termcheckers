@@ -17,6 +17,10 @@ PROG = lennart timertest
 .PHONY: all
 all: $(PROG)
 
+.PHONY: debug
+debugg: main.o board.o game.o gui.o search.o evaluation.o
+	$(CXX) -ggdb -o $@ $^
+
 # Linking:
 lennart: main.o board.o game.o gui.o search.o evaluation.o
 	$(CXX) -o $@ $^

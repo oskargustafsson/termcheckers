@@ -44,7 +44,7 @@ namespace checkers {
           result = recursiveCapture(board, movements[i-1], movements[i]);
           if(result != 0)
             undoLastMove();
-				break;
+                                break;
         }
       }
     }
@@ -56,6 +56,7 @@ namespace checkers {
     // -2 more captures possible
     //////////////////
     if (result == 0) {
+      gui->editMoveCounter(1);
       oss << "Last move: " << log2(movements[0])+1;
       for(int i = 1; i<size; i++) {
         oss << "-" << log2(movements[i])+1;
@@ -72,9 +73,9 @@ namespace checkers {
     ////////////SLUT!
 
     if(result == 0) {
-    	board.updateKings();
-    	board.changePlayer();
-	 }
+        board.updateKings();
+        board.changePlayer();
+         }
     return result == 0;
   }
 
@@ -152,13 +153,13 @@ namespace checkers {
   }
 
         void Game::aiTest() {
-    		state = PLAYING;
+                state = PLAYING;
                 while(!board.endOfGame()) {
                         Search search(this);
                         search.search();
                         gui->printBoard(board);
                 }
-    		state = NOT_PLAYING;
+                state = NOT_PLAYING;
         }
 
         void Game::ai() {
@@ -183,6 +184,7 @@ namespace checkers {
     if(history.empty()) {
       return false;
     } else {
+      gui->editMoveCounter(-1);
       board = history.top();
       history.pop();
       return true;
