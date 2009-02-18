@@ -60,7 +60,7 @@ namespace checkers {
 		std::reverse(movement->begin(), movement->end());
 		game->makeMove(*movement);
 
-		timer->stopTimer();
+		time = timer->stopTimer();
 		return value;
 	}
 

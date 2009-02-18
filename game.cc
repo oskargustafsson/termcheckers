@@ -154,7 +154,24 @@ namespace checkers {
 
         void Game::ai() {
                         Search search(this);
-                        search.search();
+			ostringstream value;
+			value << search.search();
+			ostringstream depth;
+			depth << search.maxdepth;
+			ostringstream nodes;
+			nodes << search.nrOfNodes;
+			ostringstream time;
+			time << search.time;
+
+			gui->setInfo(value.str(), "VALUE");
+			gui->setInfo(time.str(), "TIME");
+			gui->setInfo(nodes.str(), "NODES");
+			gui->setInfo(depth.str(), "DEPTH");
+			value.flush();
+			depth.flush();
+			nodes.flush();
+			time.flush();
+
         }
 
   void Game::play() {
