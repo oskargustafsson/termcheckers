@@ -7,8 +7,6 @@
 #include "board.h"
 #include "game.h"
 
-#define DEPTH 10
-
 namespace checkers {
   class Game;
 

@@ -43,6 +43,7 @@ namespace checkers {
 	int Search::search()
 	{
 		int value = 0;
+		nrOfNodes = 0;
 
 		timer->startTimer();
 
