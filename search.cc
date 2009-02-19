@@ -267,7 +267,7 @@ namespace checkers {
 		{
 			movement->push_back((*capture_movement)[i]);
 		}
-		if(countBits(board.getCaptureMoves(from)) != 1)
+		if(countBits(board.getCaptureMoves(from)) == 0)
 		{
 			movement->push_back(to);
 		}
