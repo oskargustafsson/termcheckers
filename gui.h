@@ -21,6 +21,9 @@ namespace checkers {
     void input();
     void editMoveCounter(int b);
     void println(std::string str);
+    void popLastMove();
+    void stackLastMove();
+    void gameOver();
 
   private:
     Game* game;
@@ -29,14 +32,17 @@ namespace checkers {
 
     void clearScreen();
 
+    int moveCount;
+
+    bool redraw;
+
+    std::string player;
     std::string depth;
     std::string timeUsed;
     std::string nodes;
     std::string value;
-    int moveCount;
-
     std::string lastMove;
-    //std::stack<std::string> moveHistory;
+    std::stack<std::string> moveHistory;
   };
 }
 

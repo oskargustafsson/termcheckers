@@ -14,6 +14,7 @@ namespace checkers {
 
   GUI::GUI(Game* g) : game(g) {
     moveCount = 0;
+    redraw = true;
   }
 
   GUI::~GUI() {
@@ -74,10 +75,13 @@ namespace checkers {
         }
         if(i == 3 && row == 1) {
           printf("\033[32m|\033[0mPlayer: ");
-          if(board.player == BLACK)
+          if(board.player == BLACK) {
             printf("Black");
-          else
+            player = "Black";
+          } else {
             printf("White");
+            player = "White";
+          }
         }
         if(i == 7 && row == 0) {
           cout << "\033[32m|\033[0m";
@@ -92,22 +96,22 @@ namespace checkers {
           cout << "\033[32m+-< AI >-------------+\033[0m";
         }
         if(i == 15 && row == 1) {
-          printf("\033[32m|\033[0m");
+          cout << "\033[32m|\033[0m" << "Calculation depth: " << depth;
+          depth = "0";
         }
         if(i == 15 && row == 0) {
           cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board);
         }
         if(i == 19 && row == 0) {
           cout << "\033[32m|\033[0m" << "Nodes evaluated: " << nodes;
-          nodes = "0";
+          //nodes = "0";
         }
         if(i == 19 && row == 1) {
           cout << "\033[32m|\033[0m" << "Calculation time: " << timeUsed;
           timeUsed = "0";
         }
         if(i == 23 && row == 0) {
-          cout << "\033[32m|\033[0m" << "Depth: " << depth;
-          depth = "0";
+          cout << "\033[32m|\033[0m";
         }
         if(i == 23 && row == 1) {
           cout << "\033[32m+-< General >--------+\033[0m";
@@ -175,6 +179,26 @@ namespace checkers {
     else if(inf == "VALUE") {
       value = str;
     }
+
+  }
+
+  void GUI::gameOver() {
+    redraw = false;
+    cout << "\033[12A\033[37;41m";
+    cout << "        +------------------+        " << endl;
+    cout << "        | GAME OVER BITCH! |        " << endl;
+    cout << "        +------------------+        ";
+    cout << "\033[8B\033[0m" << endl;
+    cout << "        \033[8D";
+  }
+
+  void GUI::stackLastMove() {
+    moveHistory.push(lastMove);
+  }
+
+  void GUI::popLastMove() {
+    lastMove = moveHistory.top();
+    moveHistory.pop();
   }
 
   void GUI::editMoveCounter(int b) {
@@ -182,7 +206,10 @@ namespace checkers {
   }
 
   void GUI::input() {
-    printBoard(game->board);
+    if(redraw)
+      printBoard(game->board);
+    redraw = true;
+
     string line;
     cout << "> ";
     cin >> line;
@@ -196,6 +223,7 @@ namespace checkers {
       } else if(line == "help") {
         println("Commands: newgame, play, quit");
       } else if(line == "quit") {
+        gameOver();
         game->state = QUIT;
       }
       break;
@@ -226,7 +254,6 @@ namespace checkers {
         {
           game->state = NOT_PLAYING;
           game->board.createBoard();
-          println("Stops current game");
         } else if(line == "skip") {
         game->board.changePlayer();
       }
