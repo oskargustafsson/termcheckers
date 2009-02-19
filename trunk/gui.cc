@@ -14,6 +14,7 @@ namespace checkers {
 
   GUI::GUI(Game* g) : game(g) {
     moveCount = 0;
+    totalTime = 0;
     redraw = true;
   }
 
@@ -104,14 +105,17 @@ namespace checkers {
         }
         if(i == 19 && row == 0) {
           cout << "\033[32m|\033[0m" << "Nodes evaluated: " << nodes;
-          //nodes = "0";
+          nodes = "0";
         }
         if(i == 19 && row == 1) {
-          cout << "\033[32m|\033[0m" << "Calculation time: " << timeUsed;
+          cout << "\033[32m|\033[0m" << "Calculation time: ";
+          cout << std::strtod(timeUsed.c_str(), NULL)/1000000;
+          cout << " sec";
           timeUsed = "0";
         }
         if(i == 23 && row == 0) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m|\033[0m" << "Total time: " << totalTime/1000000;
+          cout << " sec";
         }
         if(i == 23 && row == 1) {
           cout << "\033[32m+-< General >--------+\033[0m";
@@ -169,6 +173,7 @@ namespace checkers {
     }
     else if(inf == "TIME") {
       timeUsed = str;
+      totalTime += std::strtol(str.c_str(), NULL, 10);
     }
     else if(inf == "NODES") {
       nodes = str;
@@ -184,9 +189,10 @@ namespace checkers {
 
   void GUI::gameOver() {
     redraw = false;
-    cout << "\033[12A\033[37;41m";
+    cout << "\033[13A\033[37;41m";
     cout << "        +------------------+        " << endl;
     cout << "        | GAME OVER BITCH! |        " << endl;
+    cout << "        |    You Lose!     |        " << endl;
     cout << "        +------------------+        ";
     cout << "\033[8B\033[0m" << endl;
     cout << "        \033[8D";
