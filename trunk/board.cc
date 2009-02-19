@@ -124,6 +124,8 @@ namespace checkers {
     Board newboard;
     int result = -1;
 
+    if(from == to)
+      return -1;
     if((moves & to) != 0) {
       newboard = *this;
       newboard.move(from, to);
