@@ -19,7 +19,7 @@ all: $(PROG)
 
 .PHONY: debug
 debug: main.o board.o game.o gui.o search.o evaluation.o timer.o functions.o
-	$(CXX) -ggdb -o $@ $^
+	$(CXX) -ggdb -pg -o $@ $^
 
 .PHONY: clean
 clean:

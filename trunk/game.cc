@@ -56,6 +56,7 @@ namespace checkers {
     //////////////////
     if (result == 0) {
       gui->editMoveCounter(1);
+      gui->stackLastMove();
       oss << "Last move: " << log2(movements[0])+1;
       for(int i = 1; i<size; i++) {
         oss << "-" << log2(movements[i])+1;
@@ -154,23 +155,23 @@ namespace checkers {
 
         void Game::ai() {
                         Search search(this);
-			ostringstream value;
-			value << search.search();
-			ostringstream depth;
-			depth << search.maxdepth;
-			ostringstream nodes;
-			nodes << search.nrOfNodes;
-			ostringstream time;
-			time << search.time;
+                        ostringstream value;
+                        value << search.search();
+                        ostringstream depth;
+                        depth << search.maxdepth;
+                        ostringstream nodes;
+                        nodes << search.nrOfNodes;
+                        ostringstream time;
+                        time << search.time;
 
-			gui->setInfo(value.str(), "VALUE");
-			gui->setInfo(time.str(), "TIME");
-			gui->setInfo(nodes.str(), "NODES");
-			gui->setInfo(depth.str(), "DEPTH");
-			value.flush();
-			depth.flush();
-			nodes.flush();
-			time.flush();
+                        gui->setInfo(value.str(), "VALUE");
+                        gui->setInfo(time.str(), "TIME");
+                        gui->setInfo(nodes.str(), "NODES");
+                        gui->setInfo(depth.str(), "DEPTH");
+                        value.flush();
+                        depth.flush();
+                        nodes.flush();
+                        time.flush();
 
         }
 
@@ -181,7 +182,7 @@ namespace checkers {
       gui->input();
     }
     state = NOT_PLAYING;
-    cout << "Game over...\n";
+    gui->gameOver();
   }
 
   void Game::stop() {
@@ -192,6 +193,7 @@ namespace checkers {
       return false;
     } else {
       gui->editMoveCounter(-1);
+      gui->popLastMove();
       board = history.top();
       history.pop();
       return true;
