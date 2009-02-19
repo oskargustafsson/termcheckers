@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "gui.h"
 #include "board.h"
 #include "game.h"
@@ -6,6 +7,7 @@
 #define AI_TEST
 
 using namespace checkers;
+using namespace std;
 
 int main() {
 
@@ -17,10 +19,9 @@ int main() {
 	board.createBoard();
 
 	int i=0;
-	while(!game->board.endOfGame() && i < 300) {
-		Search search(game);
-		search.search();
+	while(!game->board.endOfGame() && i < 100) {
 		gui->printBoard(game->board);
+		game->ai();
 		i++;
 	}
 	std::cout << "DONE" << std::endl;
