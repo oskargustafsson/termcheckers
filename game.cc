@@ -25,8 +25,7 @@ namespace checkers {
   }
 
   bool Game::makeMove(vector<unsigned int> movements) {
-    string lmTemp;        //for gui output
-    ostringstream oss;    // -----||-----
+    ostringstream oss; //for gui output
     int result = 0;
     int size = movements.size();
 
@@ -41,9 +40,10 @@ namespace checkers {
       else {
         for(int i=1; i<size; i++) {
           result = recursiveCapture(board, movements[i-1], movements[i]);
-          if(result != 0)
+          if(result != 0) {
             undoLastMove();
-                                break;
+            break;
+	  }
         }
       }
     }
