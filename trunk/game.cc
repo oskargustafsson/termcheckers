@@ -41,7 +41,7 @@ namespace checkers {
         for(int i=1; i<size; i++) {
           result = recursiveCapture(board, movements[i-1], movements[i]);
           if(result != 0) {
-            undoLastMove();
+            history.pop();
             break;
 	  }
         }
