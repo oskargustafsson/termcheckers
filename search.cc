@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 #include "search.h"
 #include "evaluation.h"
 #include "board.h"
@@ -19,9 +20,7 @@ namespace checkers {
 		capture_movement = new std::vector<unsigned int>;
 		timer = new timer::Timer();
 #ifdef KILLER_MOVES
-		for(int i=0; i < KILLER_SIZE; ++i) {
-			killer[i] = 0x0u;
-		}
+		killer = {0x0u};
 #endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
 		for(int a=0; a<32; ++a) {
@@ -93,7 +92,7 @@ namespace checkers {
 #ifdef HISTORY_HEURISTIC
 		int movevalues[48] = {0};
 #endif // HISTORY_HEURISTIC
-		int movecount = 0;
+		unsigned int movecount = 0;
 
 		nrOfNodes++;
 
@@ -133,9 +132,13 @@ namespace checkers {
 			to = (moves & (moves-1)) ^ moves;
 			moves &= moves-1;
 
-			movelist[movecount] = from;
-			movelist[movecount+1] = to;
+			movelist[movecount<<1] = from;
+			movelist[(movecount<<1)+1] = to;
+#ifdef HISTORY_HEURISTIC
+			movevalues[movecount] = history[bitToDec(from)][bitToDec(to)];
+#endif // HISTORY_HEURISTIC
 #ifdef KILLER_MOVES
+			// Put killer move first
 			if((killer[depth] & to) != 0 && (killer[depth] & from) != 0)
 			{
 				unsigned int tmp;
@@ -147,34 +150,21 @@ namespace checkers {
 				movelist[movecount+1] = tmp;
 			}
 #endif //KILLER_MOVES
-			movecount += 2;
+			movecount++;
 
 		}
 
-		/*
-		if(depth >= 0)
-			from = pieces & killer[depth];
-		if((from != 0x0u) && (countBits(from) == 1))
-		{
-			if(capture)
-				moves = board.getCaptureMoves(from);
-			else
-				moves = board.getMoves(from);
-			to = moves & killer[depth];
-			if(to != 0x0u) // KILLER IS LEGAL
-				moves = to;
-			else
-				moves = 0x0u;
-		}
-		*/
+#ifdef HISTORY_HEURISTIC
+		sortMoves(movelist, movevalues, movecount);
+#endif // HISTORY_HEURISTIC
 
 		// For each possible move
-		for(int i=0; i<movecount; i+=2)
+		for(unsigned int i=0; i<movecount; i++)
 		{
 			Board nextboard = board;
 
-			from = movelist[i];
-			to = movelist[i+1];
+			from = movelist[i<<1];
+			to = movelist[(i<<1)+1];
 
 			nextboard.move(from, to);
 
@@ -198,9 +188,12 @@ namespace checkers {
 			}
 			if(beta <= alpha) {
 #ifdef KILLER_MOVES
-				if(depth >= 0)
-					killer[depth] = from | to;
+				killer[depth] = from | to;
 #endif // KILLER_MOVES
+#ifdef HISTORY_HEURISTIC
+			// TODO Change increment value
+			history[bitToDec(from)][bitToDec(to)]+=depth*depth;
+#endif // HISTORY_HEURISTIC
 				break;
 			}
 		}
@@ -298,5 +291,59 @@ namespace checkers {
 			movement->push_back(to);
 		}
 		movement->push_back(from);
+	}
+
+	// Using heap-sort. try optimize as much as possible
+	void Search::sortMoves(unsigned int movelist[], int movevalues[], unsigned int movecount)
+	{
+		int start = movecount /2;
+		int end = movecount-2;
+		while(start >= 0)
+		{
+			siftDown(movelist, movevalues, start, end);
+			--start;
+		}
+		while(end > 0)
+		{
+			swap(movelist, movevalues, end, 0);
+			end--;
+			siftDown(movelist, movevalues, 0, end);
+		}
+		
+	}
+
+	inline void Search::siftDown(unsigned int movelist[], int movevalues[], int start, int end)
+	{
+		int root = start;
+		while((root*2 + 1) <= end)
+		{
+			int child = root*2+1;
+			if((child + 1 <= end) && (movevalues[child] < movevalues[child+1]))
+			{
+				child++;
+			}
+			if(movevalues[root] < movevalues[child])
+			{
+				swap(movelist, movevalues, root, child);
+				root = child;
+			}
+			else
+				return;
+		}
+	}
+
+	inline void Search::swap(unsigned int movelist[], int movevalues[], int a, int b)
+	{
+		int tmp = movevalues[a];
+		movevalues[a] = movevalues[b];
+		movevalues[b] = tmp;
+
+		unsigned int utmp = movelist[a<<1];
+		movelist[a<<1] = movelist[b<<1];
+		movelist[b<<1] = utmp;
+
+		utmp = movelist[(a<<1) +1];
+		movelist[(a<<1) +1] = movelist[(b<<1) +1];
+		movelist[(b<<1) +1] = utmp;
 	}
 }
