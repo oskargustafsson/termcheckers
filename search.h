@@ -22,6 +22,7 @@ namespace checkers {
 			~Search();
 
 			int search();
+			void sortTest();
 
 			int time;
 			int maxdepth;
