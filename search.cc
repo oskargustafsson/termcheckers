@@ -19,7 +19,7 @@ namespace checkers {
 		capture_movement = new std::vector<unsigned int>;
 		timer = new timer::Timer();
 #ifdef KILLER_MOVES
-		for(int i=0; i<100; ++i) {
+		for(int i=0; i < KILLER_SIZE; ++i) {
 			killer[i] = 0x0u;
 		}
 #endif // KILLER_MOVES
@@ -65,6 +65,11 @@ namespace checkers {
 			maxdepth++;
 			value = alphabeta(game->board, 0, -32000, 32000);
 		}
+		/**
+		 * If we stop alphabeta before its finished,
+		 * remember that movement might contain wrong moves.
+		 * Use another vector for finished calculations
+		 */
 
 		std::reverse(movement->begin(), movement->end());
 		game->makeMove(*movement);
@@ -84,18 +89,28 @@ namespace checkers {
 		unsigned int to = 0x0u;
 		bool capture = false;
 		int tmp = 0;
+		unsigned int movelist[96];
+#ifdef HISTORY_HEURISTIC
+		int movevalues[48] = {0};
+#endif // HISTORY_HEURISTIC
+		int movecount = 0;
 
 		nrOfNodes++;
 
-		// check if there is capture moves
-		// and check which pieces can move
+		/*********************************
+		 * Check if there is capture moves
+		 * and which pieces can move.
+		 *********************************/
 		if((pieces = board.getJumpPieces()) != 0x0u)
 			capture=true;
 		else
 			pieces = board.getMovePieces();
 
-		// Check if its the end node
-		// if there is capture moves try one depth more
+		/*******************************
+		 * Check if its the end node.
+		 * If there is capture moves,
+		 * try one more ply.
+		 *******************************/
 		if(((depth >= maxdepth) && !capture) || pieces == 0)
 		{
 			return board.player == BLACK ? evaluate(board) : -evaluate(board);
@@ -104,26 +119,42 @@ namespace checkers {
 		/**********************
 		 * GENERATE THE MOVES:
 		 **********************/
-		/*
-		   while(pieces != 0x0u) {
-		   if(moves == 0x0u) {
-		   from = (pieces &(pieces-1)) ^ pieces;
-		   if(capture)
-		   moves = board.getCaptureMoves(from);
-		   else
-		   moves = board.getMoves(from);
-		   }
-		   to = (moves & (moves-1)) ^ moves;
-		   moves &= moves-1;
-		   if(moves == 0x0u)
-		   pieces &= pieces-1;
-		   }
-		   */
+		while(pieces != 0x0u || moves != 0x0u)
+		{
+			if(moves == 0x0u)
+			{
+				from = (pieces &(pieces-1)) ^ pieces;
+				pieces &= pieces-1;
+				if(capture)
+					moves = board.getCaptureMoves(from);
+				else
+					moves = board.getMoves(from);
+			}
+			to = (moves & (moves-1)) ^ moves;
+			moves &= moves-1;
 
+			movelist[movecount] = from;
+			movelist[movecount+1] = to;
 #ifdef KILLER_MOVES
+			if((killer[depth] & to) != 0 && (killer[depth] & from) != 0)
+			{
+				unsigned int tmp;
+				tmp = movelist[0];
+				movelist[0] = from;
+				movelist[movecount] = tmp;
+				tmp = movelist[1];
+				movelist[1] = to;
+				movelist[movecount+1] = tmp;
+			}
+#endif //KILLER_MOVES
+			movecount += 2;
+
+		}
+
+		/*
 		if(depth >= 0)
 			from = pieces & killer[depth];
-		if((from != 0) && (countBits(from) == 1))
+		if((from != 0x0u) && (countBits(from) == 1))
 		{
 			if(capture)
 				moves = board.getCaptureMoves(from);
@@ -135,36 +166,33 @@ namespace checkers {
 			else
 				moves = 0x0u;
 		}
-#endif //KILLER_MOVES
+		*/
 
 		// For each possible move
-		while(pieces != 0x0u || moves != 0x0u)
+		for(int i=0; i<movecount; i+=2)
 		{
 			Board nextboard = board;
 
-			if(moves == 0x0u)
-			{
-				from = (pieces & (pieces-1)) ^ pieces;
-				if(capture)
-					moves = board.getCaptureMoves(from);
-				else
-					moves = board.getMoves(from);
-			}
-			to = (moves & (moves-1)) ^ moves;
-			moves &= moves-1;
+			from = movelist[i];
+			to = movelist[i+1];
 
 			nextboard.move(from, to);
 
-			if(capture) {
+			if(capture)
+			{
 				tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
-			} else {
+			}
+			else
+			{
 				nextboard.changePlayer();
 				nextboard.updateKings();
 				tmp = -alphabeta(nextboard, depth+1, -beta, -alpha);
 			}
-			if(tmp > alpha) {
+			if(tmp > alpha)
+			{
 				alpha = tmp;
-				if(depth == 0) {
+				if(depth == 0)
+				{
 					newBestMove(board, from, to);
 				}
 			}
@@ -175,8 +203,6 @@ namespace checkers {
 #endif // KILLER_MOVES
 				break;
 			}
-			if(moves == 0)
-				pieces &= pieces-1;
 		}
 
 		return alpha;
@@ -190,7 +216,7 @@ namespace checkers {
 	int Search::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
 		unsigned int moves = board.getCaptureMoves(from);
 		int nrOfMoves = countBits(moves);
-		unsigned int moveTo;
+		unsigned int moveTo = 0x0u;
 		unsigned int to = 0x0u;
 		int tmp;
 
