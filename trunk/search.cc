@@ -20,7 +20,8 @@ namespace checkers {
 		capture_movement = new std::vector<unsigned int>;
 		timer = new timer::Timer();
 #ifdef KILLER_MOVES
-		killer = {0x0u};
+		for(int i=0; i < KILLER_SIZE; i++)
+			killer[i] = 0x0u;
 #endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
 		for(int a=0; a<32; ++a) {
@@ -297,7 +298,7 @@ namespace checkers {
 	void Search::sortMoves(unsigned int movelist[], int movevalues[], unsigned int movecount)
 	{
 		int start = movecount /2;
-		int end = movecount-2;
+		int end = movecount-1;
 		while(start >= 0)
 		{
 			siftDown(movelist, movevalues, start, end);
@@ -345,5 +346,21 @@ namespace checkers {
 		utmp = movelist[(a<<1) +1];
 		movelist[(a<<1) +1] = movelist[(b<<1) +1];
 		movelist[(b<<1) +1] = utmp;
+	}
+
+	void Search::sortTest() {
+		unsigned int movelist[96] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+		int movevalues[48] = {120,23,123,345,12,93,3,100,23,43};
+		unsigned int movecount = 10;
+
+		std::cout << "Osorterat:\n";
+		for(int i = 0; i<10; i++) {
+			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";
+		}
+		sortMoves(movelist, movevalues, movecount);
+		std::cout << "Sorterat:\n";
+		for(int i = 0; i<10; i++) {
+			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";
+		}
 	}
 }

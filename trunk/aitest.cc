@@ -3,6 +3,7 @@
 #include "gui.h"
 #include "board.h"
 #include "game.h"
+#include "functions.h"
 
 #define AI_TEST
 
@@ -26,6 +27,8 @@ int main() {
 	}
 	std::cout << "DONE" << std::endl;
 
+	Search s(game);
+	s.sortTest();
 
 	delete game;
 	delete gui;
