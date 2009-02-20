@@ -9,6 +9,8 @@
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
 #define KILLER_MOVES
+#define KILLER_SIZE 100
+//#define SCOUT
 //#define HISTORY_HEURISTIC
 
 namespace checkers {
@@ -41,7 +43,7 @@ namespace checkers {
 
 			timer::Timer* timer;
 #ifdef KILLER_MOVES
-			unsigned int killer[100];
+			unsigned int killer[KILLER_SIZE];
 #endif // KILLER_MOVES
 
 #ifdef HISTORY_HEURISTIC
