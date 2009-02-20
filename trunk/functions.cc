@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <cmath>
 
 int countBits(unsigned int board) {
 	return __builtin_popcount (board);
@@ -20,4 +21,8 @@ int countBits2(unsigned int n)
 		+  bits_in_char [(n >>  8) & 0xffu]
 		+  bits_in_char [(n >> 16) & 0xffu]
 		+  bits_in_char [(n >> 24) & 0xffu] ;
+}
+
+int bitToDec(unsigned int b) {
+	return static_cast<int>(log2(b));
 }

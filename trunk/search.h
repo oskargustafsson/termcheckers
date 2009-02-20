@@ -8,10 +8,10 @@
 #define MAX_TIME 100000
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
-#define KILLER_MOVES
-#define KILLER_SIZE 100
+//#define KILLER_MOVES
+//#define KILLER_SIZE 100
 //#define SCOUT
-//#define HISTORY_HEURISTIC
+#define HISTORY_HEURISTIC
 
 namespace checkers {
 	class Game;
@@ -32,6 +32,9 @@ namespace checkers {
 			bool singleJump(Board b);
 			void reverse(std::vector<unsigned int>& list);
 			void newBestMove(Board& board, unsigned int from, unsigned int to);
+			void sortMoves(unsigned int movelist[], int movevalues[], unsigned int movecount);
+			inline void siftDown(unsigned int movelist[], int movevalues[], int start, int end);
+			inline void swap(unsigned int movelist[], int movevalues[], int a, int b);
 			struct shortMove {
 				unsigned int from;
 				unsigned int to;
