@@ -44,7 +44,7 @@ namespace checkers {
 	}
 
 	/*
-	 * Only public function
+	 * The only public function
 	 * returns the value of the alphabeta algorthm
 	 * and make the move in game
 	 */
@@ -192,8 +192,8 @@ namespace checkers {
 				killer[depth] = from | to;
 #endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
-			// TODO Change increment value
-			history[bitToDec(from)][bitToDec(to)]+=depth*depth;
+				// TODO Change increment value
+				history[bitToDec(from)][bitToDec(to)]-=depth;
 #endif // HISTORY_HEURISTIC
 				break;
 			}
