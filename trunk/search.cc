@@ -94,6 +94,9 @@ namespace checkers {
 		int movevalues[48] = {0};
 #endif // HISTORY_HEURISTIC
 		unsigned int movecount = 0;
+#ifdef SCOUT
+		int testBeta = beta;
+#endif // SCOUT
 
 		nrOfNodes++;
 
@@ -159,7 +162,9 @@ namespace checkers {
 		sortMoves(movelist, movevalues, movecount);
 #endif // HISTORY_HEURISTIC
 
-		// For each possible move
+		/*****************
+		 * FOR EACH MOVE
+		 *****************/
 		for(unsigned int i=0; i<movecount; i++)
 		{
 			Board nextboard = board;
@@ -177,7 +182,15 @@ namespace checkers {
 			{
 				nextboard.changePlayer();
 				nextboard.updateKings();
+#ifdef SCOUT
+				tmp = -alphabeta(nextboard, depth+1, -testBeta, -alpha);
+				if(tmp >= testBeta && testBeta < beta)
+				{
+					tmp = -alphabeta(nextboard, depth+1, -beta, -alpha);
+				}
+#else
 				tmp = -alphabeta(nextboard, depth+1, -beta, -alpha);
+#endif // SCOUT
 			}
 			if(tmp > alpha)
 			{
@@ -186,16 +199,20 @@ namespace checkers {
 				{
 					newBestMove(board, from, to);
 				}
-			}
-			if(beta <= alpha) {
+				if(alpha >= beta)
+				{
 #ifdef KILLER_MOVES
-				killer[depth] = from | to;
+					killer[depth] = from | to;
 #endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
-				// TODO Change increment value
-				history[bitToDec(from)][bitToDec(to)]-=depth;
+					// TODO Change increment value
+					history[bitToDec(from)][bitToDec(to)]-=depth;
 #endif // HISTORY_HEURISTIC
-				break;
+					break;
+				}
+#ifdef SCOUT
+				testBeta = alpha+1;
+#endif // SCOUT
 			}
 		}
 

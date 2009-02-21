@@ -5,12 +5,12 @@
 #include "timer.h"
 #include <vector>
 
-#define MAX_TIME 100000
+#define MAX_TIME 1000000
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
 //#define KILLER_MOVES
 //#define KILLER_SIZE 100
-//#define SCOUT
+#define SCOUT
 #define HISTORY_HEURISTIC
 
 namespace checkers {
