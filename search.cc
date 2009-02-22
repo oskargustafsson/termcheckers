@@ -55,7 +55,6 @@ namespace checkers {
 				maxdepth++;
 				value = alphabeta(board, 0, -32000, 32000);
 			}
-			std::reverse(movement->begin(), movement->end());
 #else
 			maxdepth = 14;
 			value = alphabeta(board, 0, -32000, 32000);
