@@ -155,15 +155,18 @@ namespace checkers {
   }
 
         void Game::ai() {
-                        Search search(this);
+                        Search search;
+                        SearchResult result = search.search(board);
+			makeMove(result.move);
                         ostringstream value;
-                        value << search.search();
+			value << result.value;
                         ostringstream depth;
-                        depth << search.maxdepth;
+                        depth << result.depth;
                         ostringstream nodes;
-                        nodes << search.nrOfNodes;
+                        nodes << result.nodes;
                         ostringstream time;
-                        time << search.time;
+                        time << result.time;
+
 
                         gui->setInfo(value.str(), "VALUE");
                         gui->setInfo(time.str(), "TIME");
@@ -173,7 +176,6 @@ namespace checkers {
                         depth.flush();
                         nodes.flush();
                         time.flush();
-
         }
 
   void Game::play() {
