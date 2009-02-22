@@ -1,3 +1,6 @@
+/*
+ * Search.cc
+ */
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -5,16 +8,12 @@
 #include "search.h"
 #include "evaluation.h"
 #include "board.h"
-#include "game.h"
 #include "timer.h"
 #include "functions.h"
 
 namespace checkers {
 
-	/*
-	 * CONSTRUCTOR
-	 */
-	Search::Search(Game* g) : game(g)
+	Search::Search()
 	{
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
@@ -33,9 +32,6 @@ namespace checkers {
 
 	}
 
-	/*
-	 * DESTRUCTOR
-	 */
 	Search::~Search()
 	{
 		delete movement;
@@ -43,39 +39,38 @@ namespace checkers {
 		delete timer;
 	}
 
-	/*
-	 * The only public function
-	 * returns the value of the alphabeta algorthm
-	 * and make the move in game
-	 */
-	int Search::search()
+	SearchResult Search::search(Board board)
 	{
+		SearchResult result;
+
 		int value = 0;
 		nrOfNodes = 0;
 		maxdepth = 0;
 
 		timer->startTimer();
 
-		if(singleJump(game->board)) {
-			game->makeMove(*movement);
-			time = timer->stopTimer();
-			return value;
+		if(!singleJump(board)) {
+#ifdef ITERATIVE_DEEPENING
+			while(timer->getTime() < MAX_TIME) {
+				maxdepth++;
+				value = alphabeta(board, 0, -32000, 32000);
+			}
+			std::reverse(movement->begin(), movement->end());
+#else
+			maxdepth = 14;
+			value = alphabeta(board, 0, -32000, 32000);
+#endif // ITERATIVE_DEEPENING
+			std::reverse(movement->begin(), movement->end());
 		}
-		while(timer->getTime() < MAX_TIME) {
-			maxdepth++;
-			value = alphabeta(game->board, 0, -32000, 32000);
-		}
-		/**
-		 * If we stop alphabeta before its finished,
-		 * remember that movement might contain wrong moves.
-		 * Use another vector for finished calculations
-		 */
-
-		std::reverse(movement->begin(), movement->end());
-		game->makeMove(*movement);
-
 		time = timer->stopTimer();
-		return value;
+
+		result.value = value;
+		result.nodes = nrOfNodes;
+		result.move = *movement;
+		result.depth = maxdepth;
+		result.time = time;
+
+		return result;
 	}
 
 	/*
@@ -155,11 +150,10 @@ namespace checkers {
 			}
 #endif //KILLER_MOVES
 			movecount++;
-
 		}
 
 #ifdef HISTORY_HEURISTIC
-		sortMoves(movelist, movevalues, movecount);
+		sortMovesHeap(movelist, movevalues, movecount);
 #endif // HISTORY_HEURISTIC
 
 		/*****************
@@ -206,7 +200,7 @@ namespace checkers {
 #endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
 					// TODO Change increment value
-					history[bitToDec(from)][bitToDec(to)]-=depth;
+					history[bitToDec(from)][bitToDec(to)] += depth;
 #endif // HISTORY_HEURISTIC
 					break;
 				}
@@ -311,8 +305,12 @@ namespace checkers {
 		movement->push_back(from);
 	}
 
-	// Using heap-sort. try optimize as much as possible
-	void Search::sortMoves(unsigned int movelist[], int movevalues[], unsigned int movecount)
+	/*
+	 * Using heap-sort. try optimize as much as possible
+	 * maybe another algorithm is better in this case
+	 * Algorithm comes from pseudo-code on wikipedia
+	 */
+	void Search::sortMovesHeap(unsigned int movelist[], int movevalues[], unsigned int movecount)
 	{
 		int start = movecount /2;
 		int end = movecount-1;
@@ -327,7 +325,6 @@ namespace checkers {
 			end--;
 			siftDown(movelist, movevalues, 0, end);
 		}
-		
 	}
 
 	inline void Search::siftDown(unsigned int movelist[], int movevalues[], int start, int end)
@@ -336,11 +333,11 @@ namespace checkers {
 		while((root*2 + 1) <= end)
 		{
 			int child = root*2+1;
-			if((child + 1 <= end) && (movevalues[child] < movevalues[child+1]))
+			if((child + 1 <= end) && (movevalues[child] > movevalues[child+1]))
 			{
 				child++;
 			}
-			if(movevalues[root] < movevalues[child])
+			if(movevalues[root] > movevalues[child])
 			{
 				swap(movelist, movevalues, root, child);
 				root = child;
@@ -374,7 +371,7 @@ namespace checkers {
 		for(int i = 0; i<10; i++) {
 			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";
 		}
-		sortMoves(movelist, movevalues, movecount);
+		sortMovesHeap(movelist, movevalues, movecount);
 		std::cout << "Sorterat:\n";
 		for(int i = 0; i<10; i++) {
 			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";

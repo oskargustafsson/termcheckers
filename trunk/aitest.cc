@@ -5,6 +5,7 @@
 #include "board.h"
 #include "game.h"
 #include "functions.h"
+#include "search.h"
 
 #define AI_TEST
 
@@ -23,21 +24,23 @@ int main() {
 	Board& board = game->board;
 	board.createBoard();
 
+	/*
 	int i=0;
 	while(!game->board.endOfGame() && i < 100) {
-		Search s(game);
-		s.search();
-		nodes += s.nrOfNodes;
+		Search s;
+		SearchResult result = s.search(game->board);
+		nodes += result.nodes;
 		nodes /= 2;
-		depth += s.maxdepth;
+		depth += result.depth;
 		depth /= 2;
 		i++;
 	}
 	cout << "DONE" << std::endl;
 	cout << "avg depth: " << depth << " avg nodes: " << nodes << "\n";
+	*/
 
-//	Search s(game);
-//	s.sortTest();
+	Search s;
+	s.sortTest();
 
 	delete game;
 	delete gui;
