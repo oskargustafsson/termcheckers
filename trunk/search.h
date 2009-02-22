@@ -12,7 +12,7 @@
 //#define KILLER_SIZE 100
 #define SCOUT
 #define HISTORY_HEURISTIC
-//#define ITERATIVE_DEEPENING
+#define ITERATIVE_DEEPENING
 
 namespace checkers {
 
