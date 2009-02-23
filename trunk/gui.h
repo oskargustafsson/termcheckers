@@ -36,6 +36,8 @@ namespace checkers {
 
     bool redraw;
 
+    std::string messages[4];
+
     int totalTime;
     std::string player;
     std::string depth;

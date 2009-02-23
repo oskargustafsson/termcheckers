@@ -28,6 +28,7 @@ namespace checkers {
 
   bool Game::makeMove(vector<unsigned int>& movements) {
     ostringstream oss; //for gui output
+    ostringstream message;
     int size = movements.size();
 
     int result = board.validateMove(movements);
@@ -59,9 +60,12 @@ namespace checkers {
 	    gui->editMoveCounter(1);
 	    gui->stackLastMove();
 	    oss << "Last move: " << log2(movements[0])+1;
+	    message << "My move is: " << log2(movements[0])+1;
 	    for(int i = 1; i<size; i++) {
 		    oss << "-" << log2(movements[i])+1;
+		    message << "-" << log2(movements[i])+1;
 	    }
+	    gui->println(message.str());
     }
     else if(result == -1) {
 	    oss << "\033[31mIllegal move!\033[0m";
@@ -128,11 +132,10 @@ namespace checkers {
     is.open(file);
     unsigned int piece = 0x1;
 
+    gui->println("Loading file...");
     if(is != NULL) {
-      cout << "Loading file...\n";
       char ch;
       while(is.get(ch) != NULL) {
-        cout << ch;
         if(ch == 'b') {
           if(piece == 0) {
             board.player = BLACK;
@@ -167,6 +170,11 @@ namespace checkers {
         }
       }
       is.close();
+      gui->println("DONE!");
+    }
+    else
+    {
+      gui->println("Couldn't open file.");
     }
   }
 

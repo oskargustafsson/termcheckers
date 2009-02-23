@@ -1,6 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <vector>
+
 #define WHITE 0x0
 #define BLACK 0x1
 
