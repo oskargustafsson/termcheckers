@@ -28,12 +28,17 @@ namespace checkers {
 
   bool Game::makeMove(vector<unsigned int>& movements) {
     ostringstream oss; //for gui output
-    int result = 0;
     int size = movements.size();
 
+    int result = board.validateMove(movements);
 
-    result = board.validateMove(movements);
-
+    /////////////////////
+    // result:
+    // 0 Legal move.
+    // -1 illegal
+    // -2 more captures possible
+    // -3 movements.size() < 2
+    //////////////////
     if(result == 0) {
 	    if(!history.empty()) updateBoardHistory(board, history.top());
 	    history.push(board);
@@ -47,41 +52,31 @@ namespace checkers {
 			    recursiveCapture(board, movements[i-1], movements[i]);
 		    }
 	    }
-    }
+	    board.updateKings();
+	    board.changePlayer();
 
-
-    /////////////GUI GREJJER////////
-    // result:
-    // 0 Legal move.
-    // -1 illegal
-    // -2 more captures possible
-    // -3 movements.size() < 2
-    //////////////////
-    if (result == 0) {
-      gui->editMoveCounter(1);
-      gui->stackLastMove();
-      oss << "Last move: " << log2(movements[0])+1;
-      for(int i = 1; i<size; i++) {
-        oss << "-" << log2(movements[i])+1;
-      }
+	    // GUI:
+	    gui->editMoveCounter(1);
+	    gui->stackLastMove();
+	    oss << "Last move: " << log2(movements[0])+1;
+	    for(int i = 1; i<size; i++) {
+		    oss << "-" << log2(movements[i])+1;
+	    }
     }
     else if(result == -1) {
-      oss << "\033[31mIllegal move!\033[0m";
+	    oss << "\033[31mIllegal move!\033[0m";
     }
     else if(result == -2) {
-      oss << "\033[31mMore captures possible!\033[0m";
+	    oss << "\033[31mMore captures possible!\033[0m";
     }
     else if(result == -3) {
-	oss << "\033[31mNot enough moves\033[0m";
+	    oss << "\033[31mNot enough moves\033[0m";
     }
+
     gui->setInfo(oss.str(), "LM"); //Send info to gui.
     oss.flush();
 
-    ////////////SLUT!
-
     if(result == 0) {
-        board.updateKings();
-        board.changePlayer();
          }
     return result == 0;
   }
