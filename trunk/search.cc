@@ -41,7 +41,8 @@ namespace checkers {
 
 		int value = 0;
 		nrOfNodes = 0;
-		maxdepth = 0;
+		maxdepth = 1;
+		extendedDepth = 0;
 
 		timer->startTimer();
 
@@ -64,6 +65,7 @@ namespace checkers {
 		result.move = *movement;
 		result.depth = maxdepth;
 		result.time = time;
+		result.extendedDepth = extendedDepth;
 
 		return result;
 	}
@@ -89,6 +91,8 @@ namespace checkers {
 #endif // SCOUT
 
 		nrOfNodes++;
+		if(depth > extendedDepth)
+			extendedDepth = depth;
 
 		board.player == BLACK ? pieces = board.black : pieces = board.white;
 		/*********************************

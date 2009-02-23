@@ -166,16 +166,19 @@ namespace checkers {
                         nodes << result.nodes;
                         ostringstream time;
                         time << result.time;
-
+                        ostringstream extdepth;
+                        extdepth << result.extendedDepth;
 
                         gui->setInfo(value.str(), "VALUE");
                         gui->setInfo(time.str(), "TIME");
                         gui->setInfo(nodes.str(), "NODES");
                         gui->setInfo(depth.str(), "DEPTH");
+                        gui->setInfo(extdepth.str(), "EXTDEPTH");
                         value.flush();
                         depth.flush();
                         nodes.flush();
                         time.flush();
+                        extdepth.flush();
         }
 
   void Game::play() {

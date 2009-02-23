@@ -19,6 +19,7 @@ namespace checkers {
 		int depth;
 		int time;
 		int value;
+		int extendedDepth;
 		std::vector<unsigned int> move;
 	};
 
@@ -33,6 +34,7 @@ namespace checkers {
 			int time;
 			int maxdepth;
 			int nrOfNodes;
+			int extendedDepth;
 		private:
 			int alphabeta(Board& b, int depth, int alpha, int beta);
 			int captureAlphaBeta(Board& b, int depth, int alpha, int beta, unsigned int from);
