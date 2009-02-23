@@ -31,38 +31,31 @@ namespace checkers {
     int result = 0;
     int size = movements.size();
 
-	if(size > 0)
-	    result = board.validateMove(movements[0], movements[size-1]);
-	else {
-		cout << "Cannot makeMove, there is no move";
-		return false;
-	}
+
+    result = board.validateMove(movements);
 
     if(result == 0) {
-    	if(!history.empty()) updateBoardHistory(board, history.top());
-      history.push(board);
+	    if(!history.empty()) updateBoardHistory(board, history.top());
+	    history.push(board);
 
-      if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
-        board.move(movements[0], movements[1]);
-      }
-      else {
-        for(int i=1; i<size; i++) {
-          result = recursiveCapture(board, movements[i-1], movements[i]);
-          if(result != 0) {
-            board = history.top();
-            history.pop();
-            break;
-	  }
-        }
-      }
+	    if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
+		    board.move(movements[0], movements[1]);
+	    }
+	    else {
+		    for(int i=1; i<size; i++)
+		    {
+			    recursiveCapture(board, movements[i-1], movements[i]);
+		    }
+	    }
     }
-    
+
 
     /////////////GUI GREJJER////////
     // result:
     // 0 Legal move.
     // -1 illegal
     // -2 more captures possible
+    // -3 movements.size() < 2
     //////////////////
     if (result == 0) {
       gui->editMoveCounter(1);
@@ -75,8 +68,11 @@ namespace checkers {
     else if(result == -1) {
       oss << "\033[31mIllegal move!\033[0m";
     }
-    else {
+    else if(result == -2) {
       oss << "\033[31mMore captures possible!\033[0m";
+    }
+    else if(result == -3) {
+	oss << "\033[31mNot enough moves\033[0m";
     }
     gui->setInfo(oss.str(), "LM"); //Send info to gui.
     oss.flush();

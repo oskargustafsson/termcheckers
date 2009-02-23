@@ -123,47 +123,60 @@ namespace checkers {
     kings &= mask;
   }
 
-  int Board::validateMove(unsigned int from, unsigned int to) {
-    unsigned int moves = 0x0u;
-    unsigned int men = 0x0u;
+  int Board::validateMove(std::vector<unsigned int> movements)
+  {
+	  unsigned int moves = 0x0u;
+	  unsigned int men = 0x0u;
 
-    if(getJumpPieces() != 0x0u)
-        return validateCapture(from, to);
+	  unsigned int from = movements[0];
+	  unsigned int to = movements[1];
 
-    player == WHITE ? men = white : men = black;
-    moves = getMoves(from);
-    if(((moves & to) != 0) && ((men & from) != 0))
-      return 0;
-    else return -1;
+	  if(movements.size() < 2)
+		  return -3;
+	  if(getJumpPieces() != 0x0u)
+		  return validateCapture(movements, 0, from);
+	  if(movements.size() != 2)
+		  return -1;
+
+	  player == WHITE ? men = white : men = black;
+	  moves = getMoves(from);
+	  if(((moves & to) != 0) && ((men & from) != 0))
+		  return 0;
+	  else return -1;
   }
 
-  int Board::validateCapture(unsigned int from, unsigned int to) {
-    unsigned int moves = getCaptureMoves(from);
-    Board newboard;
-    int result = -1;
+  int Board::validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from) {
+	  unsigned int moves = getCaptureMoves(from);
+	  int result = -1;
 
-    if(from == to)
-      return -1;
-    if((moves & to) != 0) {
-      newboard = *this;
-      newboard.move(from, to);
-      if((newboard.getCaptureMoves(to)) == 0) {
-        return 0;
-      } else {
-        return -2;
-      }
-    }
-    while(moves != 0) {
-      unsigned int nextto = (moves & (moves-1)) ^ moves;
-      moves &= moves-1;
-      newboard = *this;
-      newboard.move(from, nextto);
-		result = newboard.validateCapture(nextto, to);
-		if(result == 0) {
-        return 0;
-      }
-    }
-    return result;
+	  if(movements.size()-1 == pos)
+	  {
+		  if(moves != 0)
+			  return -2;
+		  else
+			  return 0;
+	  }
+
+	  unsigned int to = movements[pos+1];
+
+	  if((moves & to) != 0)
+	  {
+		  Board newboard = *this;
+		  newboard.move(from, to);
+		  return newboard.validateCapture(movements, pos+1, to);
+	  }
+	  while(moves != 0)
+	  {
+		  to = (moves & (moves-1)) ^ moves;
+		  moves &= moves-1;
+		  Board newboard = *this;
+		  newboard.move(from, to);
+		  result = newboard.validateCapture(movements, pos, to);
+		  if(result == 0) {
+			  return 0;
+		  }
+	  }
+	  return result;
   }
 
   /**
