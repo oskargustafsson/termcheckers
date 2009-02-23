@@ -28,7 +28,7 @@ int main() {
 	int i=0;
 	while(!game->board.endOfGame() && i < 100) {
 		Search s;
-		SearchResult result = s.search(game->board);
+		SearchResult result = s.search(game->board, 1000000);
 		nodes += result.nodes;
 		nodes /= 2;
 		depth += result.depth;
@@ -37,11 +37,10 @@ int main() {
 	}
 	cout << "DONE" << std::endl;
 	cout << "avg depth: " << depth << " avg nodes: " << nodes << "\n";
+
 	*/
 
-	Search s;
-	s.sortTest();
-
+	gui->printInt(1073741824);
 	delete game;
 	delete gui;
 }

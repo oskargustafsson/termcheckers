@@ -35,7 +35,7 @@ namespace checkers {
 		delete timer;
 	}
 
-	SearchResult Search::search(Board board)
+	SearchResult Search::search(Board board, int time)
 	{
 		SearchResult result;
 
@@ -43,29 +43,39 @@ namespace checkers {
 		nrOfNodes = 0;
 		maxdepth = 1;
 		extendedDepth = 0;
+		finished_search = true;
+		time_check = 0;
+		max_time = time;
 
 		timer->startTimer();
 
-		if(!singleJump(board)) {
-#ifdef ITERATIVE_DEEPENING
-			while(timer->getTime() < MAX_TIME) {
+		if(!singleJump(board))
+		{
+			while(finished_search)
+			{
 				maxdepth++;
 				value = alphabeta(board, 0, -32000, 32000);
+
+				if(finished_search)
+				{
+					std::reverse(movement->begin(), movement->end());
+					result.move = *movement;
+					result.depth = maxdepth;
+					result.extendedDepth = extendedDepth;
+					result.value = value;
+				}
 			}
-#else
-			maxdepth = 14;
-			value = alphabeta(board, 0, -32000, 32000);
-#endif // ITERATIVE_DEEPENING
-			std::reverse(movement->begin(), movement->end());
+		}
+		else {
+			result.move = *movement;
+			result.depth = maxdepth;
+			result.extendedDepth = extendedDepth;
+			result.value = value;
 		}
 		time = timer->stopTimer();
 
-		result.value = value;
 		result.nodes = nrOfNodes;
-		result.move = *movement;
-		result.depth = maxdepth;
 		result.time = time;
-		result.extendedDepth = extendedDepth;
 
 		return result;
 	}
@@ -90,7 +100,22 @@ namespace checkers {
 		int testBeta = beta;
 #endif // SCOUT
 
+		if(time_check > 10000)
+		{
+			if(timer->getTime() > max_time)
+			{
+				finished_search = false;
+			}
+			time_check = 0;
+		}
+		if(!finished_search)
+		{
+			return alpha;
+		}
+		time_check++;
+
 		nrOfNodes++;
+
 		if(depth > extendedDepth)
 			extendedDepth = depth;
 
@@ -144,6 +169,12 @@ namespace checkers {
 			}
 		}
 
+		/************************
+		 * IF SOMEONE CAN'T MOVE
+		 * THIS IS AN END NODE
+		 ************************/
+		// TODO!!! This only checks the current player
+		// isn't it neccesary to check the other player too?
 		if(movecount == 0)
 		{
 			return board.player == BLACK ? evaluate(board) : -evaluate(board);
@@ -302,8 +333,7 @@ namespace checkers {
 	/*
 	 * Using heap-sort. try optimize as much as possible
 	 * maybe another algorithm is better in this case
-	 * Algorithm comes from pseudo-code on wikipedia
-	 */
+	 *
 	void Search::sortMovesHeap(unsigned int movelist[], int movevalues[], unsigned int movecount)
 	{
 		int start = movecount /2;
@@ -321,7 +351,7 @@ namespace checkers {
 		}
 	}
 
-	inline void Search::siftDown(unsigned int movelist[], int movevalues[], int start, int end)
+	void Search::siftDown(unsigned int movelist[], int movevalues[], int start, int end)
 	{
 		int root = start;
 		while((root*2 + 1) <= end)
@@ -340,6 +370,7 @@ namespace checkers {
 				return;
 		}
 	}
+	*/
 
 	inline void Search::swap(unsigned int movelist[], int movevalues[], int a, int b)
 	{
@@ -354,10 +385,6 @@ namespace checkers {
 		utmp = movelist[(a<<1) +1];
 		movelist[(a<<1) +1] = movelist[(b<<1) +1];
 		movelist[(b<<1) +1] = utmp;
-	}
-
-	void Search::sortTest() {
-		
 	}
 
 	inline void Search::insertMove(unsigned int movelist[], int movevalues[], unsigned int from, unsigned int to, int newValue, unsigned int& movecount)

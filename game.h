@@ -18,7 +18,7 @@ namespace checkers {
 			Game();
 			~Game();
 			void setGUI(GUI* g);
-			bool makeMove(std::vector<unsigned int> movements);
+			bool makeMove(std::vector<unsigned int>& movements);
 			void newGame();
 			void loadGame(char* file);
 			void play();

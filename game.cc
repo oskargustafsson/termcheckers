@@ -26,7 +26,7 @@ namespace checkers {
     gui = g;
   }
 
-  bool Game::makeMove(vector<unsigned int> movements) {
+  bool Game::makeMove(vector<unsigned int>& movements) {
     ostringstream oss; //for gui output
     int result = 0;
     int size = movements.size();
@@ -39,7 +39,7 @@ namespace checkers {
 	}
 
     if(result == 0) {
-    	if(history.size() > 0) updateBoardHistory(board, history.top());
+    	if(!history.empty()) updateBoardHistory(board, history.top());
       history.push(board);
 
       if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
@@ -181,7 +181,7 @@ namespace checkers {
 
         void Game::ai() {
                         Search search;
-                        SearchResult result = search.search(board);
+                        SearchResult result = search.search(board, 1000000);
 			makeMove(result.move);
                         ostringstream value;
 			value << result.value;
