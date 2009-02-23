@@ -89,6 +89,10 @@ namespace checkers {
 		unsigned int moves = 0x0u;
 		unsigned int from = 0x0u;
 		unsigned int to = 0x0u;
+#ifdef HISTORY_HEURISTIC
+		unsigned int best_from = 0x0u;
+		unsigned int best_to = 0x0u;
+#endif
 		bool capture = false;
 		int tmp = 0;
 		unsigned int movelist[96];
@@ -219,18 +223,23 @@ namespace checkers {
 				}
 				if(alpha >= beta)
 				{
-#ifdef HISTORY_HEURISTIC
-					// TODO Change increment value
-					history[bitToDec(from)][bitToDec(to)] += depth;
-#endif // HISTORY_HEURISTIC
 					break;
 				}
+#ifdef HISTORY_HEURISTIC
+				best_from = from;
+				best_to = to;
+#endif
 #ifdef SCOUT
 				testBeta = alpha+1;
 #endif // SCOUT
 			}
 		}
 
+#ifdef HISTORY_HEURISTIC
+		// TODO Change increment value
+		// depth*depth is better than just depth
+		history[bitToDec(best_from)][bitToDec(best_to)] += depth*depth;
+#endif // HISTORY_HEURISTIC
 		return alpha;
 	}
 
