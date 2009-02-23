@@ -23,34 +23,52 @@ namespace checkers {
   }
 
   unsigned int Board::getCaptureMoves(unsigned int piece) {
-    unsigned int moves = 0x0u;
+    unsigned int moves = 0x0u, allmask = ~(black|white);
 
     if(piece & white) {         // white man
-      moves =   (up_left((up_left(piece) & black)) & (~(black|white))) |
-        (up_right((up_right(piece) & black)) & (~(black|white)));
+      moves =   (up_left((up_left(piece) & black)) & allmask) |
+        (up_right((up_right(piece) & black)) & allmask);
       if((piece & kings)) {     // white king
-        moves |=        (down_left((down_left(piece) & black)) & (~(black|white))) |
-          (down_right((down_right(piece) & black)) & (~(black|white)));
+        moves |=        (down_left((down_left(piece) & black)) & allmask) |
+          (down_right((down_right(piece) & black)) & allmask);
       }
     }
     else if(piece & black) {    // black man
-      moves =   (down_left((down_left(piece) & white)) & (~(black|white))) |
-        (down_right((down_right(piece) & white)) & (~(black|white)));
+      moves =   (down_left((down_left(piece) & white)) & allmask) |
+        (down_right((down_right(piece) & white)) & allmask);
       if((piece & kings)) {     // black pimp
-        moves |=        (up_left((up_left(piece) & white)) & (~(black|white))) |
-          (up_right((up_right(piece) & white)) & (~(black|white)));
+        moves |=        (up_left((up_left(piece) & white)) & allmask) |
+          (up_right((up_right(piece) & white)) & allmask);
       }
     }
     return moves;
   }
+  
+	unsigned int Board::getCaptureMoves() {
+		unsigned int moves = 0x0u, allmask = ~(black|white);
+		if(player == BLACK) {
+			moves =	(down_left(down_left(black) & white) & allmask) |
+					(down_right(down_right(black) & white) & allmask) |
+					(up_left(up_left(black&kings) & white) & allmask) |
+		    		(up_right(up_right(black&kings) & white) & allmask);
+		} 
+		else {
+			moves =	(up_left(up_left(white) & black) & allmask) |
+					(up_right(up_right(white) & black) & allmask) |
+					(down_left(down_left(white&kings) & black) & allmask) |
+		    		(down_right(down_right(white&kings) & black) & allmask);
+		}
+		return moves;
+	}
 
   unsigned int Board::getMoves(unsigned int piece) {
+  	unsigned int allmask = ~(black|white);
     if((piece & kings) != 0) {
-      return (up_left(piece) | up_right(piece) | down_left(piece) | down_right(piece)) & (~(black|white));
+      return (up_left(piece) | up_right(piece) | down_left(piece) | down_right(piece)) & allmask;
     } else if((piece & white) != 0) {
-      return (up_left(piece) | up_right(piece)) & (~(black|white));
+      return (up_left(piece) | up_right(piece)) & allmask;
     } else if((piece & black) != 0) {
-      return (down_left(piece) | down_right(piece))  & (~(black|white));
+      return (down_left(piece) | down_right(piece))  & allmask;
     }
     return 0x0u;
         }

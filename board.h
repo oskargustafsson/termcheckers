@@ -18,6 +18,7 @@ namespace checkers {
 
 		void createBoard();
 		unsigned int getCaptureMoves(unsigned int piece);
+		unsigned int getCaptureMoves();
 		unsigned int getMoves(unsigned int piece);
 		bool endOfGame();
 		void move(unsigned int from, unsigned int to);

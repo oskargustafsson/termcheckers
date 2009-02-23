@@ -39,7 +39,7 @@ namespace checkers {
 	}
 
     if(result == 0) {
-    	updateBoardHistory(board, history.top());
+    	if(history.size() > 0) updateBoardHistory(board, history.top());
       history.push(board);
 
       if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
