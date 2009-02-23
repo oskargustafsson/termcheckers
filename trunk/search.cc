@@ -98,7 +98,7 @@ namespace checkers {
 		/*********************************
 		 * Check if there is capture moves
 		 *********************************/
-		if(board.getCaptureMoves(pieces) != 0x0u)
+		if(board.getCaptureMoves() != 0x0u)
 		{
 			capture = true;
 		}
