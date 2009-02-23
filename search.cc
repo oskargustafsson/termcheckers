@@ -18,10 +18,6 @@ namespace checkers {
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
 		timer = new timer::Timer();
-#ifdef KILLER_MOVES
-		for(int i=0; i < KILLER_SIZE; i++)
-			killer[i] = 0x0u;
-#endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
 		for(int a=0; a<32; ++a) {
 			for(int b=0; b<32; ++b) {
@@ -94,21 +90,21 @@ namespace checkers {
 
 		nrOfNodes++;
 
+		board.player == BLACK ? pieces = board.black : pieces = board.white;
 		/*********************************
 		 * Check if there is capture moves
-		 * and which pieces can move.
 		 *********************************/
-		if((pieces = board.getJumpPieces()) != 0x0u)
-			capture=true;
-		else
-			pieces = board.getMovePieces();
+		if(board.getCaptureMoves(pieces) != 0x0u)
+		{
+			capture = true;
+		}
 
 		/*******************************
 		 * Check if its the end node.
 		 * If there is capture moves,
 		 * try one more ply.
 		 *******************************/
-		if(((depth >= maxdepth) && !capture) || pieces == 0)
+		if(((depth >= maxdepth) && !capture))
 		{
 			return board.player == BLACK ? evaluate(board) : -evaluate(board);
 		}
@@ -116,44 +112,38 @@ namespace checkers {
 		/**********************
 		 * GENERATE THE MOVES:
 		 **********************/
-		while(pieces != 0x0u || moves != 0x0u)
+		while(pieces != 0x0u)
 		{
-			if(moves == 0x0u)
-			{
-				from = (pieces &(pieces-1)) ^ pieces;
-				pieces &= pieces-1;
-				if(capture)
-					moves = board.getCaptureMoves(from);
-				else
-					moves = board.getMoves(from);
-			}
-			to = (moves & (moves-1)) ^ moves;
-			moves &= moves-1;
+			from = (pieces &(pieces-1)) ^ pieces;
+			pieces &= pieces-1;
 
-			movelist[movecount<<1] = from;
-			movelist[(movecount<<1)+1] = to;
-#ifdef HISTORY_HEURISTIC
-			movevalues[movecount] = history[bitToDec(from)][bitToDec(to)];
-#endif // HISTORY_HEURISTIC
-#ifdef KILLER_MOVES
-			// Put killer move first
-			if((killer[depth] & to) != 0 && (killer[depth] & from) != 0)
+			if(capture)
 			{
-				unsigned int tmp;
-				tmp = movelist[0];
-				movelist[0] = from;
-				movelist[movecount] = tmp;
-				tmp = movelist[1];
-				movelist[1] = to;
-				movelist[movecount+1] = tmp;
+				moves = board.getCaptureMoves(from);
 			}
-#endif //KILLER_MOVES
-			movecount++;
+			else
+			{
+				moves = board.getMoves(from);
+			}
+			while(moves != 0x0u)
+			{
+				to = (moves & (moves-1)) ^ moves;
+				moves &= moves-1;
+
+#ifdef HISTORY_HEURISTIC
+				insertMove(movelist, movevalues, from, to, history[bitToDec(from)][bitToDec(to)], movecount);
+#else
+				movelist[movecount<<1] = from;
+				movelist[(movecount<<1)+1] = to;
+				movecount++;
+#endif // HISTORY_HEURISTIC
+			}
 		}
 
-#ifdef HISTORY_HEURISTIC
-		sortMovesHeap(movelist, movevalues, movecount);
-#endif // HISTORY_HEURISTIC
+		if(movecount == 0)
+		{
+			return board.player == BLACK ? evaluate(board) : -evaluate(board);
+		}
 
 		/*****************
 		 * FOR EACH MOVE
@@ -194,9 +184,6 @@ namespace checkers {
 				}
 				if(alpha >= beta)
 				{
-#ifdef KILLER_MOVES
-					killer[depth] = from | to;
-#endif // KILLER_MOVES
 #ifdef HISTORY_HEURISTIC
 					// TODO Change increment value
 					history[bitToDec(from)][bitToDec(to)] += depth;
@@ -297,7 +284,11 @@ namespace checkers {
 		{
 			movement->push_back((*capture_movement)[i]);
 		}
-		if(countBits(board.getCaptureMoves(from)) == 0)
+		if(capture_movement->size() == 0)
+		{
+			movement->push_back(to);
+		}
+		else if(countBits(board.getCaptureMoves(from)) > 1 && movement->back() != to)
 		{
 			movement->push_back(to);
 		}
@@ -362,18 +353,20 @@ namespace checkers {
 	}
 
 	void Search::sortTest() {
-		unsigned int movelist[96] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-		int movevalues[48] = {120,23,123,345,12,93,3,100,23,43};
-		unsigned int movecount = 10;
+		
+	}
 
-		std::cout << "Osorterat:\n";
-		for(int i = 0; i<10; i++) {
-			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";
-		}
-		sortMovesHeap(movelist, movevalues, movecount);
-		std::cout << "Sorterat:\n";
-		for(int i = 0; i<10; i++) {
-			std::cout << "From: " << movelist[i*2] << " To: " << movelist[i*2+1] << " Value: " << movevalues[i] << "\n";
+	inline void Search::insertMove(unsigned int movelist[], int movevalues[], unsigned int from, unsigned int to, int newValue, unsigned int& movecount)
+	{
+		movevalues[movecount] = newValue;
+		movelist[movecount<<1] = from;
+		movelist[(movecount<<1)+1] = to;
+		int pos = movecount-1;
+		movecount++;
+		while(pos >= 0 && movevalues[pos+1] > movevalues[pos])
+		{
+			swap(movelist, movevalues, pos+1, pos);
+			pos--;
 		}
 	}
 }

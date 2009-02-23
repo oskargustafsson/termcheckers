@@ -4,8 +4,8 @@
 
 # Compiler and compiler options:
 CC	  = g++
-CXX       = g++
-CXXFLAGS  = -pipe -O2 -Wall -W -ansi -pedantic-errors
+CXX       = g++ 
+CXXFLAGS  = -pipe -O2 -Wall -W -ansi -pedantic-errors -pg
 CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 CXXFLAGS += -g
 
