@@ -144,6 +144,12 @@ namespace checkers {
       }
     }
     printf("\033[40m%36c\033[0m\n", ' ');
+
+    // Log messages
+    for(int i=0; i<4; i++)
+    {
+        printf("%s\n", messages[i].c_str());
+    }
   }
 
   void GUI::printInt(unsigned int b) {
@@ -165,7 +171,11 @@ namespace checkers {
   }
 
   void GUI::println(string str) {
-    printf("%s\n", str.c_str());
+    for(int i=0; i<3; i++)
+    {
+      messages[i] = messages[i+1];
+    }
+    messages[3] = str;
   }
 
   void GUI::setInfo(string str, string inf) {
@@ -235,6 +245,8 @@ namespace checkers {
       } else if(line == "quit") {
         gameOver();
         game->state = QUIT;
+      } else {
+        println("Unknown command");
       }
       break;
     case PLAYING:
@@ -266,6 +278,9 @@ namespace checkers {
           game->board.createBoard();
         } else if(line == "skip") {
         game->board.changePlayer();
+	println("Skiping player");
+      } else {
+        println("Unknown command");
       }
       break;
     }
