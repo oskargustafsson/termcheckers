@@ -14,8 +14,8 @@ using namespace std;
 
 int main() {
 
-	float depth = 0;
-	float nodes = 0;
+	//float depth = 0;
+	//float nodes = 0;
 
 	Game* game = new Game();
 	GUI* gui = new GUI(game);

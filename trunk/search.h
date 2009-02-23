@@ -8,8 +8,6 @@
 #define MAX_TIME 1000000
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
-//#define KILLER_MOVES
-//#define KILLER_SIZE 100
 #define SCOUT
 #define HISTORY_HEURISTIC
 #define ITERATIVE_DEEPENING
@@ -51,9 +49,6 @@ namespace checkers {
 			std::vector<unsigned int>* capture_movement;
 
 			timer::Timer* timer;
-#ifdef KILLER_MOVES
-			unsigned int killer[KILLER_SIZE];
-#endif // KILLER_MOVES
 
 #ifdef HISTORY_HEURISTIC
 			int history[32][32];
