@@ -34,9 +34,9 @@ namespace checkers {
   void GUI::printBoard(Board& board) {
     int row = 0;
 
-//    clearScreen();
+    clearScreen();
 
-//    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
+    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
     for(int i=0; i < 32; i++) {
       if(i % 4 == 0) {
         printf("\033[40m%2c\033[0m", ' ');
@@ -91,10 +91,11 @@ namespace checkers {
           cout << "\033[32m|\033[0m";
         }
         if(i == 11 && row == 0) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m+-< AI >-------------+\033[0m";
         }
         if(i == 11 && row == 1) {
-          cout << "\033[32m+-< AI >-------------+\033[0m";
+          cout << "\033[32m|\033[0m" << "Extended depth: " << extdepth;
+          extdepth = "0";
         }
         if(i == 15 && row == 1) {
           cout << "\033[32m|\033[0m" << "Calculation depth: " << depth;
@@ -104,7 +105,7 @@ namespace checkers {
           cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board);
         }
         if(i == 19 && row == 0) {
-          cout << "\033[32m|\033[0m" << "Nodes evaluated: " << nodes;
+          cout << "\033[32m|\033[0m" << "Nodes visited: " << nodes;
           nodes = "0";
         }
         if(i == 19 && row == 1) {
@@ -180,6 +181,9 @@ namespace checkers {
     }
     else if(inf == "DEPTH") {
       depth = str;
+    }
+    else if(inf == "EXTDEPTH") {
+      extdepth = str;
     }
     else if(inf == "VALUE") {
       value = str;

@@ -42,6 +42,7 @@ namespace checkers {
     std::string timeUsed;
     std::string nodes;
     std::string value;
+    std::string extdepth;
     std::string lastMove;
     std::stack<std::string> moveHistory;
   };
