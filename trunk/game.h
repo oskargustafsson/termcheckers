@@ -25,12 +25,16 @@ namespace checkers {
 			void stop();
 			void ai();
 			bool undoLastMove();
+			void updateBoardHistory(Board&, Board&);
+			size_t countHistoryMatches(Board&);
 
 			Board board;
 			int state;
 		private:
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 
+			Board boards[50];
+			size_t board_count;
 			std::stack<Board> history;
 			bool output;
 			GUI* gui;
