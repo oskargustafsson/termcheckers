@@ -227,4 +227,9 @@ namespace checkers {
 
 		return pieces;
 	}
+	
+	bool Board::operator==(const Board& b) {
+		return player == b.player && kings == b.kings &&
+				black == b.black && white == b.white;
+	}
 }

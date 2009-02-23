@@ -35,13 +35,13 @@ namespace checkers {
 
 		unsigned int getJumpPieces();
 		unsigned int getMovePieces();
+		
+		bool operator==(const Board&);
 	private:
 		inline unsigned int up_left(unsigned const int& piece);
 		inline unsigned int up_right(unsigned const int& piece);
 		inline unsigned int down_left(unsigned const int& piece);
 		inline unsigned int down_right(unsigned const int& piece);
-		
-		static const unsigned int lg2[5];
 	};
 }
 

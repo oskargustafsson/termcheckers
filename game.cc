@@ -9,6 +9,7 @@
 #include "search.h"
 #include "board.h"
 #include "gui.h"
+#include "functions.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ namespace checkers {
 
   Game::Game() {
     state = NOT_PLAYING;
+    board_count = 0;		// put elsewhere?
   }
   Game::~Game() {}
 
@@ -29,9 +31,15 @@ namespace checkers {
     int result = 0;
     int size = movements.size();
 
-    result = board.validateMove(movements[0], movements[size-1]);
+	if(size > 0)
+	    result = board.validateMove(movements[0], movements[size-1]);
+	else {
+		cout << "Cannot makeMove, there is no move";
+		return false;
+	}
 
     if(result == 0) {
+    	updateBoardHistory(board, history.top());
       history.push(board);
 
       if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
@@ -48,6 +56,7 @@ namespace checkers {
         }
       }
     }
+    
 
     /////////////GUI GREJJER////////
     // result:
@@ -80,6 +89,22 @@ namespace checkers {
          }
     return result == 0;
   }
+  
+	void Game::updateBoardHistory(Board& newboard, Board& lastboard) {
+	  // the only time we need to add a board, is when a king moves
+		if( countBits(lastboard.kings ^ newboard.kings) == 2 )
+		 	board_count = 0;
+		else if(board_count < 50)
+			boards[board_count++] = newboard;
+	}
+	
+	size_t Game::countHistoryMatches(Board& board) {
+		size_t count = 0;
+		for(size_t i = 0; i < board_count; ++i)
+			if( boards[i] == board ) ++count;
+
+		return count;
+	}
 
   int Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
     unsigned int moves = tmpboard.getCaptureMoves(from);
