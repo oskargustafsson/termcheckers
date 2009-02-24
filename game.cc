@@ -10,6 +10,7 @@
 #include "board.h"
 #include "gui.h"
 #include "functions.h"
+#include "transposition.h"
 
 using namespace std;
 
@@ -21,8 +22,9 @@ namespace checkers {
     blackTime = 0;
     whiteTime = 0;
   }
-  Game::~Game() {}
-
+  Game::~Game()
+  {
+  }
 
   void Game::setGUI(GUI* g) {
     gui = g;
@@ -33,8 +35,14 @@ namespace checkers {
     ostringstream message;
     int size = movements.size();
 
-    int result = board.validateMove(movements);
+	 message << "My move is " << log2(movements[0])+1;
+	 for(int i = 1; i<size; i++) {
+		message << "-" << log2(movements[i])+1;
+	 }
+	 gui->println(message.str());
+	 message.flush();
 
+    int result = board.validateMove(movements);
     /////////////////////
     // result:
     // 0 Legal move.
@@ -62,12 +70,9 @@ namespace checkers {
 	    gui->editMoveCounter(1);
 	    gui->stackLastMove();
 	    oss << "Last move: " << log2(movements[0])+1;
-	    message << "My move is " << log2(movements[0])+1;
 	    for(int i = 1; i<size; i++) {
 		    oss << "-" << log2(movements[i])+1;
-		    message << "-" << log2(movements[i])+1;
 	    }
-	    gui->println(message.str());
     }
     else if(result == -1) {
 	    oss << "\033[31mIllegal move!\033[0m";
@@ -191,19 +196,19 @@ namespace checkers {
 			else
 				time_used = whiteTime;
 			if(TOTAL_TIME - time_used > 100000000)
-				time = 5000000;
+				time = 10000000;
 			else if(TOTAL_TIME - time_used > 50000000)
-				time = 4000000;
+				time = 9000000;
 			else if(TOTAL_TIME - time_used > 20000000)
-				time = 3000000;
+				time = 8000000;
 			else if(TOTAL_TIME - time_used > 10000000)
-				time = 2000000;
+				time = 6000000;
 			else if(TOTAL_TIME - time_used > 5000000)
-				time = 1000000;
+				time = 3000000;
 			else if(TOTAL_TIME - time_used > 1000000)
-				time = 100000;
+				time = 1000000;
 			else
-				time = 1000;
+				time = 10000;
 
                         result = search.search(board, time);
 			if(board.player == BLACK)

@@ -1,25 +1,38 @@
-#ifndef TRANSTABLE_H
-#define TRANSTABLE_H
+#ifndef TRANSPOSITION_H
+#define TRANSPOSITION_H
 
-#include "board.h"
+#define TABLE_SIZE 514229
+#define TRANS_DEPTH 8
+#define TRANS_NULL 64000
+
 #include <vector>
+#include "board.h"
 
 namespace checkers {
+	class Board;
 
-	class TransTable {
+	struct Position
+	{
+		int depth;
+		int value;
+		Board board;
+	};
+
+	class TranspositionTable
+	{
 		public:
-			TransTable();
-			~TransTable();
-			void add(int value);
-			void remove(Board& board);
-		private:
-			inline int hash(Board& board);
+			TranspositionTable();
+			~TranspositionTable();
+			void add(Board& board, int depth, int value);
+			int get(Board& board, int depth);
 
-			unsigned int bitstrings[128];
-			std::vector<int>* table[1000];
-			std::vector<int>** listPtr;
 			int size;
+		private:
+			inline unsigned int hash(Board& board);
+
+			unsigned int bitstrings[160];
+			Position* table;
 	};
 }
 
-#endif // TRANSTABLE_H
+#endif // TRANPOSITION_H

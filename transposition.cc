@@ -1,37 +1,79 @@
 #include "transposition.h"
 #include "board.h"
+#include <cstdlib>
+#include <iostream>
 
 namespace checkers {
 
-	TransTable::TransTable() : size(0)
+	TranspositionTable::TranspositionTable() : size(0)
 	{
-		srand(time(NULL));
-		for(int i=0; i<128; i++)
+		table = new Position[TABLE_SIZE];
+		std::srand(std::time(NULL));
+		Position null_position;
+		null_position.depth = 0;
+		null_position.value = TRANS_NULL;
+
+		for(int i=0; i<160; i++)
 		{
-			bitstrings[i] = rand();
+			bitstrings[i] = std::rand();
+		}
+		for(int i=0; i<TABLE_SIZE; i++)
+		{
+			table[i] = null_position;
 		}
 	}
 
-	TransTable::~TransTable()
+	TranspositionTable::~TranspositionTable()
 	{
-		delete table;
+		delete[] table;
 	}
 
-	void TransTable::add(Board& board, int value)
+	void TranspositionTable::add(Board& board, int depth, int value)
 	{
 		int index = hash(board);
-		listPtr = &Table[index];
-		listPtr->push_back(value);
-		size++;
+		Position last_pos = table[index];
+		if(depth > last_pos.depth)
+		{
+			Position new_pos;
+			new_pos.depth = depth;
+			new_pos.value = value;
+			new_pos.board = board;
+			table[index] = new_pos;
+			if(last_pos.depth == 0)
+			{
+				size++;
+			}
+		}
 	}
 
-	void TransTable::remove(Board& board)
+	int TranspositionTable::get(Board& board, int depth)
 	{
 		int index = hash(board);
-		listPtr = &Table[index];
+		Position p = table[index];
+		if(p.depth >= depth && board == p.board)
+			return p.value;
+		else
+			return TRANS_NULL;
 	}
 
-	inline int hash(Board& board)
+	inline unsigned int TranspositionTable::hash(Board& board)
 	{
+		unsigned int hash = 0;
+		unsigned int bit = 1;
+		for(int i = 1; i < 32; i++)
+		{
+			if((board.black & bit) != 0)
+				hash ^= bitstrings[i];
+			else if((board.white & bit) != 0)
+				hash ^= bitstrings[i+32];
+			else if((board.black & board.kings & bit) != 0)
+				hash ^= bitstrings[i+64];
+			else if((board.white & board.kings & bit) != 0)
+				hash ^= bitstrings[i+96];
+			else
+				hash ^= bitstrings[i+128];
+			bit = bit<<1;
+		}
+		return hash % TABLE_SIZE;
 	}
 }

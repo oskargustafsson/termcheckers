@@ -14,6 +14,7 @@
 
 namespace checkers {
 	class GUI;
+	class TranspositionTable;
 
 	class Game {
 		public:

@@ -10,6 +10,7 @@
 #include "board.h"
 #include "timer.h"
 #include "functions.h"
+#include "transposition.h"
 
 namespace checkers {
 
@@ -39,6 +40,9 @@ namespace checkers {
 	{
 		SearchResult result;
 
+#ifdef TRANS_TABLE
+	   trans_table = new TranspositionTable();
+#endif // TRANS_TABLE
 		int value = 0;
 		nrOfNodes = 0;
 		maxdepth = 1;
@@ -55,7 +59,6 @@ namespace checkers {
 			{
 				maxdepth++;
 				value = alphabeta(board, 0, -32000, 32000);
-
 				if(finished_search)
 				{
 					std::reverse(movement->begin(), movement->end());
@@ -64,6 +67,8 @@ namespace checkers {
 					result.extendedDepth = extendedDepth;
 					result.value = value;
 				}
+				if(timer->getTime() > time/3)
+					finished_search = false;
 			}
 		}
 		else {
@@ -76,6 +81,9 @@ namespace checkers {
 
 		result.nodes = nrOfNodes;
 		result.time = time;
+#ifdef TRANS_TABLE
+		delete trans_table;
+#endif // TRANS_TABLE
 
 		return result;
 	}
@@ -122,6 +130,14 @@ namespace checkers {
 
 		if(depth > extendedDepth)
 			extendedDepth = depth;
+
+#ifdef TRANS_TABLE
+		int trans_alpha;
+		if( depth > 2 && depth < 10 && (trans_alpha = trans_table->get(board, maxdepth-depth)) != TRANS_NULL)
+		{
+			return trans_alpha;
+		}
+#endif // TRANS_TABLE
 
 		board.player == BLACK ? pieces = board.black : pieces = board.white;
 		/*********************************
@@ -240,9 +256,12 @@ namespace checkers {
 		// depth*depth is better than just depth
 		history[bitToDec(best_from)][bitToDec(best_to)] += depth*depth;
 #endif // HISTORY_HEURISTIC
+#ifdef TRANS_TABLE
+		if(maxdepth-depth > 5 && depth > 2)
+			trans_table->add(board, maxdepth-depth, alpha);
+#endif // TRANS_TABLE 
 		return alpha;
 	}
-
 
 	/*
 	 * Help function for alphabeta
