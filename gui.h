@@ -8,6 +8,7 @@
 #include "game.h"
 
 namespace checkers {
+
   class Game;
 
   class GUI {
@@ -33,12 +34,13 @@ namespace checkers {
     void clearScreen();
 
     int moveCount;
-
     bool redraw;
 
     std::string messages[4];
 
     int totalTime;
+
+    std::string alphaval;
     std::string player;
     std::string depth;
     std::string timeUsed;
@@ -46,7 +48,8 @@ namespace checkers {
     std::string value;
     std::string extdepth;
     std::string lastMove;
-    std::stack<std::string> moveHistory;
+
+    std::stack<std::pair<std::string, int> > moveHistory;
   };
 }
 

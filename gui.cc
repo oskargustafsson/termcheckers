@@ -88,10 +88,10 @@ namespace checkers {
           cout << "\033[32m|\033[0m";
         }
         if(i == 7 && row == 1) {
-          cout << "\033[32m|\033[0m";
+          cout << "\033[32m+-< AI >-------------+\033[0m";
         }
         if(i == 11 && row == 0) {
-          cout << "\033[32m+-< AI >-------------+\033[0m";
+          cout << "\033[32m|\033[0m" << "Alphabeta value: " << alphaval;
         }
         if(i == 11 && row == 1) {
           cout << "\033[32m|\033[0m" << "Extended depth: " << extdepth;
@@ -198,7 +198,9 @@ namespace checkers {
     else if(inf == "VALUE") {
       value = str;
     }
-
+    else if(inf == "ALPHAVAL") {
+      alphaval = str;
+    }
   }
 
   void GUI::gameOver() {
@@ -213,12 +215,15 @@ namespace checkers {
   }
 
   void GUI::stackLastMove() {
-    moveHistory.push(lastMove);
+    std::pair<std::string,int> temp(lastMove, totalTime);
+    moveHistory.push(temp);
   }
 
   void GUI::popLastMove() {
-    lastMove = moveHistory.top();
+    std::pair<std::string, int> temp = moveHistory.top();
     moveHistory.pop();
+    lastMove = temp.first;
+    totalTime = temp.second;
   }
 
   void GUI::editMoveCounter(int b) {
@@ -278,7 +283,7 @@ namespace checkers {
           game->board.createBoard();
         } else if(line == "skip") {
         game->board.changePlayer();
-	println("Skiping player");
+        println("Skiping player");
       } else {
         println("Unknown command");
       }
