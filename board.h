@@ -40,11 +40,16 @@ namespace checkers {
 		unsigned int getMovePieces();
 		
 		bool operator==(const Board&);
+		unsigned int box(unsigned int pieces);
 	private:
 		inline unsigned int up_left(unsigned const int& piece);
 		inline unsigned int up_right(unsigned const int& piece);
 		inline unsigned int down_left(unsigned const int& piece);
 		inline unsigned int down_right(unsigned const int& piece);
+		inline unsigned int up(unsigned const int& piece);
+		inline unsigned int right(unsigned const int& piece);
+		inline unsigned int left(unsigned const int& piece);
+		inline unsigned int down(unsigned const int& piece);
 	};
 }
 

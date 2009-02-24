@@ -89,9 +89,23 @@ namespace checkers {
     return (((piece & 0x00F0F0F0)<<4) | ((piece & 0x07070707)<<5));
   }
 
+  inline unsigned int Board::up(unsigned const int& piece) {
+    return (piece & 0xFFFFFF00)>>8;
+  }
+  inline unsigned int Board::down(unsigned const int& piece) {
+    return (piece & 0x00FFFFFF)<<8;
+  }
+  inline unsigned int Board::left(unsigned const int& piece) {
+    return (piece & 0xEEEEEEEE)>>1;
+  }
+  inline unsigned int Board::right(unsigned const int& piece) {
+    return (piece & 0x77777777)<<1;
+  }
+
   bool Board::endOfGame() {
       return ( getJumpPieces() | getMovePieces() ) == 0;
   }
+
 
   void Board::move(unsigned int from, unsigned int to) {
     // regular move
@@ -261,4 +275,16 @@ namespace checkers {
                 return player == b.player && kings == b.kings &&
                                 black == b.black && white == b.white;
         }
+
+		unsigned int Board::box(unsigned int pieces) {
+			return up(pieces) |
+					up_left(up_left(pieces)) |
+					left(pieces) |
+					down_left(down_left(pieces)) |
+					down(pieces) |
+					down_right(down_right(pieces)) |
+					right(pieces) |
+					up_right(up_right(pieces));
+		}
+			
 }
