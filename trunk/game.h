@@ -10,6 +10,8 @@
 #define PLAYING 1
 #define QUIT 2
 
+#define TOTAL_TIME 300000000
+
 namespace checkers {
 	class GUI;
 
@@ -38,6 +40,9 @@ namespace checkers {
 			std::stack<Board> history;
 			bool output;
 			GUI* gui;
+
+			int blackTime;
+			int whiteTime;
 	};
 }
 #endif
