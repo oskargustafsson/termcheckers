@@ -39,26 +39,26 @@ namespace checkers {
     }
     return moves & (~(black|white));
   }
-  
-	unsigned int Board::getCaptureMoves() {
-		unsigned int moves = 0x0u;
-		if(player == BLACK) {
-			moves =	down_left(down_left(black) & white) |
-					down_right(down_right(black) & white) |
-					up_left(up_left(black&kings) & white) |
-		    		up_right(up_right(black&kings) & white);
-		} 
-		else {
-			moves =	up_left(up_left(white) & black) |
-					up_right(up_right(white) & black) |
-					down_left(down_left(white&kings) & black) |
-		    		down_right(down_right(white&kings) & black);
-		}
-		return moves & (~(black|white));
-	}
+
+        unsigned int Board::getCaptureMoves() {
+                unsigned int moves = 0x0u;
+                if(player == BLACK) {
+                        moves = down_left(down_left(black) & white) |
+                                        down_right(down_right(black) & white) |
+                                        up_left(up_left(black&kings) & white) |
+                                up_right(up_right(black&kings) & white);
+                }
+                else {
+                        moves = up_left(up_left(white) & black) |
+                                        up_right(up_right(white) & black) |
+                                        down_left(down_left(white&kings) & black) |
+                                down_right(down_right(white&kings) & black);
+                }
+                return moves & (~(black|white));
+        }
 
   unsigned int Board::getMoves(unsigned int piece) {
-  	unsigned int allmask = ~(black|white);
+        unsigned int allmask = ~(black|white);
     if((piece & kings) != 0) {
       return (up_left(piece) | up_right(piece) | down_left(piece) | down_right(piece)) & allmask;
     } else if((piece & white) != 0) {
@@ -121,58 +121,58 @@ namespace checkers {
 
   int Board::validateMove(std::vector<unsigned int> movements)
   {
-	  unsigned int moves = 0x0u;
-	  unsigned int men = 0x0u;
+          unsigned int moves = 0x0u;
+          unsigned int men = 0x0u;
 
-	  unsigned int from = movements[0];
-	  unsigned int to = movements[1];
+          unsigned int from = movements[0];
+          unsigned int to = movements[1];
 
-	  if(movements.size() < 2)
-		  return -3;
-	  if(getJumpPieces() != 0x0u)
-		  return validateCapture(movements, 0, from);
-	  if(movements.size() != 2)
-		  return -1;
+          if(movements.size() < 2)
+                  return -3;
+          if(getJumpPieces() != 0x0u)
+                  return validateCapture(movements, 0, from);
+          if(movements.size() != 2)
+                  return -1;
 
-	  player == WHITE ? men = white : men = black;
-	  moves = getMoves(from);
-	  if(((moves & to) != 0) && ((men & from) != 0))
-		  return 0;
-	  else return -1;
+          player == WHITE ? men = white : men = black;
+          moves = getMoves(from);
+          if(((moves & to) != 0) && ((men & from) != 0))
+                  return 0;
+          else return -1;
   }
 
   int Board::validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from) {
-	  unsigned int moves = getCaptureMoves(from);
-	  int result = -1;
+          unsigned int moves = getCaptureMoves(from);
+          int result = -1;
 
-	  if(movements.size()-1 == pos)
-	  {
-		  if(moves != 0)
-			  return -2;
-		  else
-			  return 0;
-	  }
+          if(movements.size()-1 == pos)
+          {
+                  if(moves != 0)
+                          return -2;
+                  else
+                          return 0;
+          }
 
-	  unsigned int to = movements[pos+1];
+          unsigned int to = movements[pos+1];
 
-	  if((moves & to) != 0)
-	  {
-		  Board newboard = *this;
-		  newboard.move(from, to);
-		  return newboard.validateCapture(movements, pos+1, to);
-	  }
-	  while(moves != 0)
-	  {
-		  to = (moves & (moves-1)) ^ moves;
-		  moves &= moves-1;
-		  Board newboard = *this;
-		  newboard.move(from, to);
-		  result = newboard.validateCapture(movements, pos, to);
-		  if(result == 0) {
-			  return 0;
-		  }
-	  }
-	  return result;
+          if((moves & to) != 0)
+          {
+                  Board newboard = *this;
+                  newboard.move(from, to);
+                  return newboard.validateCapture(movements, pos+1, to);
+          }
+          while(moves != 0)
+          {
+                  to = (moves & (moves-1)) ^ moves;
+                  moves &= moves-1;
+                  Board newboard = *this;
+                  newboard.move(from, to);
+                  result = newboard.validateCapture(movements, pos, to);
+                  if(result == 0) {
+                          return 0;
+                  }
+          }
+          return result;
   }
 
   /**
@@ -209,54 +209,56 @@ namespace checkers {
     kings |= (black & 0xF0000000u);
   }
 
-	/**
-	 * TODO: remove if-statement
-	 */
-	unsigned int Board::getJumpPieces() {
-		unsigned int pieces = 0x0u;
+        /**
+         * TODO: remove if-statement
+         */
+  unsigned int Board::getJumpPieces() {
+    unsigned int pieces = 0x0u;
+    unsigned int allMask = ~(black | white);
 
-		if(player == WHITE) {
-			pieces |= down_right(down_right(up_left((up_left(white) & black)) & ~(black | white)));
-			pieces |= down_left(down_left(up_right((up_right(white) & black)) & ~(black | white)));
+    if(player == WHITE) {
+      pieces |= down_right(down_right(up_left((up_left(white) & black)) & allMask));
+      pieces |= down_left(down_left(up_right((up_right(white) & black)) & allMask));
 
-			pieces |= up_right(up_right(down_left((down_left(white & kings) & black)) & ~(black | white)));
-			pieces |= up_left(up_left(down_right((down_right(white & kings) & black)) & ~(black | white)));
-		} else {
-			pieces |= up_right(up_right(down_left((down_left(black) & white)) & ~(black | white)));
-			pieces |= up_left(up_left(down_right((down_right(black) & white)) & ~(black | white)));
+      pieces |= up_right(up_right(down_left((down_left(white & kings) & black)) & allMask));
+      pieces |= up_left(up_left(down_right((down_right(white & kings) & black)) & allMask));
+    } else {
+      pieces |= up_right(up_right(down_left((down_left(black) & white)) & allMask));
+      pieces |= up_left(up_left(down_right((down_right(black) & white)) & allMask));
 
-			pieces |= down_right(down_right(up_left((up_left(black & kings) & white)) & ~(black | white)));
-			pieces |= down_left(down_left(up_right((up_right(black & kings) & white)) & ~(black | white)));
-		}
+      pieces |= down_right(down_right(up_left((up_left(black & kings) & white)) & allMask));
+      pieces |= down_left(down_left(up_right((up_right(black & kings) & white)) & allMask));
+    }
 
-		return pieces;
-	}
+    return pieces;
+  }
 
-	/**
-	 * TODO: remove if-statement
-	 */
-	unsigned int Board::getMovePieces() {
-		unsigned int pieces = 0x0u;
+        /**
+         * TODO: remove if-statement
+         */
+        unsigned int Board::getMovePieces() {
+                unsigned int pieces = 0x0u;
+                unsigned int allMask = ~(black | white);
 
-		if(player == WHITE) {
-			pieces |= down_right((up_left(white) & ~(black | white)));
-			pieces |= down_left((up_right(white) & ~(black | white)));
-			
-			pieces |= up_right((down_left(white & kings) & ~(black | white)));
-			pieces |= up_left((down_right(white & kings) & ~(black | white)));
-		} else {
-			pieces |= up_right((down_left(black) & ~(black | white)));
-			pieces |= up_left((down_right(black) & ~(black | white)));
+                if(player == WHITE) {
+                        pieces |= down_right((up_left(white) & allMask));
+                        pieces |= down_left((up_right(white) & allMask));
 
-			pieces |= down_right((up_left(black & kings) & ~(black | white)));
-			pieces |= down_left((up_right(black & kings) & ~(black | white)));
-		}
+                        pieces |= up_right((down_left(white & kings) & allMask));
+                        pieces |= up_left((down_right(white & kings) & allMask));
+                } else {
+                        pieces |= up_right((down_left(black) & allMask));
+                        pieces |= up_left((down_right(black) & allMask));
 
-		return pieces;
-	}
-	
-	bool Board::operator==(const Board& b) {
-		return player == b.player && kings == b.kings &&
-				black == b.black && white == b.white;
-	}
+                        pieces |= down_right((up_left(black & kings) & allMask));
+                        pieces |= down_left((up_right(black & kings) & allMask));
+                }
+
+                return pieces;
+        }
+
+        bool Board::operator==(const Board& b) {
+                return player == b.player && kings == b.kings &&
+                                black == b.black && white == b.white;
+        }
 }
