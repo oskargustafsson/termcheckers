@@ -18,6 +18,8 @@ namespace checkers {
   Game::Game() {
     state = NOT_PLAYING;
     board_count = 0;		// put elsewhere?
+    blackTime = 0;
+    whiteTime = 0;
   }
   Game::~Game() {}
 
@@ -60,7 +62,7 @@ namespace checkers {
 	    gui->editMoveCounter(1);
 	    gui->stackLastMove();
 	    oss << "Last move: " << log2(movements[0])+1;
-	    message << "My move is: " << log2(movements[0])+1;
+	    message << "My move is " << log2(movements[0])+1;
 	    for(int i = 1; i<size; i++) {
 		    oss << "-" << log2(movements[i])+1;
 		    message << "-" << log2(movements[i])+1;
@@ -180,7 +182,34 @@ namespace checkers {
 
         void Game::ai() {
                         Search search;
-                        SearchResult result = search.search(board, 1000000);
+			SearchResult result;
+			int time;
+			int time_used;
+
+			if(board.player == BLACK)
+				time_used = blackTime;
+			else
+				time_used = whiteTime;
+			if(TOTAL_TIME - time_used > 100000000)
+				time = 5000000;
+			else if(TOTAL_TIME - time_used > 50000000)
+				time = 4000000;
+			else if(TOTAL_TIME - time_used > 20000000)
+				time = 3000000;
+			else if(TOTAL_TIME - time_used > 10000000)
+				time = 2000000;
+			else if(TOTAL_TIME - time_used > 5000000)
+				time = 1000000;
+			else if(TOTAL_TIME - time_used > 1000000)
+				time = 100000;
+			else
+				time = 1000;
+
+                        result = search.search(board, time);
+			if(board.player == BLACK)
+				blackTime += result.time;
+			else
+				whiteTime += result.time;
 			makeMove(result.move);
                         ostringstream value;
 			value << result.value;
@@ -188,20 +217,20 @@ namespace checkers {
                         depth << result.depth;
                         ostringstream nodes;
                         nodes << result.nodes;
-                        ostringstream time;
-                        time << result.time;
+                        ostringstream time_str;
+                        time_str << result.time;
                         ostringstream extdepth;
                         extdepth << result.extendedDepth;
 
                         gui->setInfo(value.str(), "VALUE");
-                        gui->setInfo(time.str(), "TIME");
+                        gui->setInfo(time_str.str(), "TIME");
                         gui->setInfo(nodes.str(), "NODES");
                         gui->setInfo(depth.str(), "DEPTH");
                         gui->setInfo(extdepth.str(), "EXTDEPTH");
                         value.flush();
                         depth.flush();
                         nodes.flush();
-                        time.flush();
+                        time_str.flush();
                         extdepth.flush();
         }
 

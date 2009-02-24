@@ -1,27 +1,22 @@
++ TODO
+- DONE
+============== Väldigt viktigt ================
++ Inte upprepa samma drag
++ Undvik draw, och fixa speciell evaluering vid vinst
++ Hålla koll på hur mycket tid det är kvar och bestämma hur mycket tid nästa drag får ta
+- Räkna tiden // Linus fixar.
+- Iterativ deepening
+- Scout algoritmen
 
-* Inte upprepa samma drag
-* Undvik draw
-* Räkna tiden // Linus fixar.
-* Iterativ deepening
-* Hashtable grejjer för att spara drag
-* Lägga in 2-3 första dragen utan sökning
-* Scout algoritmen
-* Lite andra optimeringar typ history heuristics
+============== Ganska viktigt =================
++ Fixa fler grejjer till evalueringsfunktionen och testa lite olika
++ Hashtable grejjer för att spara drag
++ Transposition table
+- history heuristics
 
+============== Lite viktigt ===================
++ Lägga in 2-3 första dragen utan sökning, "Opening book"
 
-Lämna till Linus: ---------------------------------
-* Skriva ut varje gång:
-	Player: White
-	Current evaluation: 234
-	Time left: 295 sek
-
-	Last move
-	  Move Nbr: 1
-	  Move: 9-13
-	  Value: (retur-värde av alpha-beta)
-	  Evaluated nodes: 12453534
-	  Depth: 16
-	  Time used: 2 sek
-
-Jag kan fixa detta I veckan. :-D
----------------------------------------------------
+============== mindre viktigt =================
++ spara spel ("wdp" format, smidigt för debug kanske)
++ loggfil över alla drag (kan vara bra till turneringen, men inte särskilt viktigt)
