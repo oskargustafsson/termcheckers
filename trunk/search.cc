@@ -155,7 +155,7 @@ namespace checkers {
 		 *******************************/
 		if(((depth >= maxdepth) && !capture))
 		{
-			return board.player == BLACK ? evaluate(board) : -evaluate(board);
+			return board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
 		}
 
 		/**********************
@@ -197,7 +197,7 @@ namespace checkers {
 		// isn't it neccesary to check the other player too?
 		if(movecount == 0)
 		{
-			return board.player == BLACK ? evaluate(board) : -evaluate(board);
+			return board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
 		}
 
 		/*****************

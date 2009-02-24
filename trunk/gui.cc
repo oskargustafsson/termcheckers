@@ -102,7 +102,7 @@ namespace checkers {
           depth = "0";
         }
         if(i == 15 && row == 0) {
-          cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board);
+          cout << "\033[32m|\033[0m" << "Evaluation: " << evaluate(board, -32000, 32000, 0);
         }
         if(i == 19 && row == 0) {
           cout << "\033[32m|\033[0m" << "Nodes visited: " << nodes;
