@@ -91,7 +91,7 @@ namespace checkers {
           cout << "\033[32m+-< AI >-------------+\033[0m";
         }
         if(i == 11 && row == 0) {
-          cout << "\033[32m|\033[0m" << "Alphabeta value: " << alphaval;
+          cout << "\033[32m|\033[0m" << "Alphabeta value: " << value;
         }
         if(i == 11 && row == 1) {
           cout << "\033[32m|\033[0m" << "Extended depth: " << extdepth;
