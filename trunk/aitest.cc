@@ -40,7 +40,8 @@ int main() {
 
 	*/
 
-	gui->printInt(1073741824);
+//	gui->printInt(1073741824);
+	
 	delete game;
 	delete gui;
 }

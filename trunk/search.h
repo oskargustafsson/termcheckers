@@ -8,8 +8,10 @@
 // DEFINE WHAT OPTIMIZATIONS TO USE:
 #define SCOUT
 #define HISTORY_HEURISTIC
+//#define TRANS_TABLE
 
 namespace checkers {
+	class TranspositionTable;
 
 	struct SearchResult {
 		int nodes;
@@ -51,6 +53,10 @@ namespace checkers {
 #ifdef HISTORY_HEURISTIC
 			int history[32][32];
 #endif // HISTORY_HEURISTIC
+
+#ifdef TRANS_TABLE
+			TranspositionTable* trans_table;
+#endif // TRANS_TABLE
 
 	};
 }

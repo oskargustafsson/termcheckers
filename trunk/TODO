@@ -1,3 +1,9 @@
+justera tidshanteringen
+fixa med evalueringen
+kontrollera draw
+kontrollera vinst
+
+
 + TODO
 - DONE
 ============== Väldigt viktigt ================
@@ -11,7 +17,7 @@
 ============== Ganska viktigt =================
 + Fixa fler grejjer till evalueringsfunktionen och testa lite olika
 + Hashtable grejjer för att spara drag
-+ Transposition table
+- Transposition table
 - history heuristics
 
 ============== Lite viktigt ===================
