@@ -8,9 +8,26 @@ using namespace std;
 
 int evaluate(Board& board) {
         int score = 0;
+	
+	int black_mvps, black_jmps, white_mvps, white_mvps;
+	
+	if(board.player == BLACK) {
+	        black_mvps = board.getMovePieces();
+        	black_jmps = board.getJumpPieces();
+		board.changePlayer();
+        	white_mvps = board.getMovePieces();
+	        white_jmps = board.getJumpPieces();
+	} 
+	else {
+	        white_mvps = board.getMovePieces();
+        	white_jmps = board.getJumpPieces();
+		board.changePlayer();
+        	black_mvps = board.getMovePieces();
+	        black_jmps = board.getJumpPieces();
+	}
+	board.changPlayer();
+	
 
-        int mvps = board.getMovePieces();
-        int jmps = board.getJumpPieces();
 
         ///////////////////////////////////////////
         //      MATERIAL VALUE
@@ -50,13 +67,12 @@ int evaluate(Board& board) {
         score -= (board.player == WHITE)<<2;
 
         // Make it good to imobilize opponents peices
-        score += (countBits(board.white) - jmps - mvps) * 30;
-        score -= (countBits(board.black) - jmps - mvps) * 30;
+        score += (countBits(board.white & (white_jmps | white_mvps))) * 30;
+        score -= (countBits(board.black & (black_jmps | black_mvps))) * 30;
 
         // make it good to win
-        bool tmp = (jmps + mvps == 0);
-        score -= (board.player == BLACK && tmp) * 10000;
-        score += (board.player == WHITE && tmp) * 10000;
+        score -= (board.player == BLACK && (black_jmps | black_mvps) == 0) * 10000;
+        score += (board.player == WHITE && (white_jmps | white_mvps) == 0) * 10000;
 
         return score;
 }
