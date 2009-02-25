@@ -90,12 +90,12 @@ namespace checkers {
 		}*/
 
 		int pos = 0;
-		for(int i = 1; i < 32; i++) {
+		for(int i = 0; i < 32; i++) {
 			pos = 0;
 			pos += ((board.white & (~board.kings) & bit) != 0) * 32;
 			pos += ((board.black & board.kings & bit) != 0) * 64;
 			pos += ((board.white & board.kings & bit) != 0) * 96;
-			pos += ~bit * 128;
+			pos += (bit == 0) * 128;
 			hash ^= bitstrings[i+pos];
 			bit = bit<<1;
 		}
