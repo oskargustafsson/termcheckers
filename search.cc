@@ -60,7 +60,7 @@ namespace checkers {
 			while(finished_search)
 			{
 				maxdepth++;
-				value = alphabeta(board, 0, -32000, 32000);
+				value = alphabeta(board, 0, -999999, 999999);
 				if(finished_search)
 				{
 					std::reverse(movement->begin(), movement->end());
@@ -75,7 +75,7 @@ namespace checkers {
 		}
 		else {
 			result.move = *movement;
-			result.depth = maxdepth;
+			result.depth = 0;
 			result.extendedDepth = extendedDepth;
 			result.value = value;
 		}
@@ -134,7 +134,7 @@ namespace checkers {
 		 ******************************/
 		int hash_flag = FLAG_ALPHA;
 		int trans_alpha;
-		if( depth > 2 && depth < 10 && (trans_alpha = trans_table->get(board, maxdepth-depth, alpha, beta)) != TRANS_NULL)
+		if( depth > 2 && (trans_alpha = trans_table->get(board, maxdepth-depth, alpha, beta)) != TRANS_NULL)
 		{
 			// If we found a good entry for
 			// this node in the table,
@@ -201,8 +201,8 @@ namespace checkers {
 		 * IF SOMEONE CAN'T MOVE
 		 * THIS IS AN END NODE
 		 ************************/
-		// TODO!!! This only checks the current player
-		// isn't it neccesary to check the other player too?
+		// TODO:
+		// Might evaluate quicker here
 		if(movecount == 0)
 		{
 			return board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
@@ -220,6 +220,8 @@ namespace checkers {
 
 			nextboard.move(from, to);
 
+			// TODO:
+			// Add scout for capture-moves
 			if(capture)
 			{
 				tmp = captureAlphaBeta(nextboard, depth, alpha, beta, to);
@@ -273,7 +275,10 @@ namespace checkers {
 		/*********************************
 		 * UPDATE THE TRANSPOSITION TABLE
 		 *********************************/
-		trans_table->update(board, maxdepth-depth, alpha, hash_flag);
+		trans_alpha = alpha;
+		if(hash_flag == FLAG_EXACT)
+			trans_alpha += depth;
+		trans_table->update(board, maxdepth-depth, trans_alpha, hash_flag);
 #endif // TRANS_TABLE 
 
 		return alpha;
