@@ -21,9 +21,15 @@ namespace checkers {
     board_count = 0;		// put elsewhere?
     blackTime = 0;
     whiteTime = 0;
+#ifdef TRANS_TABLE
+    trans_table = new TranspositionTable();
+#endif // TRANS_TABLE
   }
   Game::~Game()
   {
+#ifdef TRANS_TABLE
+    delete trans_table;
+#endif // TRANS_TABLE
   }
 
   void Game::setGUI(GUI* g) {
@@ -186,7 +192,7 @@ namespace checkers {
   }
 
         void Game::ai() {
-                        Search search;
+                        Search search(*this);
 			SearchResult result;
 			int time;
 			int time_used;

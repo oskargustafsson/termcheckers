@@ -33,6 +33,9 @@ namespace checkers {
 
 			Board board;
 			int state;
+#ifdef TRANS_TABLE
+			TranspositionTable* trans_table;
+#endif // TRANS_TABLE
 		private:
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 

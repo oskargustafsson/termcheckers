@@ -1,6 +1,7 @@
 #include "transposition.h"
 #include "board.h"
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 namespace checkers {
@@ -28,7 +29,7 @@ namespace checkers {
 		delete[] table;
 	}
 
-	void TranspositionTable::add(Board& board, int depth, int value)
+	void TranspositionTable::update(Board& board, int depth, int value, int flag)
 	{
 		int index = hash(board);
 		Position last_pos = table[index];
@@ -38,6 +39,7 @@ namespace checkers {
 			new_pos.depth = depth;
 			new_pos.value = value;
 			new_pos.board = board;
+			new_pos.flag = flag;
 			table[index] = new_pos;
 			if(last_pos.depth == 0)
 			{
@@ -46,14 +48,26 @@ namespace checkers {
 		}
 	}
 
-	int TranspositionTable::get(Board& board, int depth)
+	int TranspositionTable::get(Board& board, int depth, int alpha, int beta)
 	{
 		int index = hash(board);
 		Position p = table[index];
 		if(p.depth >= depth && board == p.board)
-			return p.value;
-		else
-			return TRANS_NULL;
+		{
+			if(p.flag == FLAG_EXACT)
+			{
+				return p.value;
+			}
+			if((p.flag == FLAG_ALPHA) && (p.value <= alpha))
+			{
+				return alpha;
+			}
+			if((p.flag == FLAG_BETA) && (p.value >= beta))
+			{
+				return beta;
+			}
+		}
+		return TRANS_NULL;
 	}
 
 	inline unsigned int TranspositionTable::hash(Board& board)

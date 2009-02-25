@@ -11,10 +11,11 @@
 #include "timer.h"
 #include "functions.h"
 #include "transposition.h"
+#include "game.h"
 
 namespace checkers {
 
-	Search::Search()
+	Search::Search(Game& g) : game(g)
 	{
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
@@ -41,11 +42,12 @@ namespace checkers {
 		SearchResult result;
 
 #ifdef TRANS_TABLE
-	   trans_table = new TranspositionTable();
+		trans_table = game.trans_table;
 #endif // TRANS_TABLE
+
 		int value = 0;
 		nrOfNodes = 0;
-		maxdepth = 1;
+		maxdepth = 6;
 		extendedDepth = 0;
 		finished_search = true;
 		time_check = 0;
@@ -81,9 +83,6 @@ namespace checkers {
 
 		result.nodes = nrOfNodes;
 		result.time = time;
-#ifdef TRANS_TABLE
-		delete trans_table;
-#endif // TRANS_TABLE
 
 		return result;
 	}
@@ -97,15 +96,13 @@ namespace checkers {
 		unsigned int moves = 0x0u;
 		unsigned int from = 0x0u;
 		unsigned int to = 0x0u;
-#ifdef HISTORY_HEURISTIC
-		unsigned int best_from = 0x0u;
-		unsigned int best_to = 0x0u;
-#endif
 		bool capture = false;
 		int tmp = 0;
 		unsigned int movelist[96];
 #ifdef HISTORY_HEURISTIC
 		int movevalues[48] = {0};
+		unsigned int best_from = 0x0u;
+		unsigned int best_to = 0x0u;
 #endif // HISTORY_HEURISTIC
 		unsigned int movecount = 0;
 #ifdef SCOUT
@@ -132,9 +129,16 @@ namespace checkers {
 			extendedDepth = depth;
 
 #ifdef TRANS_TABLE
+		/******************************
+		 * CHECK IF THE NODE IS CACHED
+		 ******************************/
+		int hash_flag = FLAG_ALPHA;
 		int trans_alpha;
-		if( depth > 2 && depth < 10 && (trans_alpha = trans_table->get(board, maxdepth-depth)) != TRANS_NULL)
+		if( depth > 2 && depth < 10 && (trans_alpha = trans_table->get(board, maxdepth-depth, alpha, beta)) != TRANS_NULL)
 		{
+			// If we found a good entry for
+			// this node in the table,
+			// we don't have to search further.
 			return trans_alpha;
 		}
 #endif // TRANS_TABLE
@@ -155,11 +159,15 @@ namespace checkers {
 		 *******************************/
 		if(((depth >= maxdepth) && !capture))
 		{
-			return board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
+			alpha = board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
+#ifdef TRANS_TABLE
+			trans_table->update(board, maxdepth-depth, alpha, FLAG_EXACT);
+#endif // TRANS_TABLE
+			return alpha;
 		}
 
 		/**********************
-		 * GENERATE THE MOVES:
+		 * GENERATE THE MOVES
 		 **********************/
 		while(pieces != 0x0u)
 		{
@@ -232,6 +240,9 @@ namespace checkers {
 			}
 			if(tmp > alpha)
 			{
+#ifdef TRANS_TABLE
+				hash_flag = FLAG_EXACT;
+#endif // TRANS_TABLE
 				alpha = tmp;
 				if(depth == 0)
 				{
@@ -239,7 +250,10 @@ namespace checkers {
 				}
 				if(alpha >= beta)
 				{
-					break;
+#ifdef TRANS_TABLE
+					trans_table->update(board, maxdepth-depth, beta, FLAG_BETA);
+#endif // TRANS_TABLE
+					return beta;
 				}
 #ifdef HISTORY_HEURISTIC
 				best_from = from;
@@ -252,14 +266,16 @@ namespace checkers {
 		}
 
 #ifdef HISTORY_HEURISTIC
-		// TODO Change increment value
-		// depth*depth is better than just depth
 		history[bitToDec(best_from)][bitToDec(best_to)] += depth*depth;
 #endif // HISTORY_HEURISTIC
+
 #ifdef TRANS_TABLE
-		if(maxdepth-depth > 5 && depth > 2)
-			trans_table->add(board, maxdepth-depth, alpha);
+		/*********************************
+		 * UPDATE THE TRANSPOSITION TABLE
+		 *********************************/
+		trans_table->update(board, maxdepth-depth, alpha, hash_flag);
 #endif // TRANS_TABLE 
+
 		return alpha;
 	}
 
@@ -357,48 +373,6 @@ namespace checkers {
 		}
 		movement->push_back(from);
 	}
-
-	/*
-	 * Using heap-sort. try optimize as much as possible
-	 * maybe another algorithm is better in this case
-	 *
-	void Search::sortMovesHeap(unsigned int movelist[], int movevalues[], unsigned int movecount)
-	{
-		int start = movecount /2;
-		int end = movecount-1;
-		while(start >= 0)
-		{
-			siftDown(movelist, movevalues, start, end);
-			--start;
-		}
-		while(end > 0)
-		{
-			swap(movelist, movevalues, end, 0);
-			end--;
-			siftDown(movelist, movevalues, 0, end);
-		}
-	}
-
-	void Search::siftDown(unsigned int movelist[], int movevalues[], int start, int end)
-	{
-		int root = start;
-		while((root*2 + 1) <= end)
-		{
-			int child = root*2+1;
-			if((child + 1 <= end) && (movevalues[child] > movevalues[child+1]))
-			{
-				child++;
-			}
-			if(movevalues[root] > movevalues[child])
-			{
-				swap(movelist, movevalues, root, child);
-				root = child;
-			}
-			else
-				return;
-		}
-	}
-	*/
 
 	inline void Search::swap(unsigned int movelist[], int movevalues[], int a, int b)
 	{
