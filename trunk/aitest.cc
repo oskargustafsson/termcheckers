@@ -14,9 +14,6 @@ using namespace std;
 
 int main() {
 
-	float depth = 0;
-	float nodes = 0;
-
 	Game* game = new Game();
 	GUI* gui = new GUI(game);
 	game->setGUI(gui);
@@ -25,18 +22,34 @@ int main() {
 	board.createBoard();
 
 	int i=0;
-	while(!game->board.endOfGame() && i < 100) {
-		Search s;
-		SearchResult result = s.search(game->board, 1000000);
-		gui->printBoard(game->board);
-		nodes += result.nodes;
-		nodes /= 2;
-		depth += result.depth;
-		depth /= 2;
+	while(!game->board.endOfGame() && i < 1000) {
+		Search s(*game);
+		SearchResult result = s.search(game->board, 4000000);
+		game->makeMove(result.move);
+
+		ostringstream value;
+		value << result.value;
+		ostringstream depth;
+		depth << result.depth;
+		ostringstream nodes;
+		nodes << result.nodes;
+		ostringstream time_str;
+		time_str << result.time;
+		ostringstream extdepth;
+		extdepth << result.extendedDepth;
+
+		gui->setInfo(value.str(), "VALUE");
+		gui->setInfo(time_str.str(), "TIME");
+		gui->setInfo(nodes.str(), "NODES");
+		gui->setInfo(depth.str(), "DEPTH");
+		gui->setInfo(extdepth.str(), "EXTDEPTH");
+		value.flush();
+		depth.flush();
+		nodes.flush();
+		time_str.flush();
+		extdepth.flush();gui->printBoard(game->board);
 		i++;
 	}
-	cout << "DONE" << std::endl;
-	cout << "avg depth: " << depth << " avg nodes: " << nodes << "\n";
 
 	delete game;
 	delete gui;

@@ -34,9 +34,9 @@ namespace checkers {
   void GUI::printBoard(Board& board) {
     int row = 0;
 
-    clearScreen();
+//    clearScreen();
 
-    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
+//    printf("\n\033[21A\033[40m%36c\033[0m\n", ' ');
     for(int i=0; i < 32; i++) {
       if(i % 4 == 0) {
         printf("\033[40m%2c\033[0m", ' ');

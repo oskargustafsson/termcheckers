@@ -9,7 +9,7 @@ CXXFLAGS  = -pipe -O3 -Wall -W -ansi -pedantic-errors
 CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 
 
-PROG = lennart timertest aitest transtest
+PROG = lennart timertest aitest
 
 #what to do with all
 
@@ -32,8 +32,6 @@ timertest: timertest.o timer.o
 
 aitest: aitest.o board.o game.o gui.o search.o evaluation.o timer.o functions.o transposition.o
 
-transtest: transtest.o transposition.o board.o
-
 # Dependencies, the implicit rule .cc => .o is used
 timertest.o: timertest.cc timer.h
 timer.o: timer.h timer.cc
@@ -46,4 +44,3 @@ gui.o: gui.h gui.cc
 aitest.o: aitest.cc
 functions.o: functions.h functions.cc
 transposition.o: transposition.h transposition.cc
-transtest.o: transtest.cc
