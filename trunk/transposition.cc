@@ -74,7 +74,7 @@ namespace checkers {
 	{
 		unsigned int hash = 0;
 		unsigned int bit = 1;
-		for(int i = 1; i < 32; i++)
+/*		for(int i = 1; i < 32; i++)
 		{
 			if((board.black & bit) != 0)
 				hash ^= bitstrings[i];
@@ -86,6 +86,17 @@ namespace checkers {
 				hash ^= bitstrings[i+96];
 			else
 				hash ^= bitstrings[i+128];
+			bit = bit<<1;
+		}*/
+
+		int pos = 0;
+		for(int i = 1; i < 32; i++) {
+			pos = 0;
+			pos += ((board.white & (~board.kings) & bit) != 0) * 32;
+			pos += ((board.black & board.kings & bit) != 0) * 64;
+			pos += ((board.white & board.kings & bit) != 0) * 96;
+			pos += ~bit * 128;
+			hash ^= bitstrings[i+pos];
 			bit = bit<<1;
 		}
 		return hash % TABLE_SIZE;
