@@ -100,7 +100,7 @@ namespace checkers {
   
 	void Game::updateBoardHistory(Board& newboard, Board& lastboard) {
 	  // the only time we need to add a board, is when a king moves
-		if( countBits(lastboard.kings ^ newboard.kings) == 2 )
+		if( countBits(lastboard.kings ^ newboard.kings) != 2 )
 		 	board_count = 0;
 		else if(board_count < 50)
 			boards[board_count++] = newboard;
@@ -203,16 +203,18 @@ namespace checkers {
 				time_used = whiteTime;
 			if(TOTAL_TIME - time_used > 100000000)
 				time = 10000000;
-			else if(TOTAL_TIME - time_used > 50000000)
+			else if(TOTAL_TIME - time_used > 70000000)
 				time = 9000000;
-			else if(TOTAL_TIME - time_used > 20000000)
-				time = 8000000;
-			else if(TOTAL_TIME - time_used > 10000000)
-				time = 6000000;
-			else if(TOTAL_TIME - time_used > 5000000)
+			else if(TOTAL_TIME - time_used > 60000000)
+				time = 7000000;
+			else if(TOTAL_TIME - time_used > 4000000)
+				time = 5000000;
+			else if(TOTAL_TIME - time_used > 2000000)
 				time = 3000000;
 			else if(TOTAL_TIME - time_used > 1000000)
-				time = 1000000;
+				time = 2000000;
+			else if(TOTAL_TIME - time_used > 100000)
+				time = 100000;
 			else
 				time = 10000;
 
