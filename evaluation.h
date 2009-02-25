@@ -5,6 +5,6 @@
 
 using namespace checkers;
 
-int evaluate(Board& b, int alpha, int beta, int depth);
+int evaluate(Board& b, int depth);
 
 #endif

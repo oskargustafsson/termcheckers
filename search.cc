@@ -55,6 +55,14 @@ namespace checkers {
 
 		timer->startTimer();
 
+		Board newboard;
+		newboard.createBoard();
+		if(newboard == board) {
+			movement->push_back(0x400);
+			movement->push_back(0x4000);
+			result.move = *movement;
+			return result;
+		}
 		if(!singleJump(board))
 		{
 			while(finished_search)
@@ -128,6 +136,13 @@ namespace checkers {
 		if(depth > extendedDepth)
 			extendedDepth = depth;
 
+		if(depth == 1 && game.countHistoryMatches(board) == 2)
+		{
+			return 200;
+		}
+
+
+
 #ifdef TRANS_TABLE
 		/******************************
 		 * CHECK IF THE NODE IS CACHED
@@ -159,9 +174,9 @@ namespace checkers {
 		 *******************************/
 		if(((depth >= maxdepth) && !capture))
 		{
-			alpha = board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
+			alpha = board.player == BLACK ? evaluate(board, depth) : -evaluate(board, depth);
 #ifdef TRANS_TABLE
-			trans_table->update(board, maxdepth-depth, alpha, FLAG_EXACT);
+			trans_table->update(board, maxdepth-depth, alpha-depth, FLAG_EXACT);
 #endif // TRANS_TABLE
 			return alpha;
 		}
@@ -205,7 +220,7 @@ namespace checkers {
 		// Might evaluate quicker here
 		if(movecount == 0)
 		{
-			return board.player == BLACK ? evaluate(board, alpha, beta, depth) : -evaluate(board, alpha, beta, depth);
+			return board.player == BLACK ? evaluate(board, depth) : -evaluate(board, depth);
 		}
 
 		/*****************

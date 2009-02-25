@@ -1,12 +1,13 @@
 #include <iostream>
 #include "evaluation.h"
 #include "board.h"
-#include "functions.h"
+
+#define countBits(pieces) (__builtin_popcount(pieces))
 
 //              BLACK is +              WHITE is -
 using namespace std;
 
-int evaluate(Board& board, int alpha, int beta, int depth) {
+int evaluate(Board& board, int depth) {
 		  int score = 0;
 
 		  int black_mvps, black_jmps, white_mvps, white_jmps;
