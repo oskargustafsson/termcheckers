@@ -47,7 +47,7 @@ namespace checkers {
 
 		int value = 0;
 		nrOfNodes = 0;
-		maxdepth = 6;
+		maxdepth = 2;
 		extendedDepth = 0;
 		finished_search = true;
 		time_check = 0;
@@ -61,6 +61,10 @@ namespace checkers {
 			movement->push_back(0x400);
 			movement->push_back(0x4000);
 			result.move = *movement;
+			result.time = 0;
+			result.value = 0;
+			result.extendedDepth = 0;
+			result.depth = 0;
 			return result;
 		}
 		if(!singleJump(board))
@@ -77,7 +81,7 @@ namespace checkers {
 					result.extendedDepth = extendedDepth;
 					result.value = value;
 				}
-				if(timer->getTime() > time/3)
+				if(timer->getTime() > time/4)
 					finished_search = false;
 			}
 		}

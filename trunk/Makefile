@@ -8,7 +8,7 @@ CXX       = g++
 CXXFLAGS  = -pipe -O3 -Wall -W -ansi -pedantic-errors
 CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 #CXXFLAGS += -g -pg
-CXXFLAGS += -floop-optimize2
+#CXXFLAGS += -floop-optimize2
 
 
 
