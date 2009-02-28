@@ -8,7 +8,7 @@
 // DEFINE WHAT OPTIMIZATIONS TO USE:
 #define SCOUT
 #define HISTORY_HEURISTIC
-#define TRANS_TABLE
+//#define TRANS_TABLE
 
 namespace checkers {
 	class TranspositionTable;

@@ -205,18 +205,18 @@ namespace checkers {
 				time = 10000000;
 			else if(TOTAL_TIME - time_used > 70000000)
 				time = 9000000;
-			else if(TOTAL_TIME - time_used > 60000000)
-				time = 7000000;
-			else if(TOTAL_TIME - time_used > 4000000)
+			else if(TOTAL_TIME - time_used > 40000000)
 				time = 5000000;
-			else if(TOTAL_TIME - time_used > 2000000)
-				time = 3000000;
-			else if(TOTAL_TIME - time_used > 1000000)
+			else if(TOTAL_TIME - time_used > 20000000)
 				time = 2000000;
-			else if(TOTAL_TIME - time_used > 100000)
+			else if(TOTAL_TIME - time_used > 10000000)
+				time = 500000;
+			else if(TOTAL_TIME - time_used > 1000000)
 				time = 100000;
-			else
+			else if(TOTAL_TIME - time_used > 200000)
 				time = 10000;
+			else
+				time = 1000;
 
                         result = search.search(board, time);
 			if(board.player == BLACK)
