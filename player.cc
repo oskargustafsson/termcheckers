@@ -1,11 +1,11 @@
 /*
- * Search.cc
+ * player.cc
  */
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include "search.h"
+#include "player.h"
 #include "evaluation.h"
 #include "board.h"
 #include "timer.h"
@@ -15,11 +15,11 @@
 
 namespace checkers {
 
-	Search::Search(Game& g) : game(g)
+	Player::Player(Game* g) : game(g)
 	{
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
-		timer = new timer::Timer();
+		timer = new timer::Timer(TOTAL_TIME);
 #ifdef HISTORY_HEURISTIC
 		for(int a=0; a<32; ++a) {
 			for(int b=0; b<32; ++b) {
@@ -27,23 +27,25 @@ namespace checkers {
 			}
 		}
 #endif // HISTORY_HEURISTIC
+#ifdef TRANS_TABLE
+		trans_table = new TranspositionTable;
+#endif // TRANS_TABLE
 
 	}
 
-	Search::~Search()
+	Player::~Player()
 	{
 		delete movement;
 		delete capture_movement;
 		delete timer;
+#ifdef TRANS_TABLE
+		delete trans_table;
+#endif // TRANS_TABLE
 	}
 
-	SearchResult Search::search(Board board, int time)
+	SearchResult Player::search()
 	{
 		SearchResult result;
-
-#ifdef TRANS_TABLE
-		trans_table = game.trans_table;
-#endif // TRANS_TABLE
 
 		int value = 0;
 		nrOfNodes = 0;
@@ -51,28 +53,31 @@ namespace checkers {
 		extendedDepth = 0;
 		finished_search = true;
 		time_check = 0;
-		max_time = time;
+		max_time = timer->getMaxTime();
 
 		timer->startTimer();
 
 		Board newboard;
 		newboard.createBoard();
-		if(newboard == board) {
+		movement->clear();
+		capture_movement->clear();
+		if(newboard == game->board) {
 			movement->push_back(0x400);
 			movement->push_back(0x4000);
 			result.move = *movement;
 			result.time = 0;
 			result.value = 0;
 			result.extendedDepth = 0;
+			result.nodes = 0;
 			result.depth = 0;
 			return result;
 		}
-		if(!singleJump(board))
+		if(!singleJump(game->board))
 		{
 			while(finished_search)
 			{
 				maxdepth++;
-				value = alphabeta(board, 0, -999999, 999999);
+				value = alphabeta(game->board, 0, -999999, 999999);
 				if(finished_search)
 				{
 					std::reverse(movement->begin(), movement->end());
@@ -81,7 +86,7 @@ namespace checkers {
 					result.extendedDepth = extendedDepth;
 					result.value = value;
 				}
-				if(timer->getTime() > time/4)
+				if(timer->getTime() > max_time/4)
 					finished_search = false;
 			}
 		}
@@ -91,10 +96,9 @@ namespace checkers {
 			result.extendedDepth = extendedDepth;
 			result.value = value;
 		}
-		time = timer->stopTimer();
 
+		result.time = timer->stopTimer();
 		result.nodes = nrOfNodes;
-		result.time = time;
 
 		return result;
 	}
@@ -102,7 +106,7 @@ namespace checkers {
 	/*
 	 * ALPHABETA
 	 */
-	int Search::alphabeta(Board& board, int depth, int alpha, int beta)
+	int Player::alphabeta(Board& board, int depth, int alpha, int beta)
 	{
 		unsigned int pieces = 0x0u;
 		unsigned int moves = 0x0u;
@@ -140,7 +144,11 @@ namespace checkers {
 		if(depth > extendedDepth)
 			extendedDepth = depth;
 
-		if(depth == 1 && game.countHistoryMatches(board) == 2)
+
+		/*************************
+		 * CHECK FOR 3-STEPS DRAW
+		 *************************/
+		if(depth == 1 && game->countHistoryMatches(board) == 2)
 		{
 			return 200;
 		}
@@ -307,7 +315,7 @@ namespace checkers {
 	 * Help function for alphabeta
 	 * used for jump-moves
 	 */
-	int Search::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
+	int Player::captureAlphaBeta(Board& board, int depth, int alpha, int beta, unsigned int from) {
 		unsigned int moves = board.getCaptureMoves(from);
 		int nrOfMoves = countBits(moves);
 		unsigned int moveTo = 0x0u;
@@ -352,7 +360,7 @@ namespace checkers {
 	/*
 	 * Check if there is just one option this move
 	 */
-	bool Search::singleJump(Board board)
+	bool Player::singleJump(Board board)
 	{
 		unsigned int to;
 		int bits;
@@ -380,7 +388,7 @@ namespace checkers {
 	/**
 	 * Best move so far!
 	 */
-	void Search::newBestMove(Board& board, unsigned int from, unsigned int to)
+	void Player::newBestMove(Board& board, unsigned int from, unsigned int to)
 	{
 		movement->clear();
 		for(unsigned int i=0; i < capture_movement->size(); i++)
@@ -398,7 +406,7 @@ namespace checkers {
 		movement->push_back(from);
 	}
 
-	inline void Search::swap(unsigned int movelist[], int movevalues[], int a, int b)
+	inline void Player::swap(unsigned int movelist[], int movevalues[], int a, int b)
 	{
 		int tmp = movevalues[a];
 		movevalues[a] = movevalues[b];
@@ -413,7 +421,7 @@ namespace checkers {
 		movelist[(b<<1) +1] = utmp;
 	}
 
-	inline void Search::insertMove(unsigned int movelist[], int movevalues[], unsigned int from, unsigned int to, int newValue, unsigned int& movecount)
+	inline void Player::insertMove(unsigned int movelist[], int movevalues[], unsigned int from, unsigned int to, int newValue, unsigned int& movecount)
 	{
 		movevalues[movecount] = newValue;
 		movelist[movecount<<1] = from;
@@ -425,5 +433,10 @@ namespace checkers {
 			swap(movelist, movevalues, pos+1, pos);
 			pos--;
 		}
+	}
+
+	int Player::getTime()
+	{
+		return timer->getTotalTime();
 	}
 }

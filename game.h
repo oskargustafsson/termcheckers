@@ -2,9 +2,10 @@
 #define GAME_H
 
 #include "board.h"
+#include "player.h"
 #include <stack>
 #include <vector>
-#include "search.h"
+#include <string>
 
 #define NOT_PLAYING 0
 #define PLAYING 1
@@ -14,39 +15,52 @@
 
 namespace checkers {
 	class GUI;
-	class TranspositionTable;
+	class Player;
+
+	struct SearchResult {
+		int nodes;
+		int depth;
+		int time;
+		int value;
+		int extendedDepth;
+		std::vector<unsigned int> move;
+	};
 
 	class Game {
 		public:
 			Game();
 			~Game();
 			void setGUI(GUI* g);
-			bool makeMove(std::vector<unsigned int>& movements);
-			void newGame();
-			void loadGame(char* file);
+			void new_game();
+			void load(char* file);
 			void play();
-			void stop();
-			void ai();
-			bool undoLastMove();
-			void updateBoardHistory(Board&, Board&);
 			size_t countHistoryMatches(Board&);
+			void interpretCommand(std::string);
+			bool makeMove(std::vector<unsigned int>& movements);
 
 			Board board;
 			int state;
-#ifdef TRANS_TABLE
-			TranspositionTable* trans_table;
-#endif // TRANS_TABLE
+			int move_count;
+			SearchResult lastMove;
+
+			Player* black;
+			Player* white;
 		private:
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
+			void ai();
+			bool undo();
+			void quit();
+			void updateBoardHistory(Board&, Board&);
+
+			int isMovement(std::string line);
+			std::vector<unsigned int> parseMovement(std::string line);
 
 			Board boards[50];
 			size_t board_count;
 			std::stack<Board> history;
 			bool output;
 			GUI* gui;
-
-			int blackTime;
-			int whiteTime;
 	};
 }
-#endif
+
+#endif // GAME_H

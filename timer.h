@@ -8,26 +8,29 @@
 
 namespace timer {
 
-  class Timer {
+	class Timer {
 
-  public:
+		public:
 
-    /*Constructor and destructor */
-    Timer();
-    ~Timer();
+			/*Constructor and destructor */
+			Timer(int);
+			~Timer();
 
-    /* retreiving the time variables */
-    int getTime(); //mellantid
+			/* retreiving the time variables */
+			int getTime(); //mellantid
+			int getUsedTime();
 
-    /*starting and stopping timer */
-    void startTimer();
-    int stopTimer(); //returns total time
+			int getMaxTime();
+			int getTotalTime();
 
-  private:
-    int starttime, stoptime;
+			/*starting and stopping timer */
+			void startTimer();
+			int stopTimer(); //returns used time
 
-  };
+		private:
+			int max, used, start, stop;
 
+	};
 }
 
 #endif /* TIMER_H */

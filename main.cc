@@ -10,7 +10,11 @@ int main(int argc, char* argv[]) {
 	game->setGUI(gui);
 
 	if(argc > 1) {
-		game->loadGame(argv[1]);
+		game->load(argv[1]);
+	}
+	else
+	{
+		game->board.createBoard();
 	}
 
 	while(game->state != QUIT) {

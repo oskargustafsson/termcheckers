@@ -6,21 +6,37 @@
 
 namespace timer {
 
-  Timer::Timer() {}
+	Timer::Timer(int t) : max(t), used(0) {}
 
-  Timer::~Timer() {}
+	Timer::~Timer() {}
 
-  void Timer::startTimer() {
-    starttime = clock();
-  }
+	void Timer::startTimer() {
+		start = clock();
+	}
 
-  int Timer::stopTimer() {
-    stoptime = clock();
-    return stoptime - starttime;
-  }
+	int Timer::stopTimer() {
+		stop = clock();
+		used += stop-start;
+		return stop-start;
+	}
 
-  int Timer::getTime() {
-    int tmp(clock());
-    return tmp - starttime;
-  }
+	int Timer::getTime() {
+		int tmp(clock());
+		return tmp - start;
+	}
+
+	int Timer::getTotalTime()
+	{
+		return used;
+	}
+
+	int Timer::getMaxTime()
+	{
+		if(max-used > max/3)
+			return max/30;
+		else if(max-used > max/5)
+			return max/50;
+		else
+			return max/300;
+	}
 }

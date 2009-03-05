@@ -1,5 +1,7 @@
 #include "functions.h"
 #include <cmath>
+#include <ctime>
+#include <unistd.h>
 
 int countBits(unsigned int board) {
 		  return __builtin_popcount (board);
@@ -37,4 +39,9 @@ int bitToDec(unsigned int v) {
 
 		return r;
 
+}
+
+void wait(int ms)
+{
+	usleep(ms*1000);
 }

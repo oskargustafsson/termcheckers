@@ -8,29 +8,22 @@
 // DEFINE WHAT OPTIMIZATIONS TO USE:
 #define SCOUT
 #define HISTORY_HEURISTIC
-//#define TRANS_TABLE
+#define TRANS_TABLE
 
 namespace checkers {
 	class TranspositionTable;
+	struct SearchResult;
 	class Game;
 
-	struct SearchResult {
-		int nodes;
-		int depth;
-		int time;
-		int value;
-		int extendedDepth;
-		std::vector<unsigned int> move;
-	};
-
-	class Search {
+	class Player {
 		public:
-			Search(Game& g);
-			~Search();
+			Player(Game*);
+			~Player();
 
-			SearchResult search(Board board, int time);
+			SearchResult search();
+			int getTime();
 		private:
-			Game& game;
+			Game* game;
 			int alphabeta(Board& b, int depth, int alpha, int beta);
 			int captureAlphaBeta(Board& b, int depth, int alpha, int beta, unsigned int from);
 			bool singleJump(Board b);
@@ -43,7 +36,6 @@ namespace checkers {
 
 			timer::Timer* timer;
 
-			int time;
 			int maxdepth;
 			int nrOfNodes;
 			int extendedDepth;

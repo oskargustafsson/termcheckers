@@ -9,48 +9,28 @@
 
 namespace checkers {
 
-  class Game;
+	class Game;
 
-  class GUI {
-  public:
-    GUI(Game* g);
-    ~GUI();
+	class GUI {
+		public:
+			GUI(Game* g);
+			~GUI();
 
-    void setInfo(std::string str, std::string inf);
-    void printBoard(Board& b);
-    static void printInt(unsigned int b);
-    void input();
-    void editMoveCounter(int b);
-    void println(std::string str);
-    void popLastMove();
-    void stackLastMove();
-    void gameOver();
+			void clearScreen();
+			void printBoard(Board& b);
+			static void printInt(unsigned int b);
+			void printLog();
+			void printInfo();
+			void println(std::string);
+			void gameOver();
+			void input();
 
-  private:
-    Game* game;
-    int isMovement(std::string line);
-    std::vector<unsigned int> parseMovement(std::string line);
+		private:
+			void printWelcome();
 
-    void clearScreen();
-
-    int moveCount;
-    bool redraw;
-
-    std::string messages[4];
-
-    int totalTime;
-
-    std::string alphaval;
-    std::string player;
-    std::string depth;
-    std::string timeUsed;
-    std::string nodes;
-    std::string value;
-    std::string extdepth;
-    std::string lastMove;
-
-    std::stack<std::pair<std::string, int> > moveHistory;
-  };
+			Game* game;
+			std::string messages[4];
+	};
 }
 
 #endif
