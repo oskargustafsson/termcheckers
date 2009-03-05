@@ -1,0 +1,11 @@
+* The search algorithm
+The algorithms we used was alphabeta with scout, iterative deepening, quiescence, history heuristics and a transposition table.
+We started with only a simple alphabeta algorithm and tried to optimize it as much as possible. That algorithm could search 10-14 plies in reasonable time. When we was happy with that result we implemented iterative deepening to easier see how deep it could search in a given time.
+We also added one line of code for quiescence search so it didnt stop searching if the next move is a capture move.
+
+Then we tried out different alphabeta optimizations.
+First we implemented killer moves which showed a small improvement, but history heuristics was better and it doesn't make sence to use both.
+The scout algorithm search didnt seem to make much different but we used it anyway.
+In the last few days we implemented a simple transposition table which used the zobrist hash function and stored the alphabeta values and board in a big array (~2 000 000 elements). Collision is handled by saving only the board that got its value from the deepest search.
+In start and middle game it didnt make much different using the transposition table, at a given depth it visited around half the nodes but in twice the time, but in the endgame it sometimes searched alot deeper, when there was 2 kings vs 1 king it searched so deep it almost always found the winning path. In some positions it searched as deep as 50 plies because almost every node was in the hash table from a previous serach.
+Since we hadnt had time to debug the transposition table enough we only used it in the first round of the tournament because we got a segmentation fault around 300 seconds in the game so we commented it out only to later find out that it actually worked and the crash was because it didnt have enough time left to find a move at all.
