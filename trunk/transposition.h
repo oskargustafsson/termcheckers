@@ -1,7 +1,9 @@
 #ifndef TRANSPOSITION_H
 #define TRANSPOSITION_H
 
-#define TABLE_SIZE 1000003
+//#define TABLE_SIZE 1000003	// ~ 26MB / player
+#define TABLE_SIZE 2097593	// ~ 56MB / player
+//#define TABLE_SIZE 12500003	// ~ 333 / player
 #define TRANS_NULL 64000
 
 #define FLAG_EXACT 0
@@ -10,8 +12,6 @@
 
 #include <vector>
 #include "board.h"
-
-//#define ENDBOOK
 
 namespace checkers {
 	class Board;
@@ -36,7 +36,6 @@ namespace checkers {
 
 			unsigned int bitstrings[161];
 			Position* table;
-			void endBook();
 	};
 }
 
