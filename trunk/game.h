@@ -28,18 +28,14 @@ namespace checkers {
 
 	class Game {
 		public:
-			Game();
+			Game(Board&, GUI*);
 			~Game();
-			void setGUI(GUI* g);
-			void new_game();
 			void load(char* file);
-			void play();
 			size_t countHistoryMatches(Board&);
 			void interpretCommand(std::string);
 			bool makeMove(std::vector<unsigned int>& movements);
 
 			Board board;
-			int state;
 			int move_count;
 			SearchResult lastMove;
 
@@ -49,12 +45,12 @@ namespace checkers {
 			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
 			void ai();
 			bool undo();
-			void quit();
 			void updateBoardHistory(Board&, Board&);
 
 			int isMovement(std::string line);
 			std::vector<unsigned int> parseMovement(std::string line);
 
+			bool playing;
 			Board boards[50];
 			size_t board_count;
 			std::stack<Board> history;

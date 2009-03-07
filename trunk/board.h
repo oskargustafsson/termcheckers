@@ -18,7 +18,8 @@ namespace checkers {
 		unsigned int kings;
 		bool player; // WHITE=0, BLACK=1
 
-		void createBoard();
+		bool load(char* file);
+		void new_board();
 		unsigned int getCaptureMoves(unsigned int piece);
 		unsigned int getCaptureMoves();
 		unsigned int getMoves(unsigned int piece);
