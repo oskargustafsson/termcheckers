@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -7,22 +8,75 @@
 namespace checkers {
 
 	Board::Board() :
-		black(0x0u),
-		white(0x0u),
+		black(0x00000FFFu),
+		white(0xFFF00000u),
 		kings(0x0u),
 		player(BLACK)
 	{}
 
 	Board::~Board() {}
 
-	void Board::createBoard() {
+	void Board::new_board()
+	{
 		black = 0x00000FFFu;
 		white = 0xFFF00000u;
 		kings = 0x0u;
 		player = BLACK;
 	}
 
-	unsigned int Board::getCaptureMoves(unsigned int piece) {
+	bool Board::load(char* file)
+	{
+		std::ifstream is;
+		is.open(file);
+		unsigned int piece = 0x1;
+
+		if(is != NULL) {
+			char ch;
+			black = 0;
+			white = 0;
+			kings = 0;
+			while(is.get(ch) != NULL) {
+				if(ch == 'b') {
+					if(piece == 0) {
+						player = BLACK;
+					}
+					black |= piece;
+					white &= ~piece;
+					kings &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'B') {
+					black |= piece;
+					kings |= piece;
+					white &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'w') {
+					if(piece == 0) {
+						player = WHITE;
+					}
+					white |= piece;
+					black &= ~piece;
+					kings &= ~piece;
+					piece = piece<<1;
+				} else if(ch == 'W') {
+					white |= piece;
+					kings |= piece;
+					black &= ~piece;
+					piece = piece<<1;
+				} else if(ch == '.') {
+					black &= ~piece;
+					white &= ~piece;
+					kings &= ~piece;
+					piece = piece<<1;
+				}
+			}
+			is.close();
+			return true;
+		}
+		return false;
+	}
+
+	unsigned int Board::getCaptureMoves(unsigned int piece)
+	{
 		unsigned int moves = 0x0u;
 
 		if(piece & white) {         // white man

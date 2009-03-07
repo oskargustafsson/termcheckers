@@ -58,7 +58,6 @@ namespace checkers {
 		timer->startTimer();
 
 		Board newboard;
-		newboard.createBoard();
 		movement->clear();
 		capture_movement->clear();
 		if(newboard == game->board) {

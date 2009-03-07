@@ -16,12 +16,11 @@ using namespace std;
 
 namespace checkers {
 
-	Game::Game()
+	Game::Game(Board& b, GUI* g) : board(b), gui(g)
 	{
 		black = new Player(this);
 		white = new Player(this);
-
-		state = NOT_PLAYING;
+		playing = true;
 
 		board_count = 0;		// put elsewhere?
 		move_count = 0;
@@ -31,6 +30,16 @@ namespace checkers {
 		lastMove.value = 0;
 		lastMove.extendedDepth = 0;
 		lastMove.depth = 0;
+
+		gui->printBoard(board);
+		gui->printInfo(*this);
+		gui->printLog();
+
+		while(playing)
+		{
+			interpretCommand(gui->input());
+			gui->printInfo(*this);
+		}
 	}
 
 	Game::~Game()
@@ -39,71 +48,44 @@ namespace checkers {
 		delete white;
 	}
 
-	void Game::setGUI(GUI* g) {
-		gui = g;
-	}
-
 	void Game::interpretCommand(string command) {
-		switch(state)
+		int size = 0;
+		if((size = isMovement(command)) != 0)
 		{
-			case NOT_PLAYING:
-				if(command == "play")
-				{
-					play();
-				}
-				else if(command == "newgame")
-				{
-					new_game();
-				}
-				else if(command == "quit" || command == "exit")
-				{
-					quit();
-				}
-				else
-				{
-					gui->println("Unknown command");
-				}
-				break;
-			case PLAYING:
-				int size = 0;
-				if((size = isMovement(command)) != 0)
-				{
-					vector<unsigned int> movement = parseMovement(command);
-					makeMove(movement);
-				}
-				else if(command == "help")
-				{
-					gui->println("Commands: ai, undo, quit");
-				}
-				else if(command == "ai")
-				{
-					ai();
-				}
-				else if(command == "undo")
-				{
-					if(undo())
-					{
-						gui->println("Reverting!");
-					}
-					else
-					{
-						gui->println("Nothing to undo!");
-					}
-				}
-				else if(command == "skip")
-				{
-					board.changePlayer();
-					gui->println("Skiping turn.");
-				}
-				else if(command == "quit")
-				{
-					state = NOT_PLAYING;
-				}
-				else
-				{
-					gui->println("Unknown command");
-				}
-				break;
+			vector<unsigned int> movement = parseMovement(command);
+			makeMove(movement);
+		}
+		else if(command == "help")
+		{
+			gui->println("Commands: ai, undo, quit");
+		}
+		else if(command == "ai")
+		{
+			ai();
+		}
+		else if(command == "undo")
+		{
+			if(undo())
+			{
+				gui->println("Reverting!");
+			}
+			else
+			{
+				gui->println("Nothing to undo!");
+			}
+		}
+		else if(command == "skip")
+		{
+			board.changePlayer();
+			gui->println("Skiping turn.");
+		}
+		else if(command == "quit")
+		{
+			playing = false;
+		}
+		else
+		{
+			gui->println("Unknown command");
 		}
 	}
 
@@ -201,82 +183,12 @@ namespace checkers {
 		return -1;
 	}
 
-	void Game::new_game() {
-		board.createBoard();
-		gui->println("Starting new game.");
-		play();
-	}
-
-	void Game::load(char* file) {
-		ifstream is;
-		is.open(file);
-		unsigned int piece = 0x1;
-
-		gui->println("Loading file...");
-		if(is != NULL) {
-			char ch;
-			while(is.get(ch) != NULL) {
-				if(ch == 'b') {
-					if(piece == 0) {
-						board.player = BLACK;
-					}
-					board.black |= piece;
-					board.white &= ~piece;
-					board.kings &= ~piece;
-					piece = piece<<1;
-				} else if(ch == 'B') {
-					board.black |= piece;
-					board.kings |= piece;
-					board.white &= ~piece;
-					piece = piece<<1;
-				} else if(ch == 'w') {
-					if(piece == 0) {
-						board.player = WHITE;
-					}
-					board.white |= piece;
-					board.black &= ~piece;
-					board.kings &= ~piece;
-					piece = piece<<1;
-				} else if(ch == 'W') {
-					board.white |= piece;
-					board.kings |= piece;
-					board.black &= ~piece;
-					piece = piece<<1;
-				} else if(ch == '.') {
-					board.black &= ~piece;
-					board.white &= ~piece;
-					board.kings &= ~piece;
-					piece = piece<<1;
-				}
-			}
-			is.close();
-			gui->println("DONE!");
-		}
-		else
-		{
-			gui->println("Couldn't open file.");
-		}
-	}
-
 	void Game::ai() {
 		Player* p;
 		board.player == BLACK ? p = black : p = white;
 		SearchResult result = p->search();
 		makeMove(result.move);
 		lastMove = result;
-	}
-
-	void Game::play() {
-		state = PLAYING;
-		gui->clearScreen();
-		gui->printBoard(board);
-		gui->printLog();
-		while(!board.endOfGame() && state == PLAYING) {
-			gui->printInfo();
-			gui->input();
-		}
-		state = NOT_PLAYING;
-		gui->gameOver();
 	}
 
 	bool Game::undo() {
@@ -289,11 +201,6 @@ namespace checkers {
 			gui->printBoard(board);
 			return true;
 		}
-	}
-
-	void Game::quit() {
-		gui->println("Bye!");
-		state = QUIT;
 	}
 
 	int Game::isMovement(string line) {
