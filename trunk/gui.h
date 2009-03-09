@@ -25,8 +25,10 @@ namespace checkers {
 			void println(std::string);
 			int menu(std::string[], int);
 			bool dialogbox(std::string);
+			void messagebox(std::string);
 			void quit();
 			void gameOver();
+			void shadow(const Board&, unsigned int, unsigned int);
 			std::string input();
 
 		private:

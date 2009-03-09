@@ -30,13 +30,32 @@ int main(int argc, char* argv[]) {
 		switch(gui->menu(mainmenu, 5))
 		{
 			case 0:
-				game = new Game(board, gui);
-				board = game->board;
-				delete game;
+				do
+				{
+					game = new Game(board, gui);
+					if(game->state == BLACK_WON)
+						gui->println("Black won!");
+					else if(game->state == WHITE_WON)
+						gui->println("White won!");
+					else if(game->state == QUIT)
+						break;
+					delete game;
+				} while(gui->dialogbox("Play again?"));
+
 				break;
 			case 1:
-				gui->println("Generating new game");
+				gui->println("Generating new game.");
 				board.new_board();
+				break;
+			case 2:
+				gui->println("Select game file.");
+				if(board.load(gui->input().c_str()))
+					gui->println("Game loaded.");
+				else
+					gui->println("Couldnt open file.");
+				break;
+			case 3:
+				gui->println("No options available yet.");
 				break;
 			case 4:
 				quit = true;

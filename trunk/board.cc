@@ -24,7 +24,7 @@ namespace checkers {
 		player = BLACK;
 	}
 
-	bool Board::load(char* file)
+	bool Board::load(const char* file)
 	{
 		std::ifstream is;
 		is.open(file);

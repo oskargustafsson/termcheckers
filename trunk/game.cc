@@ -20,7 +20,8 @@ namespace checkers {
 	{
 		black = new Player(this);
 		white = new Player(this);
-		playing = true;
+
+		state = PLAYING;
 
 		board_count = 0;		// put elsewhere?
 		move_count = 0;
@@ -35,7 +36,7 @@ namespace checkers {
 		gui->printInfo(*this);
 		gui->printLog();
 
-		while(playing)
+		while(state == PLAYING)
 		{
 			interpretCommand(gui->input());
 			gui->printInfo(*this);
@@ -57,7 +58,7 @@ namespace checkers {
 		}
 		else if(command == "help")
 		{
-			gui->println("Commands: ai, undo, quit");
+			gui->println("Commands: help, ai, undo, skip, quit");
 		}
 		else if(command == "ai")
 		{
@@ -81,21 +82,25 @@ namespace checkers {
 		}
 		else if(command == "quit")
 		{
-			playing = false;
+			if(gui->dialogbox("Really quit?"))
+				state = QUIT;
+			else
+				gui->printBoard(board);
 		}
 		else
 		{
-			gui->println("Unknown command");
+			gui->println("Unknown command: " + command);
 		}
 	}
 
-	bool Game::makeMove(vector<unsigned int>& movements) {
-		ostringstream message; //for gui output
+	bool Game::makeMove(vector<unsigned int>& movements)
+	{
 		ostringstream movestring;
 		int size = movements.size();
 
 		movestring << log2(movements[0])+1;
-		for(int i = 1; i<size; i++) {
+		for(int i = 1; i<size; i++)
+		{
 			movestring << "-" << log2(movements[i])+1;
 		}
 
@@ -107,17 +112,31 @@ namespace checkers {
 		// -2 more captures possible
 		// -3 movements.size() < 2
 		//////////////////
-		if(result == 0) {
+		if(result == 0)
+		{
 			if(!history.empty()) updateBoardHistory(board, history.top());
 			history.push(board);
 
-			if(size == 2 && board.getCaptureMoves(movements[0]) == 0) {
+			gui->println("My move is " + movestring.str());
+
+			if(board.getCaptureMoves(movements[0]) == 0)
+			{
 				board.move(movements[0], movements[1]);
 			}
-			else {
-				for(int i=1; i<size; i++)
+			else
+			{
+				vector<unsigned int> tmp;
+				for(size_t i=1; i<movements.size(); i++)
 				{
-					recursiveCapture(board, movements[i-1], movements[i]);
+					tmp.clear();
+					recursiveCapture(board, movements[i-1], movements[i], tmp);
+					tmp.push_back(movements[i-1]);
+					for(size_t j=tmp.size()-1; j>0; j--)
+					{
+						board.move(tmp[j], tmp[j-1]);
+						gui->printBoard(board);
+						usleep(300000);
+					}
 				}
 			}
 			board.updateKings();
@@ -126,21 +145,23 @@ namespace checkers {
 
 			gui->printBoard(board);
 
-			message << "My move is " << movestring.str();
-
+			if(board.endOfGame())
+			{
+				if(board.black == 0)
+					state = WHITE_WON;
+				else
+					state = BLACK_WON;
+			}
 		}
 		else if(result == -1) {
-			message << "\033[31mIllegal move: " << movestring.str() << "\033[0m";
+			gui->println("\033[31mIllegal move: " + movestring.str() + "\033[0m");
 		}
 		else if(result == -2) {
-			message << "\033[31mMore captures possible: " << movestring.str() << "\033[0m";
+			gui->println("\033[31mMore captures possible: " + movestring.str() + "\033[0m");
 		}
 		else if(result == -3) {
-			message << "\033[31mNot enough moves: " << movestring.str() << "\033[0m";
+			gui->println("\033[31mNot enough moves: " + movestring.str() + "\033[0m");
 		}
-
-		gui->println(message.str());
-		message.flush();
 
 		return result == 0;
 	}
@@ -161,7 +182,7 @@ namespace checkers {
 		return count;
 	}
 
-	int Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to) {
+	int Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to, vector<unsigned int>& movements) {
 		unsigned int moves = tmpboard.getCaptureMoves(from);
 		unsigned int capture = 0x0u;
 		Board test;
@@ -173,10 +194,11 @@ namespace checkers {
 			test.move(from, capture);
 
 			if(capture == to) {
-				board = test;
+				movements.push_back(to);
 				return 0;
 			}
-			if(recursiveCapture(test, capture, to) == 0) {
+			if(recursiveCapture(test, capture, to, movements) == 0) {
+				movements.push_back(capture);
 				return 0;
 			}
 		}
@@ -186,6 +208,7 @@ namespace checkers {
 	void Game::ai() {
 		Player* p;
 		board.player == BLACK ? p = black : p = white;
+		gui->println("Im thinking...");
 		SearchResult result = p->search();
 		makeMove(result.move);
 		lastMove = result;

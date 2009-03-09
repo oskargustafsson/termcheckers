@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "game.h"
 #include "board.h"
+#include "functions.h"
 
 using namespace std;
 
@@ -17,9 +18,12 @@ namespace checkers {
 	GUI::GUI()
 	{
 		clearScreen();
+		cout << "\033[?25l";
 	}
 
-	GUI::~GUI() {}
+	GUI::~GUI() {
+		cout << "\033[?25h";
+	}
 
 	void GUI::clearScreen() {
 		cout << "\033[2J";
@@ -72,6 +76,7 @@ namespace checkers {
 				}
 			}
 		}
+		cout << "\033[23;3H";
 	}
 
 	void GUI::printInfo(Game& game)
@@ -274,7 +279,6 @@ namespace checkers {
 
 			fflush(stdout);
 			c = getch();
-			cout << "\033[0;3H\033[K[" << c+1-1 << "]";
 
 			if(c == 'j' || c == 'l' || c == 9 || c == 14)
 			{
@@ -297,7 +301,59 @@ namespace checkers {
 
 	bool GUI::dialogbox(string message)
 	{
-		return true;
+		size_t width = message.size();
+		bool choice = true;
+		unsigned char c;
+		size_t x,y;
+
+		x = 17 - width/2;
+		y = 9;
+
+		do {
+			cout << "\033[" << y << ";" << x << "H";
+
+			cout << "\033[44;37m+";
+			for(size_t col = 0; col < width+2; col++)
+			{
+				cout << "-";
+			}
+			cout << "+";
+			cout << "\033[B";
+			cout << "\033[" << x << "G";
+			cout << "\033[44;37m| ";
+			cout << message;
+			cout << " |";
+
+			cout << "\033[B\033[" << x << "G|";
+			if(choice)
+			{
+				cout << " \033[41;37m[Yes]\033[44;37m [No]";
+			}
+			else
+			{
+				cout << " \033[44;37m[Yes] \033[41;37m[No]";
+			}
+			for(size_t col = 9; col < width; col++)
+			{
+				cout << "\033[44;37m ";
+			}
+			cout << "|";
+
+			cout << "\033[B\033[" << x << "G\033[44;37m+";
+			for(size_t col = 0; col < width+2; col++)
+			{
+				cout << "-";
+			}
+			cout << "+\033[0m";
+
+			fflush(stdout);
+			c = getch();
+
+			if(c == 'j' || c == 'l' || c == 'k' || c == 'h' || c == 9)
+				choice = !choice;
+		} while(c != 13);
+
+		return choice;
 	}
 
 	void GUI::gameOver() {
@@ -315,6 +371,8 @@ namespace checkers {
 		cout << "\033[23;1H>\033[K ";
 		cout << "\033[?25h";
 		cin >> command;
+		cout << "\033[23;1H\033[K";
+		cout << "\033[?25l";
 
 		return command;
 	}
@@ -345,7 +403,6 @@ namespace checkers {
 		/*  termattr.c_cc[VMIN] = 1; */ /* uncomment if needed */
 		i = tcsetattr (STDIN_FILENO, TCSANOW, &termattr);
 
-
 		// restore TTY mode
 		tcsetattr (STDIN_FILENO, TCSAFLUSH, &save_termattr);
 		ttystate = RESET;
@@ -354,6 +411,26 @@ namespace checkers {
 			return 0;
 		else
 			return ch;
+	}
+
+	void GUI::shadow(const Board& board, unsigned int from, unsigned int to)
+	{
+		bool king = (board.kings & to) != 0;
+		int x=0, y=0, i=0;
+		while(from != 0)
+		{
+			from = from>>1;
+			i++;
+		}
+		y = ((i/4)+1)*2;
+		x = -((i/4)%2)*4 + ((i-1)%4)*8 + 8;
+		cout << "\033[" << y << ";" << x << "H\033[30;42m";
+		if(king)
+			cout << "WW";
+		else
+			cout << "==";
+		cout << "\033[H";
+		fflush(stdout);
 	}
 
 	void GUI::quit()
