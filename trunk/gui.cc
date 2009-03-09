@@ -141,7 +141,7 @@ namespace checkers {
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Evaluation: " << evaluate(game.board, 0);
+		cout << "\033[32m|\033[0m Evaluation: " << evaluate(game.board);
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37

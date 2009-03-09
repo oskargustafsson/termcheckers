@@ -3,8 +3,10 @@
 
 #include "board.h"
 
+#define ALPHA_WIN 32000
+
 using namespace checkers;
 
-int evaluate(Board& b, int depth);
+int evaluate(Board& b);
 
 #endif

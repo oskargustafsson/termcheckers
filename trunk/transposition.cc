@@ -1,4 +1,5 @@
 #include "transposition.h"
+#include "evaluation.h"
 #include "board.h"
 #include <cstdlib>
 #include <ctime>
@@ -31,6 +32,8 @@ namespace checkers {
 
 	void TranspositionTable::update(Board& board, int depth, int value, int flag)
 	{
+		if(value == ALPHA_WIN || value == -ALPHA_WIN)
+			return;
 		int index = hash(board);
 		Position last_pos = table[index];
 		if(depth > last_pos.depth)
