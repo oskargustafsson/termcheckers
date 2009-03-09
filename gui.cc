@@ -413,26 +413,6 @@ namespace checkers {
 			return ch;
 	}
 
-	void GUI::shadow(const Board& board, unsigned int from, unsigned int to)
-	{
-		bool king = (board.kings & to) != 0;
-		int x=0, y=0, i=0;
-		while(from != 0)
-		{
-			from = from>>1;
-			i++;
-		}
-		y = ((i/4)+1)*2;
-		x = -((i/4)%2)*4 + ((i-1)%4)*8 + 8;
-		cout << "\033[" << y << ";" << x << "H\033[30;42m";
-		if(king)
-			cout << "WW";
-		else
-			cout << "==";
-		cout << "\033[H";
-		fflush(stdout);
-	}
-
 	void GUI::quit()
 	{
 		cout << "\033[0m\033[23;0H";

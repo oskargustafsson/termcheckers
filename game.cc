@@ -96,12 +96,11 @@ namespace checkers {
 	bool Game::makeMove(vector<unsigned int>& movements)
 	{
 		ostringstream movestring;
-		int size = movements.size();
 
-		movestring << log2(movements[0])+1;
-		for(int i = 1; i<size; i++)
+		for(size_t i = 0; i<movements.size(); i++)
 		{
-			movestring << "-" << log2(movements[i])+1;
+			if(i > 0) movestring << "-";
+			movestring << log2(movements[i])+1;
 		}
 
 		int result = board.validateMove(movements);
@@ -119,25 +118,12 @@ namespace checkers {
 
 			gui->println("My move is " + movestring.str());
 
-			if(board.getCaptureMoves(movements[0]) == 0)
+			for(size_t i=1; i<movements.size(); i++)
 			{
-				board.move(movements[0], movements[1]);
-			}
-			else
-			{
-				vector<unsigned int> tmp;
-				for(size_t i=1; i<movements.size(); i++)
-				{
-					tmp.clear();
-					recursiveCapture(board, movements[i-1], movements[i], tmp);
-					tmp.push_back(movements[i-1]);
-					for(size_t j=tmp.size()-1; j>0; j--)
-					{
-						board.move(tmp[j], tmp[j-1]);
-						gui->printBoard(board);
-						usleep(300000);
-					}
-				}
+				board.move(movements[i-1], movements[i]);
+				gui->printBoard(board);
+				if(i < movements.size()-1)
+					usleep(300000);
 			}
 			board.updateKings();
 			board.changePlayer();

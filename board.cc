@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <queue>
+#include <algorithm>
 #include "board.h"
 
 namespace checkers {
@@ -187,18 +188,27 @@ namespace checkers {
 		kings &= mask;
 	}
 
-	int Board::validateMove(std::vector<unsigned int> movements)
+	int Board::validateMove(std::vector<unsigned int>& movements)
 	{
 		unsigned int moves = 0x0u;
 		unsigned int men = 0x0u;
 
+		std::vector<unsigned int> tmp;
 		unsigned int from = movements[0];
 		unsigned int to = movements[1];
 
 		if(movements.size() < 2)
 			return -3;
 		if(getJumpPieces() != 0x0u)
-			return validateCapture(movements, 0, from);
+		{
+			int result = validateCapture(movements, 0, from, tmp);
+			if(result == 0)
+			{
+				std::reverse(tmp.begin(), tmp.end());
+				movements = tmp;
+			}
+			return result;
+		}
 		if(movements.size() != 2)
 			return -1;
 
@@ -209,7 +219,7 @@ namespace checkers {
 		else return -1;
 	}
 
-	int Board::validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from) {
+	int Board::validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from, std::vector<unsigned int>& tmp) {
 		unsigned int moves = getCaptureMoves(from);
 		int result = -1;
 
@@ -218,7 +228,10 @@ namespace checkers {
 			if(moves != 0)
 				return -2;
 			else
+			{
+				tmp.push_back(from);
 				return 0;
+			}
 		}
 
 		unsigned int to = movements[pos+1];
@@ -227,7 +240,12 @@ namespace checkers {
 		{
 			Board newboard = *this;
 			newboard.move(from, to);
-			return newboard.validateCapture(movements, pos+1, to);
+			result = newboard.validateCapture(movements, pos+1, to, tmp);
+			if(result == 0)
+			{
+				tmp.push_back(from);
+			}
+			return result;
 		}
 		while(moves != 0)
 		{
@@ -235,8 +253,10 @@ namespace checkers {
 			moves &= moves-1;
 			Board newboard = *this;
 			newboard.move(from, to);
-			result = newboard.validateCapture(movements, pos, to);
-			if(result == 0) {
+			result = newboard.validateCapture(movements, pos, to, tmp);
+			if(result == 0)
+			{
+				tmp.push_back(from);
 				return 0;
 			}
 		}
