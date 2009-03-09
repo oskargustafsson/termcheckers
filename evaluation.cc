@@ -7,7 +7,7 @@
 //              BLACK is +              WHITE is -
 using namespace std;
 
-int evaluate(Board& board, int depth) {
+int evaluate(Board& board) {
 		  int score = 0;
 
 		  int black_mvps, black_jmps, white_mvps, white_jmps;
@@ -32,8 +32,8 @@ int evaluate(Board& board, int depth) {
 		  board.changePlayer();
 
 		  // make it good to win
-		  score -= (board.player == BLACK && (black_jmps | black_mvps) == 0) * (32000 - depth);
-		  score += (board.player == WHITE && (white_jmps | white_mvps) == 0) * (32000 - depth);
+		  score -= (board.player == BLACK && (black_jmps | black_mvps) == 0) * ALPHA_WIN;
+		  score += (board.player == WHITE && (white_jmps | white_mvps) == 0) * ALPHA_WIN;
 
 		  // this is a win or loss
 		  if(score != 0) {

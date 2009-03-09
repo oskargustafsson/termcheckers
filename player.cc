@@ -20,13 +20,6 @@ namespace checkers {
 		movement = new std::vector<unsigned int>;
 		capture_movement = new std::vector<unsigned int>;
 		timer = new timer::Timer(TOTAL_TIME);
-#ifdef HISTORY_HEURISTIC
-		for(int a=0; a<32; ++a) {
-			for(int b=0; b<32; ++b) {
-				history[a][b] = 0;
-			}
-		}
-#endif // HISTORY_HEURISTIC
 #ifdef TRANS_TABLE
 		trans_table = new TranspositionTable;
 #endif // TRANS_TABLE
@@ -47,13 +40,21 @@ namespace checkers {
 	{
 		SearchResult result;
 
+#ifdef HISTORY_HEURISTIC
+		for(int a=0; a<32; ++a) {
+			for(int b=0; b<32; ++b) {
+				history[a][b] = 0;
+			}
+		}
+#endif // HISTORY_HEURISTIC
+
 		int value = 0;
 		nrOfNodes = 0;
 		maxdepth = 2;
 		extendedDepth = 0;
-		finished_search = true;
 		time_check = 0;
 		max_time = timer->getMaxTime();
+		finished_search = true;
 
 		timer->startTimer();
 
@@ -85,6 +86,8 @@ namespace checkers {
 					result.extendedDepth = extendedDepth;
 					result.value = value;
 				}
+				if(value == ALPHA_WIN || value == -ALPHA_WIN)
+					break;
 				if(timer->getTime() > max_time/4)
 					finished_search = false;
 			}
@@ -185,7 +188,7 @@ namespace checkers {
 		 *******************************/
 		if(((depth >= maxdepth) && !capture))
 		{
-			alpha = board.player == BLACK ? evaluate(board, depth) : -evaluate(board, depth);
+			alpha = board.player == BLACK ? evaluate(board) : -evaluate(board);
 #ifdef TRANS_TABLE
 			trans_table->update(board, maxdepth-depth, alpha-depth, FLAG_EXACT);
 #endif // TRANS_TABLE
@@ -231,7 +234,8 @@ namespace checkers {
 		// Might evaluate quicker here
 		if(movecount == 0)
 		{
-			return board.player == BLACK ? evaluate(board, depth) : -evaluate(board, depth);
+			alpha = board.player == BLACK ? evaluate(board) : -evaluate(board);
+			return alpha;
 		}
 
 		/*****************
@@ -276,6 +280,10 @@ namespace checkers {
 				{
 					newBestMove(board, from, to);
 				}
+				if(alpha == ALPHA_WIN)
+				{
+					return alpha;
+				}
 				if(alpha >= beta)
 				{
 #ifdef TRANS_TABLE
@@ -294,17 +302,14 @@ namespace checkers {
 		}
 
 #ifdef HISTORY_HEURISTIC
-		history[bitToDec(best_from)][bitToDec(best_to)] += depth*depth;
+		history[bitToDec(best_from)][bitToDec(best_to)] += maxdepth*maxdepth;
 #endif // HISTORY_HEURISTIC
 
 #ifdef TRANS_TABLE
 		/*********************************
 		 * UPDATE THE TRANSPOSITION TABLE
 		 *********************************/
-		trans_alpha = alpha;
-		if(hash_flag == FLAG_EXACT)
-			trans_alpha += depth;
-		trans_table->update(board, maxdepth-depth, trans_alpha, hash_flag);
+		trans_table->update(board, maxdepth-depth, alpha, hash_flag);
 #endif // TRANS_TABLE 
 
 		return alpha;
