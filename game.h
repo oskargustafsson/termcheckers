@@ -7,13 +7,15 @@
 #include <vector>
 #include <string>
 
-#define NOT_PLAYING 0
-#define PLAYING 1
-#define QUIT 2
+#define PLAYING 0
+#define BLACK_WON 1
+#define WHITE_WON 2
+#define QUIT 3
 
 #define TOTAL_TIME 300000000
 
-namespace checkers {
+namespace checkers
+{
 	class GUI;
 	class Player;
 
@@ -26,7 +28,8 @@ namespace checkers {
 		std::vector<unsigned int> move;
 	};
 
-	class Game {
+	class Game
+	{
 		public:
 			Game(Board&, GUI*);
 			~Game();
@@ -39,10 +42,11 @@ namespace checkers {
 			int move_count;
 			SearchResult lastMove;
 
+			int state;
 			Player* black;
 			Player* white;
 		private:
-			int recursiveCapture(Board tmpboard, unsigned int from, unsigned int to);
+			int recursiveCapture(Board, unsigned int from, unsigned int to, std::vector<unsigned int>&);
 			void ai();
 			bool undo();
 			void updateBoardHistory(Board&, Board&);
