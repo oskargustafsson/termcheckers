@@ -32,8 +32,8 @@ namespace checkers {
 
 		inline bool empty(unsigned int piece);
 
-		int validateMove(std::vector<unsigned int> movements);
-		int validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from);
+		int validateMove(std::vector<unsigned int>& movements);
+		int validateCapture(std::vector<unsigned int> movements, unsigned int pos, unsigned int from, std::vector<unsigned int>&);
 
 		void updateKings();
 

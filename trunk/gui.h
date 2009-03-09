@@ -28,7 +28,6 @@ namespace checkers {
 			void messagebox(std::string);
 			void quit();
 			void gameOver();
-			void shadow(const Board&, unsigned int, unsigned int);
 			std::string input();
 
 		private:
