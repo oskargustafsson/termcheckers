@@ -11,35 +11,47 @@
 #include "board.h"
 #include "gui.h"
 #include "functions.h"
+#include "move.h"
 
 using namespace std;
 
 namespace checkers {
 
-	Game::Game(Board& b, GUI* g) : board(b), gui(g)
+	Game::Game(Board& board, GUI* g) : gui(g)
 	{
 		black = new Player(this);
 		white = new Player(this);
 
-		state = PLAYING;
-
 		board_count = 0;		// put elsewhere?
-		move_count = 0;
 
-		lastMove.nodes = 0;
-		lastMove.time = 0;
-		lastMove.value = 0;
-		lastMove.extendedDepth = 0;
-		lastMove.depth = 0;
+		state.board = board;
+		state.action = PLAYING;
+		state.move_count = 0;
+		state.moves_since_capture = 0;
+		state.moves_since_man = 0;
+		state.black_time = 0;
+		state.white_time = 0;
 
-		gui->printBoard(board);
-		gui->printInfo(*this);
+		gui->printBoard(state.board);
+		gui->gameInfo(state);
+//		gui->moveInfo(last_move);
 		gui->printLog();
 
-		while(state == PLAYING)
+		while(state.action == PLAYING)
 		{
 			interpretCommand(gui->input());
-			gui->printInfo(*this);
+
+			if(state.action == DRAW)
+			{
+				if(gui->dialogbox("DRAW! Coninue?"))
+				{
+					state.action = PLAYING;
+					state.moves_since_man = 0;
+					state.moves_since_capture = 0;
+					board_count = 0;
+				}
+				gui->printBoard(state.board);
+			}
 		}
 	}
 
@@ -53,12 +65,12 @@ namespace checkers {
 		int size = 0;
 		if((size = isMovement(command)) != 0)
 		{
-			vector<unsigned int> movement = parseMovement(command);
-			makeMove(movement);
+			Move move(command);
+			makeMove(move);
 		}
 		else if(command == "help")
 		{
-			gui->println("Commands: help, ai, undo, skip, quit");
+			gui->println("Commands: help, ai, undo, skip, save, quit");
 		}
 		else if(command == "ai")
 		{
@@ -77,15 +89,25 @@ namespace checkers {
 		}
 		else if(command == "skip")
 		{
-			board.changePlayer();
+			state.board.changePlayer();
 			gui->println("Skiping turn.");
+			gui->gameInfo(state);
+		}
+		else if(command == "save")
+		{
+			gui->println("Filename:");
+			std::string filename = "tests/" + gui->input();
+			if(state.board.save(filename.c_str()))
+				gui->println("Game saved.");
+			else
+				gui->println("Failed to save the game!");
 		}
 		else if(command == "quit")
 		{
 			if(gui->dialogbox("Really quit?"))
-				state = QUIT;
+				state.action = QUIT;
 			else
-				gui->printBoard(board);
+				gui->printBoard(state.board);
 		}
 		else
 		{
@@ -93,17 +115,12 @@ namespace checkers {
 		}
 	}
 
-	bool Game::makeMove(vector<unsigned int>& movements)
+	bool Game::makeMove(Move& move)
 	{
 		ostringstream movestring;
+		int result = move.validate(state.board);
+		movestring << move;
 
-		for(size_t i = 0; i<movements.size(); i++)
-		{
-			if(i > 0) movestring << "-";
-			movestring << log2(movements[i])+1;
-		}
-
-		int result = board.validateMove(movements);
 		/////////////////////
 		// result:
 		// 0 Legal move.
@@ -113,31 +130,25 @@ namespace checkers {
 		//////////////////
 		if(result == 0)
 		{
-			if(!history.empty()) updateBoardHistory(board, history.top());
-			history.push(board);
+			Board newboard = state.board;
+			if(!history.empty())
+			{
+				updateBoardHistory(state.board, history.top().first.board);
+			}
+			history.push(make_pair(state, last_move));
 
 			gui->println("My move is " + movestring.str());
 
-			for(size_t i=1; i<movements.size(); i++)
+			while(move.makeNext(newboard))
 			{
-				board.move(movements[i-1], movements[i]);
-				gui->printBoard(board);
-				if(i < movements.size()-1)
-					usleep(300000);
+				usleep(300000);
+				gui->printBoard(newboard);
 			}
-			board.updateKings();
-			board.changePlayer();
-			move_count++;
+			newboard.updateKings();
+			newboard.changePlayer();
+			gui->printBoard(newboard);
 
-			gui->printBoard(board);
-
-			if(board.endOfGame())
-			{
-				if(board.black == 0)
-					state = WHITE_WON;
-				else
-					state = BLACK_WON;
-			}
+			updateState(newboard, move);
 		}
 		else if(result == -1) {
 			gui->println("\033[31mIllegal move: " + movestring.str() + "\033[0m");
@@ -150,6 +161,49 @@ namespace checkers {
 		}
 
 		return result == 0;
+	}
+
+	void Game::updateState(const Board& newboard, const Move& move)
+	{
+		state.move_count++;
+
+		if(state.board.player == BLACK)
+			state.black_time += move.time;
+		else
+			state.white_time += move.time;
+
+		if(((state.board.black | state.board.white) & ~state.board.kings & move.first()) != 0)
+			state.moves_since_man=0;
+		else
+			state.moves_since_man++;
+		if(state.board.getCaptureMoves() != 0)
+			state.moves_since_capture = 0;
+		else
+			state.moves_since_capture++;
+
+		state.board = newboard;
+		last_move = move;
+
+		if(state.moves_since_capture > 40 && state.moves_since_man > 40)
+		{
+			gui->println("40 moves since last capture or man move.");
+			state.action = DRAW;
+		}
+		if(countHistoryMatches(state.board) >= 3)
+		{
+			gui->println("This is the third time for this position.");
+			state.action = DRAW;
+		}
+
+		if(state.board.endOfGame())
+		{
+			if((state.board.getCaptureMoves(state.board.black) | state.board.getMoves(state.board.black)) == 0)
+				state.action = WHITE_WON;
+			else
+				state.action = BLACK_WON;
+		}
+
+		gui->gameInfo(state);
 	}
 
 	void Game::updateBoardHistory(Board& newboard, Board& lastboard) {
@@ -168,46 +222,25 @@ namespace checkers {
 		return count;
 	}
 
-	int Game::recursiveCapture(Board tmpboard, unsigned int from, unsigned int to, vector<unsigned int>& movements) {
-		unsigned int moves = tmpboard.getCaptureMoves(from);
-		unsigned int capture = 0x0u;
-		Board test;
-		while(moves != 0) {
-			capture = (moves & (moves-1)) ^ moves;
-			moves &= moves-1;
-			test = tmpboard;
-
-			test.move(from, capture);
-
-			if(capture == to) {
-				movements.push_back(to);
-				return 0;
-			}
-			if(recursiveCapture(test, capture, to, movements) == 0) {
-				movements.push_back(capture);
-				return 0;
-			}
-		}
-		return -1;
-	}
-
 	void Game::ai() {
 		Player* p;
-		board.player == BLACK ? p = black : p = white;
+		state.board.player == BLACK ? p = black : p = white;
 		gui->println("Im thinking...");
 		SearchResult result = p->search();
+
+		gui->moveInfo(result);
 		makeMove(result.move);
-		lastMove = result;
 	}
 
 	bool Game::undo() {
 		if(history.empty()) {
 			return false;
 		} else {
-			board = history.top();
+			state = history.top().first;
+			last_move = history.top().second;
 			history.pop();
-			move_count--;
-			gui->printBoard(board);
+			gui->printBoard(state.board);
+			gui->gameInfo(state);
 			return true;
 		}
 	}
@@ -232,27 +265,5 @@ namespace checkers {
 			result = 0;
 		}
 		return result;
-	}
-
-	vector<unsigned int> Game::parseMovement(string line) {
-		string::iterator It = line.begin();
-		int i=0;
-		vector<unsigned int> movement;
-		string tmpstr;
-
-		while( It != line.end()) {
-			if(*It == '-') {
-				movement.push_back(static_cast<unsigned int>(pow(2.0, atof(tmpstr.c_str())-1)));
-				tmpstr = "";
-				i++;
-				It++;
-				continue;
-			}
-			tmpstr += *It;
-			It++;
-		}
-		movement.push_back(static_cast<unsigned int>(pow(2.0, atof(tmpstr.c_str())-1)));
-
-		return movement;
 	}
 }

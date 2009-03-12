@@ -8,7 +8,7 @@ CXX       = g++
 CXXFLAGS  = -pipe -O3 -Wall -W -ansi -pedantic-errors
 CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 #CXXFLAGS += -lcurses
-CXXFLAGS += -g
+#CXXFLAGS += -g
 #CXXFLAGS += -pg
 #CXXFLAGS += -floop-optimize2
 
@@ -22,7 +22,7 @@ PROG = lennart
 all: $(PROG)
 
 .PHONY: debug
-debug: main.o board.o game.o gui.o player.o evaluation.o timer.o transposition.o functions.o
+debug: main.o board.o game.o gui.o player.o evaluation.o timer.o transposition.o functions.o move.o
 	$(CXX) -ggdb -pg -o $@ $^
 
 .PHONY: clean
@@ -30,7 +30,7 @@ clean:
 	rm *.o -f
 
 # Linking:
-lennart: main.o board.o game.o gui.o player.o evaluation.o timer.o transposition.o functions.o
+lennart: main.o board.o game.o gui.o player.o evaluation.o timer.o transposition.o functions.o move.o
 	$(CXX) -o $@ $^
 
 # Dependencies, the implicit rule .cc => .o is used
@@ -43,3 +43,4 @@ game.o: game.h game.cc
 gui.o: gui.h gui.cc
 transposition.o: transposition.h transposition.cc
 functions.o: functions.h functions.cc
+move.o: move.h move.cc

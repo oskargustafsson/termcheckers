@@ -20,7 +20,7 @@ namespace timer {
 			int getTime(); //mellantid
 			int getUsedTime();
 
-			int getMaxTime();
+			int getMaxTime(int);
 			int getTotalTime();
 
 			/*starting and stopping timer */
@@ -28,7 +28,7 @@ namespace timer {
 			int stopTimer(); //returns used time
 
 		private:
-			int max, used, start, stop;
+			int max, start, stop;
 
 	};
 }

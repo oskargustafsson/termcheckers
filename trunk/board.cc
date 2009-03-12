@@ -76,6 +76,34 @@ namespace checkers {
 		return false;
 	}
 
+	bool Board::save(const char* file)
+	{
+		std::ofstream os;
+		os.open(file);
+		if(os != NULL)
+		{
+			unsigned int piece = 1;
+			while(piece != 0)
+			{
+				if(piece & black & kings)
+					os << 'B';
+				else if(piece & black)
+					os << 'b';
+				else if(piece & white & kings)
+					os << 'W';
+				else if(piece & white)
+					os << 'w';
+				else
+					os << '.';
+				piece = piece<<1;
+			}
+			player == BLACK ? os << 'b' : os << 'w';
+			os.close();
+			return true;
+		}
+		return false;
+	}
+
 	unsigned int Board::getCaptureMoves(unsigned int piece)
 	{
 		unsigned int moves = 0x0u;
@@ -160,7 +188,6 @@ namespace checkers {
 	bool Board::endOfGame() {
 		return ( getJumpPieces() | getMovePieces() ) == 0;
 	}
-
 
 	void Board::move(unsigned int from, unsigned int to) {
 		// regular move

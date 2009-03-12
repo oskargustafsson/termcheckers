@@ -3,10 +3,9 @@
 
 #include <vector>
 
-#define WHITE 0x0
-#define BLACK 0x1
-
 namespace checkers {
+
+	enum PLAYER { WHITE, BLACK };
 
 	class Board {
 
@@ -16,9 +15,10 @@ namespace checkers {
 		unsigned int black;
 		unsigned int white;
 		unsigned int kings;
-		bool player; // WHITE=0, BLACK=1
+		PLAYER player;
 
 		bool load(const char* file);
+		bool save(const char* file);
 		void new_board();
 		unsigned int getCaptureMoves(unsigned int piece);
 		unsigned int getCaptureMoves();

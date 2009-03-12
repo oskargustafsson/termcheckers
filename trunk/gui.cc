@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "game.h"
 #include "board.h"
+#include "player.h"
 #include "functions.h"
 
 using namespace std;
@@ -19,6 +20,7 @@ namespace checkers {
 	{
 		clearScreen();
 		cout << "\033[?25l";
+		println("Welcome to lennart!");
 	}
 
 	GUI::~GUI() {
@@ -79,7 +81,48 @@ namespace checkers {
 		cout << "\033[23;3H";
 	}
 
-	void GUI::printInfo(Game& game)
+	void GUI::mark(const Board& board, unsigned int pieces)
+	{
+		unsigned int bit = 1;
+		int i = 0;
+		while(bit != 0)
+		{
+			if((pieces & bit) != 0)
+			{
+				int y = 2*(i/4)+2;
+				int x = ((i)%4)*8 - ((i/4)%2)*4 + 7;
+
+				cout << "\033[" << y << ";" << x << "H";
+				cout << "\033[46m ";
+				if(board.black & bit)
+				{
+					cout << "\033[31;1m";
+					if(board.kings & bit)
+						cout << "WW";
+					else
+						cout << "==";
+				}
+				else if(board.white & bit)
+				{
+					cout << "\033[37;1m";
+					if(board.kings & bit)
+						cout << "WW";
+					else
+						cout << "==";
+				}
+				else
+				{
+					cout << "  ";
+				}
+				cout << " \033[0m";
+				printf("\n\033[46;30m\033[%dG %2d \033[0m", x, i+1);
+			}
+			bit = bit<<1;
+			i++;
+		}
+	}
+
+	void GUI::gameInfo(GameState& state)
 	{
 		cout << "\033[2;37H"; // place cursor at position 2x37
 
@@ -90,85 +133,91 @@ namespace checkers {
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m|\033[0m ";
-		if(game.board.player == BLACK) {
+		if(state.board.player == BLACK) {
 			cout << "\033[36m";
 		}
-		cout << "Black (" << game.black->getTime()/1000000 << " sec)\033[0m";
+		cout << "Black (" << state.black_time/1000000.0 << " sec)\033[0m";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m|\033[0m ";
-		if(game.board.player == WHITE) {
+		if(state.board.player == WHITE) {
 			cout << "\033[36m";
 		}
-		cout << "White (" << game.white->getTime()/1000000 << " sec)\033[0m";
+		cout << "White (" << state.white_time/1000000.0 << " sec)\033[0m";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m";
+		cout << "\033[32m|\033[0m Move #: " << state.move_count;
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G\033[K";
-		cout << "\033[32m|\033[0m Move #: " << game.move_count;
+		cout << "\033[32m|\033[0m Moves since man: " << state.moves_since_man;
+		cout << "\033[32m\033[68G|\033[0m\033[1B";
+
+		cout << "\033[37G"; // set cursor at column 37
+		cout << "\033[K"; // clear the line
+		cout << "\033[32m|\033[0m Moves since capture: " << state.moves_since_capture;
+		cout << "\033[32m\033[68G|\033[0m\033[1B";
+
+		cout << "\033[37G"; // set cursor at column 37
+		cout << "\033[K"; // clear the line
+		cout << "\033[32m|\033[0m Evaluation: " << evaluate(state.board);
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m|\033[0m";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
+	}
 
-		cout << "\033[37G"; // set cursor at column 37
+	void GUI::moveInfo(SearchResult& result)
+	{
+		cout << "\033[10;37H"; // set cursor at row 8 column 37
+
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m+-< Last move >----------------+\033[0m";
 		cout << "\033[1B"; // move cursor down
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Alphabeta value: " << game.lastMove.value;
+		cout << "\033[32m|\033[0m " << result.move;
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Extended depth: " << game.lastMove.extendedDepth;
+		cout << "\033[32m|\033[0m Alphabeta value: " << result.value;
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Calculation depth: " << game.lastMove.depth;
+		cout << "\033[32m|\033[0m Calculation depth: " << result.depth;
+		cout << " (" << result.extDepth << ")";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Evaluation: " << evaluate(game.board);
-		cout << "\033[32m\033[68G|\033[0m\033[1B";
-
-		cout << "\033[37G"; // set cursor at column 37
-		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m Nodes visited: " << game.lastMove.nodes;
+		cout << "\033[32m|\033[0m Nodes visited: " << result.nodes;
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m|\033[0m Calculation time: ";
-		cout << (game.lastMove.time)/1000000;
+		cout << (result.move.time)/1000000.0;
 		cout << " sec";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
-		cout << "\033[32m|\033[0m";
+		cout << "\033[32m|\033[0m NPS: " << result.nodes / (result.move.time/ 1000000.0);
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
 
 		cout << "\033[37G"; // set cursor at column 37
 		cout << "\033[K"; // clear the line
 		cout << "\033[32m|\033[0m";
 		cout << "\033[32m\033[68G|\033[0m\033[1B";
-
-		cout << "\033[37G"; // set cursor at column 37
-		cout << "\033[K"; // clear the line
-		cout << "\033[32m+------------------------------+\033[0m";
 	}
 
 	void GUI::printLog()
@@ -200,18 +249,6 @@ namespace checkers {
 			}
 		}
 		printf("\n");
-	}
-
-	void GUI::printWelcome()
-	{
-		cout << "\033[2;1H";
-		cout << "        _                                _\n";
-		cout << "       | |    ___ _ __  _ __   __ _ _ __| |_\n";
-		cout << "       | |   / _ \\ '_ \\| '_ \\ / _` | '__| __|\n";
-		cout << "       | |__|  __/ | | | | | | (_| | |  | |_\n";
-		cout << "       |_____\\___|_| |_|_| |_|\\__,_|_|   \\__|\n";
-		cout << "\n\n\n";
-		cout << " Authors: Johan Ask, Linus Probert and Oskar Gustafsson.\n";
 	}
 
 	void GUI::println(string str)
@@ -416,5 +453,73 @@ namespace checkers {
 	void GUI::quit()
 	{
 		cout << "\033[0m\033[23;0H";
+	}
+
+	void GUI::edit(Board& board)
+	{
+		char c;
+		unsigned int pos = 1;
+		unsigned int tmp = 0;
+
+		clearScreen();
+		do 
+		{
+			printBoard(board);
+			mark(board, pos);
+			cout << "\033[19;H";
+			cout << "   h: left, j: down, k: up, l: right\n";
+			cout << "   w: white, W: white king, b: black, B: black king\n";
+			cout << "   Space clear square\n";
+			cout << "   Press enter to quit";
+
+			fflush(stdout);
+			c = getch();
+
+			if(c == 'j')
+				tmp = (pos & 0x0FFFFFFF)<<4;
+			else if(c == 'k')
+				tmp = (pos & 0xFFFFFFF0)>>4;
+			else if(c == 'l')
+				tmp = (pos & 0x77777777)<<1;
+			else if(c == 'h')
+				tmp = (pos & 0xEEEEEEEE)>>1;
+			else if(c == 'b')
+			{
+				board.black |= pos;
+				board.white &= ~pos;
+				board.kings &= ~pos;
+			}
+			else if(c == 'B')
+			{
+				board.black |= pos;
+				board.white &= ~pos;
+				board.kings |= pos;
+			}
+			else if(c == 'w')
+			{
+				board.black &= ~pos;
+				board.white |= pos;
+				board.kings &= ~pos;
+			}
+			else if(c == 'W')
+			{
+				board.black &= ~pos;
+				board.white |= pos;
+				board.kings |= pos;
+			}
+			else if(c == ' ')
+			{
+				board.black &= ~pos;
+				board.white &= ~pos;
+				board.kings &= ~pos;
+			}
+
+			if(tmp != 0)
+			{
+				pos = tmp;
+				tmp = 0;
+			}
+
+		} while(c != 13);
 	}
 }

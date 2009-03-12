@@ -10,6 +10,7 @@
 
 namespace checkers {
 
+	class Player;
 	class Game;
 
 	class GUI {
@@ -19,19 +20,21 @@ namespace checkers {
 
 			void clearScreen();
 			void printBoard(const Board&);
+			void mark(const Board&, unsigned int);
 			static void printInt(unsigned int b);
 			void printLog();
-			void printInfo(Game&);
+			void gameInfo(GameState&);
+			void moveInfo(SearchResult&);
 			void println(std::string);
 			int menu(std::string[], int);
 			bool dialogbox(std::string);
 			void messagebox(std::string);
+			void edit(Board&);
 			void quit();
 			void gameOver();
 			std::string input();
 
 		private:
-			void printWelcome();
 			unsigned char getch();
 
 			Game* game;

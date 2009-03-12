@@ -21,6 +21,7 @@ namespace checkers {
 		int depth;
 		int value;
 		int flag;
+		int movecount;
 		Board board;
 	};
 
@@ -29,12 +30,19 @@ namespace checkers {
 		public:
 			TranspositionTable();
 			~TranspositionTable();
-			void update(Board& board, int depth, int value, int flag);
+			void update(Board& board, int depth, int value, int flag, int movecount);
 			int get(Board& board, int depth, int alpha, int beta);
+			// debug values:
+			int new_values;
+			int collisions;
+			int no_updates;
+			int used_values;
+			int total_get;
+			int size;
 		private:
 			inline unsigned int hash(Board& board);
 
-			unsigned int bitstrings[161];
+			unsigned int zobristvalues[161];
 			Position* table;
 	};
 }
