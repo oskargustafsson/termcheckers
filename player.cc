@@ -12,6 +12,7 @@
 #include "functions.h"
 #include "transposition.h"
 #include "game.h"
+#include "move.h"
 
 namespace checkers {
 
@@ -38,7 +39,18 @@ namespace checkers {
 
 	SearchResult Player::search()
 	{
+		Move move;
 		SearchResult result;
+		Board board = game->state.board;
+		nrOfNodes = 0;
+		maxdepth = 2;
+		extDepth = 0;
+		time_check = 0;
+
+		Board newboard;
+		movement->clear();
+		capture_movement->clear();
+		timeout = false; 
 
 #ifdef HISTORY_HEURISTIC
 		for(int a=0; a<32; ++a) {
@@ -48,59 +60,59 @@ namespace checkers {
 		}
 #endif // HISTORY_HEURISTIC
 
-		int value = 0;
-		nrOfNodes = 0;
-		maxdepth = 2;
-		extendedDepth = 0;
-		time_check = 0;
-		max_time = timer->getMaxTime();
-		finished_search = true;
+		if(board.player == BLACK)
+			max_time = timer->getMaxTime(game->state.black_time);
+		else
+			max_time = timer->getMaxTime(game->state.white_time);
 
 		timer->startTimer();
 
-		Board newboard;
-		movement->clear();
-		capture_movement->clear();
-		if(newboard == game->board) {
+		if(newboard == board) {
 			movement->push_back(0x400);
 			movement->push_back(0x4000);
-			result.move = *movement;
-			result.time = 0;
-			result.value = 0;
-			result.extendedDepth = 0;
-			result.nodes = 0;
-			result.depth = 0;
-			return result;
+			move = *movement;
 		}
-		if(!singleJump(game->board))
+		else if(!singleJump(board))
 		{
-			while(finished_search)
+			int value = 0;
+			while(!timeout)
 			{
 				maxdepth++;
-				value = alphabeta(game->board, 0, -999999, 999999);
-				if(finished_search)
-				{
-					std::reverse(movement->begin(), movement->end());
-					result.move = *movement;
-					result.depth = maxdepth;
-					result.extendedDepth = extendedDepth;
+				value = alphabeta(board, 0, -ALPHA_MAX, ALPHA_MAX);
+
+				std::reverse(movement->begin(), movement->end());
+				move = *movement;
+
+				result.depth = maxdepth;
+				result.extDepth = extDepth;
+				result.nodes = nrOfNodes;
+				if(value != ALPHA_MAX)
 					result.value = value;
-				}
 				if(value == ALPHA_WIN || value == -ALPHA_WIN)
 					break;
 				if(timer->getTime() > max_time/4)
-					finished_search = false;
+					timeout = true;
 			}
 		}
 		else {
-			result.move = *movement;
-			result.depth = 0;
-			result.extendedDepth = extendedDepth;
-			result.value = value;
+			move = *movement;
 		}
 
-		result.time = timer->stopTimer();
-		result.nodes = nrOfNodes;
+		move.time = timer->stopTimer();
+		result.move = move;
+
+		std::cout << "\033[29;1HTransposition debug:";
+		std::cout << "\n\033[KCollisions: " << trans_table->collisions;
+		std::cout << "\n\033[KTotal get: " << trans_table->total_get;
+		std::cout << "\n\033[KUpdates: " << trans_table->new_values;
+		std::cout << "\n\033[KNot updated: " << trans_table->no_updates;
+		std::cout << "\n\033[KUsed values: " << trans_table->used_values;
+		std::cout << "\n\033[KSize: " << trans_table->size;
+		trans_table->collisions = 0;
+		trans_table->total_get = 0;
+		trans_table->new_values = 0;
+		trans_table->no_updates = 0;
+		trans_table->used_values = 0;
 
 		return result;
 	}
@@ -131,11 +143,11 @@ namespace checkers {
 		{
 			if(timer->getTime() > max_time)
 			{
-				finished_search = false;
+				timeout = true;
 			}
 			time_check = 0;
 		}
-		if(!finished_search)
+		if(timeout)
 		{
 			return alpha;
 		}
@@ -143,9 +155,8 @@ namespace checkers {
 
 		nrOfNodes++;
 
-		if(depth > extendedDepth)
-			extendedDepth = depth;
-
+		if(depth > extDepth)
+			extDepth = depth;
 
 		/*************************
 		 * CHECK FOR 3-STEPS DRAW
@@ -154,8 +165,6 @@ namespace checkers {
 		{
 			return 200;
 		}
-
-
 
 #ifdef TRANS_TABLE
 		/******************************
@@ -190,7 +199,7 @@ namespace checkers {
 		{
 			alpha = board.player == BLACK ? evaluate(board) : -evaluate(board);
 #ifdef TRANS_TABLE
-			trans_table->update(board, maxdepth-depth, alpha-depth, FLAG_EXACT);
+			trans_table->update(board, maxdepth-depth, alpha-depth, FLAG_EXACT, game->state.move_count+depth);
 #endif // TRANS_TABLE
 			return alpha;
 		}
@@ -217,7 +226,10 @@ namespace checkers {
 				moves &= moves-1;
 
 #ifdef HISTORY_HEURISTIC
-				insertMove(movelist, movevalues, from, to, history[bitToDec(from)][bitToDec(to)], movecount);
+				if(depth == 0 && movement->size() >=2 && movement->back() == to)
+					insertMove(movelist, movevalues, from, to, 99999, movecount);
+				else
+					insertMove(movelist, movevalues, from, to, history[bitToDec(from)][bitToDec(to)], movecount);
 #else
 				movelist[movecount<<1] = from;
 				movelist[(movecount<<1)+1] = to;
@@ -287,7 +299,7 @@ namespace checkers {
 				if(alpha >= beta)
 				{
 #ifdef TRANS_TABLE
-					trans_table->update(board, maxdepth-depth, beta, FLAG_BETA);
+					trans_table->update(board, maxdepth-depth, beta, FLAG_BETA, game->state.move_count+depth);
 #endif // TRANS_TABLE
 					return beta;
 				}
@@ -309,7 +321,7 @@ namespace checkers {
 		/*********************************
 		 * UPDATE THE TRANSPOSITION TABLE
 		 *********************************/
-		trans_table->update(board, maxdepth-depth, alpha, hash_flag);
+		trans_table->update(board, maxdepth-depth, alpha, hash_flag, game->state.move_count+depth);
 #endif // TRANS_TABLE 
 
 		return alpha;
@@ -324,7 +336,7 @@ namespace checkers {
 		int nrOfMoves = countBits(moves);
 		unsigned int moveTo = 0x0u;
 		unsigned int to = 0x0u;
-		int tmp;
+		int tmp = 0;
 
 		if(moves == 0) {
 			Board nextboard = board;
@@ -354,7 +366,8 @@ namespace checkers {
 			}
 		}
 
-		if((nrOfMoves > 1) && (depth == 0) && (capture_movement->back() != moveTo)) {
+		if((nrOfMoves > 1) && (depth == 0) && (capture_movement->back() != moveTo) && moveTo != 0)
+		{
 			capture_movement->push_back(moveTo);
 		}
 
@@ -437,10 +450,5 @@ namespace checkers {
 			swap(movelist, movevalues, pos+1, pos);
 			pos--;
 		}
-	}
-
-	int Player::getTime()
-	{
-		return timer->getTotalTime();
 	}
 }

@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include "timer.h"
+#include "move.h"
 #include <vector>
 
 // DEFINE WHAT OPTIMIZATIONS TO USE:
@@ -12,8 +13,18 @@
 
 namespace checkers {
 	class TranspositionTable;
-	struct SearchResult;
 	class Game;
+	class Move;
+
+	struct SearchResult
+	{
+		SearchResult() : nodes(0),depth(0),extDepth(0),value(0) {};
+		Move move;
+		int nodes;
+		int depth;
+		int extDepth;
+		int value;
+	};
 
 	class Player {
 		public:
@@ -21,7 +32,6 @@ namespace checkers {
 			~Player();
 
 			SearchResult search();
-			int getTime();
 		private:
 			Game* game;
 			int alphabeta(Board& b, int depth, int alpha, int beta);
@@ -38,8 +48,8 @@ namespace checkers {
 
 			int maxdepth;
 			int nrOfNodes;
-			int extendedDepth;
-			bool finished_search;
+			int extDepth;
+			bool timeout;
 			int time_check;
 			int max_time;
 #ifdef HISTORY_HEURISTIC

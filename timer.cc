@@ -6,7 +6,7 @@
 
 namespace timer {
 
-	Timer::Timer(int t) : max(t), used(0) {}
+	Timer::Timer(int t) : max(t) {}
 
 	Timer::~Timer() {}
 
@@ -16,7 +16,6 @@ namespace timer {
 
 	int Timer::stopTimer() {
 		stop = clock();
-		used += stop-start;
 		return stop-start;
 	}
 
@@ -25,12 +24,7 @@ namespace timer {
 		return tmp - start;
 	}
 
-	int Timer::getTotalTime()
-	{
-		return used;
-	}
-
-	int Timer::getMaxTime()
+	int Timer::getMaxTime(int used)
 	{
 		if(max-used > max/3)
 			return max/30;

@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 			gui->println("Failed");
 	}
 
-	std::string mainmenu[] = {"Play", "New game", "Load game", "Options", "Quit"};
+	std::string mainmenu[] = {"Play", "New game", "Load game", "Edit board", "Options", "Quit"};
 	gui->println("Use j and k to navigate the menu.");
 	while(!quit)
 	{
@@ -27,18 +27,21 @@ int main(int argc, char* argv[]) {
 		gui->printBoard(board);
 		gui->printLog();
 
-		switch(gui->menu(mainmenu, 5))
+		switch(gui->menu(mainmenu, 6))
 		{
 			case 0:
 				do
 				{
 					game = new Game(board, gui);
-					if(game->state == BLACK_WON)
+					if(game->state.action == BLACK_WON)
 						gui->println("Black won!");
-					else if(game->state == WHITE_WON)
+					else if(game->state.action == WHITE_WON)
 						gui->println("White won!");
-					else if(game->state == QUIT)
+					else if(game->state.action == QUIT)
+					{
+						delete game;
 						break;
+					}
 					delete game;
 				} while(gui->dialogbox("Play again?"));
 
@@ -55,9 +58,12 @@ int main(int argc, char* argv[]) {
 					gui->println("Couldnt open file.");
 				break;
 			case 3:
-				gui->println("No options available yet.");
+				gui->edit(board);
 				break;
 			case 4:
+				gui->println("No options available yet.");
+				break;
+			case 5:
 				quit = true;
 				gui->quit();
 				break;
