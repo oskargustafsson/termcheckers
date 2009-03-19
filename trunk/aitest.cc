@@ -24,7 +24,7 @@ int main() {
 	int i=0;
 	while(!game->board.endOfGame() && i < 1000) {
 		Search s(*game);
-		SearchResult result = s.search(game->board, 10000000);
+		SearchResult result = s.search(game->board, 1000000);
 		game->makeMove(result.move);
 
 		ostringstream value;

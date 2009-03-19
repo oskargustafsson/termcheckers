@@ -169,6 +169,7 @@ namespace checkers {
 #ifdef TRANS_TABLE
 		/******************************
 		 * CHECK IF THE NODE IS CACHED
+         * TODO: maybe we shouldnt get values at leaf-nodes
 		 ******************************/
 		int hash_flag = FLAG_ALPHA;
 		int trans_alpha;
