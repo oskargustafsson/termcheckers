@@ -10,7 +10,7 @@ CXXFLAGS += -Wmissing-braces -Wparentheses -Wold-style-cast
 #CXXFLAGS += -lcurses
 #CXXFLAGS += -g
 #CXXFLAGS += -pg
-#CXXFLAGS += -floop-optimize2
+CXXFLAGS += -floop-optimize2
 
 
 
