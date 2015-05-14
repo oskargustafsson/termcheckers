@@ -1,0 +1,1 @@
+A checkers game for the Unix terminal, with a computer opponent. Written in C++ originally as a school project.
